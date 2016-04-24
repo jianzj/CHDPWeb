@@ -24,37 +24,37 @@ public class UserService {
 		List<UserAuthority> auths = new ArrayList<UserAuthority>(11);
 		if (user == null)
 			return auths;
-		if ((user.getAuthority() & 1024) == 1) {
+		if ((user.getAuthority() & 1024) > 0) {
 			auths.add(UserAuthority.ADMIN);
 		}
-		if ((user.getAuthority() & 512) == 1) {
+		if ((user.getAuthority() & 512) > 0) {
 			auths.add(UserAuthority.RECEIVE);
 		}
-		if ((user.getAuthority() & 256) == 1) {
+		if ((user.getAuthority() & 256) > 0) {
 			auths.add(UserAuthority.CHECK);
 		}
-		if ((user.getAuthority() & 128) == 1) {
+		if ((user.getAuthority() & 128) > 0) {
 			auths.add(UserAuthority.MIX);
 		}
-		if ((user.getAuthority() & 64) == 1) {
+		if ((user.getAuthority() & 64) > 0) {
 			auths.add(UserAuthority.MIXCHECK);
 		}
-		if ((user.getAuthority() & 32) == 1) {
+		if ((user.getAuthority() & 32) > 0) {
 			auths.add(UserAuthority.SOAK);
 		}
-		if ((user.getAuthority() & 16) == 1) {
+		if ((user.getAuthority() & 16) > 0) {
 			auths.add(UserAuthority.DECOCT);
 		}
-		if ((user.getAuthority() & 8) == 1) {
+		if ((user.getAuthority() & 8) > 0) {
 			auths.add(UserAuthority.POUR);
 		}
-		if ((user.getAuthority() & 4) == 1) {
+		if ((user.getAuthority() & 4) > 0) {
 			auths.add(UserAuthority.CLEAN);
 		}
-		if ((user.getAuthority() & 2) == 1) {
+		if ((user.getAuthority() & 2) > 0) {
 			auths.add(UserAuthority.PACKAGE);
 		}
-		if ((user.getAuthority() & 1) == 1) {
+		if ((user.getAuthority() & 1) > 0) {
 			auths.add(UserAuthority.SHIP);
 		}
 		return auths;

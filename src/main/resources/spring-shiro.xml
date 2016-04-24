@@ -22,7 +22,7 @@
                 /images/** = anon
                 /js/** = anon
                 /templates/** = anon
-                /** = user
+                /** = authc
             </value>
         </property>
     </bean>
