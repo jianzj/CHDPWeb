@@ -1,5 +1,6 @@
 package com.chdp.chdpweb.auth;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -41,7 +42,8 @@ public class ShiroDbRealm extends AuthorizingRealm {
 		User user = userService.getUser(token.getUsername());
 		if (user != null) {
 			AuthenticationInfo authcInfo = new SimpleAuthenticationInfo(user.getUsercode(), user.getPassword(),
-					user.getName());
+					this.getName());
+			SecurityUtils.getSubject().getSession().setAttribute("user", user);
 			return authcInfo;
 		}
 		return null;

@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -54,7 +55,8 @@ body {
 <body>
     <div class="container">
         <form class="form-signin" action="<%=request.getContextPath()%>/user/login" method="POST">
-            <h3 class="form-signin-heading"><strong><center>CHDP - 登录</center></strong></h3>
+            <h3 class="form-signin-heading text-center"><strong>CHDP - 登录</strong></h3>
+            <c:if test="${not empty errorMsg}"><div class="alert alert-danger" role="alert">${errorMsg}</div></c:if>
             <label for="inputUsercode" class="sr-only">工号</label>
             <input type="text" name="usercode" id="inputUsercode" class="form-control" placeholder="工号" required autofocus>
             <label for="inputPassword" class="sr-only">密码</label>

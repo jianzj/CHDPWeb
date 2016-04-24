@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.User;
 import com.chdp.chdpweb.bean.UserAuthority;
 import com.chdp.chdpweb.dao.UserDao;
+import com.github.pagehelper.PageHelper;
 
 @Repository
 public class UserService {
@@ -62,5 +65,33 @@ public class UserService {
 
 	public String encodePassword(String usercode, String password) {
 		return DigestUtils.sha256Hex(usercode + password);
+	}
+
+	public boolean checkPassword(String password) {
+		User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
+		if (user.getPassword().equals(encodePassword(user.getUsercode(), password)))
+			return true;
+		else
+			return false;
+	}
+
+	public boolean changePassword(String password) {
+		User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
+		user.setPassword(encodePassword(user.getUsercode(), password));
+		try {
+			userDao.changePassword(user);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public List<User> getUserList(int pageNum) {
+		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+		try {
+			return userDao.getUserList();
+		} catch (Exception e) {
+			return new ArrayList<User>();
+		}
 	}
 }
