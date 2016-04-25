@@ -23,6 +23,10 @@ public class UserService {
 		return userDao.getUser(usercode);
 	}
 
+	public User getUserById(int id) {
+		return userDao.getUserById(id);
+	}
+
 	public List<UserAuthority> getUserAuthority(User user) {
 		List<UserAuthority> auths = new ArrayList<UserAuthority>(11);
 		if (user == null)
@@ -92,6 +96,45 @@ public class UserService {
 			return userDao.getUserList();
 		} catch (Exception e) {
 			return new ArrayList<User>();
+		}
+	}
+
+	public boolean deleteUser(int userId) {
+		try {
+			userDao.deleteUser(userId);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public boolean resetUserPassword(int userId) {
+		User user = userDao.getUserById(userId);
+		user.setPassword(encodePassword(user.getUsercode(), Constants.DEFAULT_PASSWORD));
+		try {
+			userDao.changePassword(user);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public boolean addUser(User user) {
+		try {
+			user.setPassword(encodePassword(user.getUsercode(), user.getPassword()));
+			userDao.addUser(user);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public boolean updateUser(User user) {
+		try {
+			userDao.updateUser(user);
+			return true;
+		} catch (Exception e) {
+			return false;
 		}
 	}
 }

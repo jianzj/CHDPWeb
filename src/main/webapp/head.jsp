@@ -109,7 +109,7 @@ body {
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("员工维度统计")) out.print("class=\"active\""); %>><a href="">员工维度统计</a></li>
                 </ul>
                 <ul class="nav nav-sidebar">
-                    <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("用户管理")) out.print("class=\"active\""); %>><a href="">用户管理</a></li>
+                    <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("用户管理")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/user/list">用户管理</a></li>
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("配置管理")) out.print("class=\"active\""); %>><a href="">配置管理</a></li>
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("机器管理")) out.print("class=\"active\""); %>><a href="">机器管理</a></li>
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("中药管理")) out.print("class=\"active\""); %>><a href="">中药管理</a></li>

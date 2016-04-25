@@ -5,5 +5,6 @@
 
     <script src="<%=request.getContextPath()%>/js/jquery-1.12.3.min.js"></script>
     <script src="<%=request.getContextPath()%>/js/bootstrap.min.js"></script>
+    <script src="<%=request.getContextPath()%>/js/common.js"></script>
 </body>
 </html>
