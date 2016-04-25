@@ -7,6 +7,8 @@ public class Prescription {
 	private int hospital_id;
 	private String patient_name;
 	private int sex;
+	private int packet_num;
+	private double price;
 	private String create_time;
 	private int class_of_medicines;
 	private int need_decoct_first;
@@ -71,6 +73,22 @@ public class Prescription {
 	
 	public void setSex(int sex){
 		this.sex = sex;
+	}
+	
+	public int getPacket_num(){
+		return packet_num;
+	}
+	
+	public void setPacket_num(int packet_num){
+		this.packet_num = packet_num;
+	}
+	
+	public double getPrice(){
+		return price;
+	}
+	
+	public void setPrice(double price){
+		this.price = price;
 	}
 	
 	public String getCreate_time(){
