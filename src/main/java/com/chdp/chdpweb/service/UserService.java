@@ -94,4 +94,34 @@ public class UserService {
 			return new ArrayList<User>();
 		}
 	}
+
+	public boolean deleteUser(int userId) {
+		try {
+			userDao.deleteUser(userId);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public boolean resetUserPassword(int userId) {
+		User user = userDao.getUserById(userId);
+		user.setPassword(encodePassword(user.getUsercode(), Constants.DEFAULT_PASSWORD));
+		try {
+			userDao.changePassword(user);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public boolean addUser(User user) {
+		try {
+			user.setPassword(encodePassword(user.getUsercode(), user.getPassword()));
+			userDao.addUser(user);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }

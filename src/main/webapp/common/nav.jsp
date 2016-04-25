@@ -12,7 +12,7 @@
 			int start = pageInfo.getPageNum() - 2 >= 1 ? pageInfo.getPageNum() - 2 : 1;
 			int end = start + 4 > pageInfo.getPages() ? pageInfo.getPages() : start + 4;
 			if (end - start < 4)
-				start = end - 4 >= 1 ? end - 4 : start;
+				start = end - 4 >= 1 ? end - 4 : 1;
 			request.setAttribute("start", start);
 			request.setAttribute("end", end);
 		%>
