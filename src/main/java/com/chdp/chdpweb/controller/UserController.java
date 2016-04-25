@@ -178,7 +178,7 @@ public class UserController {
 				| (request.getParameter("authority-4") == null ? 0 : 4)
 				| (request.getParameter("authority-2") == null ? 0 : 2)
 				| (request.getParameter("authority-1") == null ? 0 : 1));
-		
+
 		if (!user.getPassword().equals(rePassword)) {
 			request.setAttribute("errorMsg", "两次密码输入不同");
 		} else {
@@ -193,5 +193,48 @@ public class UserController {
 		}
 		request.setAttribute("userAdd", user);
 		return "user/addUser";
+	}
+
+	@RequiresRoles("ADMIN")
+	@RequestMapping(value = "/modify", method = RequestMethod.GET)
+	public String modify(HttpServletRequest request, @RequestParam(name = "userId") Integer userId) {
+		request.setAttribute("nav", "用户管理");
+		if (userId == null)
+			request.setAttribute("errorMsg", "未知的用户ID");
+		else
+			request.setAttribute("userModify", userService.getUserById(userId));
+
+		return "user/modifyUser";
+	}
+
+	@RequiresRoles("ADMIN")
+	@RequestMapping(value = "/modify", method = RequestMethod.POST)
+	public String modifyPost(HttpServletRequest request, @RequestParam(name = "userId") Integer userId) {
+		request.setAttribute("nav", "用户管理");
+		if (userId == null)
+			request.setAttribute("errorMsg", "未知的用户ID");
+		else {
+			User user = userService.getUserById(userId);
+			user.setName(request.getParameter("name"));
+			user.setAuthority((request.getParameter("authority-1024") == null ? 0 : 1024)
+					| (request.getParameter("authority-512") == null ? 0 : 512)
+					| (request.getParameter("authority-256") == null ? 0 : 256)
+					| (request.getParameter("authority-128") == null ? 0 : 128)
+					| (request.getParameter("authority-64") == null ? 0 : 64)
+					| (request.getParameter("authority-32") == null ? 0 : 32)
+					| (request.getParameter("authority-16") == null ? 0 : 16)
+					| (request.getParameter("authority-8") == null ? 0 : 8)
+					| (request.getParameter("authority-4") == null ? 0 : 4)
+					| (request.getParameter("authority-2") == null ? 0 : 2)
+					| (request.getParameter("authority-1") == null ? 0 : 1));
+
+			if (userService.updateUser(user))
+				request.setAttribute("successMsg", "用户修改成功");
+			else
+				request.setAttribute("errorMsg", "用户修改失败");
+
+			request.setAttribute("userModify", user);
+		}
+		return "user/modifyUser";
 	}
 }

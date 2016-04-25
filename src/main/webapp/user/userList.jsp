@@ -30,7 +30,7 @@
 					<td><c:out value="${user.authority_str}" /></td>
 					<td width="300">
 						<div class="btn-group" role="group" aria-label="...">
-							<a type="button" class="btn btn-default" href="">权限配置</a> <a type="button" class="btn btn-default"
+							<a type="button" class="btn btn-default" href="<%=request.getContextPath()%>/user/modify?userId=${user.id}">用户修改</a> <a type="button" class="btn btn-default"
 								onClick="resetUserPassword(${user.id},'${user.usercode}');">重置密码</a> <a type="button" class="btn btn-danger"
 								onClick="deleteUser(${user.id},'${user.usercode}');">删除用户</a>
 						</div>

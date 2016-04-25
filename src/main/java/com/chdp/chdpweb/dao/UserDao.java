@@ -30,4 +30,7 @@ public interface UserDao {
 
 	@Insert("insert into user(usercode,password,name,authority) values(#{user.usercode},#{user.password},#{user.name},#{user.authority})")
 	int addUser(@Param("user") User user);
+	
+	@Update("update user set name = #{user.name},authority = #{user.authority} where id = #{user.id}")
+	int updateUser(@Param("user") User user);
 }
