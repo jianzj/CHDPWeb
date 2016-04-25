@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -38,7 +39,7 @@ public class UserController {
 	public String login(HttpServletRequest request) {
 		String usercode = request.getParameter("usercode");
 		String password = request.getParameter("password");
-
+		
 		UsernamePasswordToken token = new UsernamePasswordToken(usercode,
 				userService.encodePassword(usercode, password));
 		Subject currentUser = SecurityUtils.getSubject();
