@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page import="com.chdp.chdpweb.bean.Machine" %>
-<%@ page import="com.chdp.chdpweb.Constants" %>>
+<%@ page import="com.chdp.chdpweb.Constants" %>
 <%@ include file="../head.jsp"%>
 <h3 class="sub-header">添加机器</h3>
 <div>

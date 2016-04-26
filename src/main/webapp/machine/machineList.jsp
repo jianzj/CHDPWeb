@@ -40,7 +40,7 @@
 	</table>
 </div>
 <div class="text-right">
-	<c:set var="pageUrl" value="user/list" />
+	<c:set var="pageUrl" value="machine/list" />
 	<%@ include file="../common/nav.jsp"%>
 </div>
 <div class="modal fade" id="assureDlg" tabindex="-1" role="dialog">
