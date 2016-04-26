@@ -16,4 +16,7 @@ public interface MachineDao {
 	@Select("select * from machines where type = #{type}")
 	List<Machine> getMachinesByType(@Param("type") int type);
 	
+	@Select("select * from machine")
+	List<Machine> getMachines();
+	
 }

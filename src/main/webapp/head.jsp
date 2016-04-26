@@ -111,8 +111,9 @@ body {
                 <ul class="nav nav-sidebar">
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("用户管理")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/user/list">用户管理</a></li>
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("配置管理")) out.print("class=\"active\""); %>><a href="">配置管理</a></li>
-                    <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("机器管理")) out.print("class=\"active\""); %>><a href="">机器管理</a></li>
+                    <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("机器管理")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/machine/list">机器管理</a></li>
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("中药管理")) out.print("class=\"active\""); %>><a href="">中药管理</a></li>
                 </ul>
             </div>
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+      
