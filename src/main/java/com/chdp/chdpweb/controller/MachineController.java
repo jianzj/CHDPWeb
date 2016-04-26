@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,7 +35,6 @@ public class MachineController {
 		return "machine/machineList";
 	}
 	
-	
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/add", method = RequestMethod.GET)
 	public String add(HttpServletRequest request){
@@ -50,11 +50,40 @@ public class MachineController {
 		if (machineService.addMachine(machine)){
 			request.setAttribute("successMsg", "添加机器成功！");
 		}else{
-			request.setAttribute("errorMsg", "添加机器失败！");
+			request.setAttribute("errorMsg", "添加机器失败，请稍后重试！");
 		}
 		
 		request.setAttribute("machineAdd", machine);
 		return "machine/addMachine";
 	}
 
+	@RequiresRoles("ADMIN")
+	@RequestMapping(value = "/delete")
+	public String delete(HttpServletRequest request, 
+			@RequestParam(name = "machineId") Integer machineId,
+			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum){
+		request.setAttribute("nav", "机器管理");
+		
+		if (machineId == null){
+			request.setAttribute("errorMsg", "未知的机器ID！");
+		}else{
+			if (machineService.isMachineInUse(machineId)) {
+				request.setAttribute("errorMsg", "当前有处方只在使用此机器，请稍后删除！");
+			}else{
+				if (machineService.deleteMachine(machineId)){
+					request.setAttribute("successMsg", "删除机器成功");
+				}else{
+					request.setAttribute("errorMsg", "删除机器失败，请稍后重试！");
+				}
+			}
+		}
+		
+		List<Machine> machineList = machineService.getMachineList(pageNum);
+		request.setAttribute("machineList", machineList);
+		PageInfo<Machine> page = new PageInfo<Machine>(machineList);
+		request.setAttribute("page", page);
+
+		return "machine/machineList";
+	}
+	
 }
