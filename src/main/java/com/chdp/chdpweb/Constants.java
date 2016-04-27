@@ -7,4 +7,9 @@ public class Constants {
 	//These params are for Machine
 	public static final int DECOCTION_MACHINE = 1;
 	public static final int FILLING_MACHINE = 2;
+	
+	//These params are for Herb
+	public static final int DECOCT_FIRST = 1;
+	public static final int DECOCT_LATER = 2;
+	public static final int WRAPPED_DECOCT = 3;
 }
