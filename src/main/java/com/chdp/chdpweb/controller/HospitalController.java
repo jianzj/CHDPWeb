@@ -44,12 +44,15 @@ public class HospitalController {
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public String addPost(HttpServletRequest request, Hospital hospital){
 		request.setAttribute("nav", "医院管理");
-		if (hospitalService.addHospital(hospital)){
-			request.setAttribute("successMsg", "添加医院成功！");
+		if (hospitalService.doesHospitalExist(hospital)){
+			request.setAttribute("errorMsg", "此医院名已经存在，请调整后重新输入！");
 		}else{
-			request.setAttribute("errorMsg", "添加医院失败，请稍后重试！");
+			if (hospitalService.addHospital(hospital)){
+				request.setAttribute("successMsg", "添加医院成功！");
+			}else{
+				request.setAttribute("errorMsg", "添加医院失败，请稍后重试！");
+			}
 		}
-		
 		request.setAttribute("hospitalAdd", hospital);
 		return "hospital/addHospital";
 	}

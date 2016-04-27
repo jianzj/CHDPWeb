@@ -27,6 +27,17 @@ public class MachineService {
 			return new ArrayList<Machine>();
 		}
 	}
+
+	public boolean doesMachineExist(Machine machine){
+		try{
+			if (machineDao.getMachineWithName(machine.getName()) != null){
+				return true;
+			}
+			return false;
+		} catch (Exception e){
+			return false;
+		}
+	}
 	
 	public boolean addMachine(Machine machine){
 		try{

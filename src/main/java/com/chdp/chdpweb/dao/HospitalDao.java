@@ -26,12 +26,12 @@ public interface HospitalDao {
 	@Select("select count(h.id) from hospital as h, prescription as p where prescription.hospital_id = #{hospitalId}")
 	int countPrescriptionsWithHospital(@Param("hospitalId") int hospitalId);
 	
+	@Select("select * from hospital where name = #{name}")
+	Hospital getHospitalwithName(@Param("name") String name);
+
 	
 	@Delete("delete from hospital where name = #{name}")
 	int deleteHospitalwithName(@Param("name") String name);
-	
-	@Select("select * from hospital where name = #{name}")
-	Hospital getHospitalwithName(@Param("name") String name);
 	
 	@Select("select * from hostpital where id = #{id}")
 	Hospital getHospitalwithID(@Param("id") int id);

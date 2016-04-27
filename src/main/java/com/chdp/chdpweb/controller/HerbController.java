@@ -47,10 +47,14 @@ public class HerbController {
 	public String addPost(HttpServletRequest request, Herb herb){
 		request.setAttribute("nav", "中药管理");
 		herb.setType(Integer.parseInt(request.getParameter("herb_type")));
-		if (herbService.addHerb(herb)){
-			request.setAttribute("successMsg", "添加中药成功！");
+		if (herbService.doesHerbExist(herb)){
+			request.setAttribute("errorMsg", "相同类型、相同名称的中药已经存在，请调整后添加！");
 		}else{
-			request.setAttribute("errorMsg", "添加中药失败，请稍后重试！");
+			if (herbService.addHerb(herb)){
+				request.setAttribute("successMsg", "添加中药成功！");
+			}else{
+				request.setAttribute("errorMsg", "添加中药失败，请稍后重试！");
+			}
 		}
 		
 		request.setAttribute("herbAdd", herb);

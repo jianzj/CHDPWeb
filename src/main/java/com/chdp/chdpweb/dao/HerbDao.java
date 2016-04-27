@@ -20,6 +20,9 @@ public interface HerbDao {
 	@Select("select * from herb where type = #{type}")
 	List<Herb> getHerbsByType(@Param("type") int type);
 	
+	@Select("select * from herb where name = #{name}")
+	Herb getHerbByName(@Param("name") String name);
+	
 	@Delete("delete from herb where id = #{id}")
 	int deleteHerb(@Param("id") int id);
 	

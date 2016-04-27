@@ -20,6 +20,9 @@ public interface MachineDao {
 	@Select("select * from machine")
 	List<Machine> getMachines();
 	
+	@Select("select * from machine where name = #{name}")
+	Machine getMachineWithName(@Param("name") String name);
+	
 	@Delete("delete from machine where id = #{id}")
 	int deleteMachine(@Param("id") int id);
 }
