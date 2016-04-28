@@ -12,7 +12,7 @@ public class Process {
 	private String error_msg;
 	private int previous_process_id;
 	private int machine_id;
-	
+		
 	public int getId(){
 		return id;
 	}

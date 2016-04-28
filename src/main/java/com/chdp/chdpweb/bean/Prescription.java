@@ -5,6 +5,7 @@ public class Prescription {
 	private String uuid;
 	private String outer_id;
 	private int hospital_id;
+	private String hospital_name;
 	private String patient_name;
 	private int sex;
 	private int packet_num;
@@ -57,6 +58,14 @@ public class Prescription {
 	
 	public void setHospital_id(int hospital_id){
 		this.hospital_id = hospital_id;
+	}
+	
+	public String getHospital_name(){
+		return hospital_name;
+	}
+	
+	public void setHospital_name(String hospital_name){
+		this.hospital_name = hospital_name;
 	}
 	
 	public String getPatient_name(){

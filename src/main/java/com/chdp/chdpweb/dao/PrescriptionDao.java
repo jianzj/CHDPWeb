@@ -1,5 +1,6 @@
 package com.chdp.chdpweb.dao;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -17,11 +18,14 @@ public interface PrescriptionDao {
 			  "#{prs.class_of_medicines}, #{prs.need_decoct_first}, #{prs.need_decoct_later}, #{prs.need_wrapped_decoct}, #{prs.need_take_drenched}, " +
 			"#{prs.need_melt}, #{prs.need_decoct_alone}, #{prs.process}, #{prs.process_id})")
 	int createPrescription(@Param("prs") Prescription prs);
+
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.id = #{id}")
+	Prescription getPrescriptionByID(@Param("id") int id);
 	
 	@Select("select * from prescription where uuid = #{uuid}")
 	Prescription getPrescriptionByUUID(@Param("uuid") String uuid);
 	
-	@Select("select * from prescription where process = #{process}")
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.process = #{process}")
 	List<Prescription> getPrescriptionsByProcess(@Param("process") int process);
 	
 	@Select("select * from prescription where hospital_id = #{hospital_id} and process = #{process}")
@@ -34,7 +38,7 @@ public interface PrescriptionDao {
 	int updatePrescriptionProcess(@Param("prs") Prescription prs);
 	
 	@Update("update prescription set outer_id = #{prs.outer_id}, hospital_id = #{prs.hospital_id}, patient_name = #{patient_name}, " +
-	          "sex = #{prs.sex}, packet_num = #{prs.packet_num}, price = #{prs.price} where uuid = #{prs.uuid}")
+	          "sex = #{prs.sex}, packet_num = #{prs.packet_num}, price = #{prs.price} where id = #{prs.idd}")
 	int updatePrescriptionByPhase1(@Param("prescription") Prescription prs);
 
 	// This method is used update all sections about if these methods are needed, such as need_decoct first, or need_decoct_later.
@@ -48,7 +52,13 @@ public interface PrescriptionDao {
 	@Update("update prescription set finish_time = #{prs.finish_time} where uuid = #{prs.uuid}")
 	int updatePrescriptionFinishTime(@Param("prs") Prescription prs);
 	
-	@Select("select * from prescription where id = (select max(id) from prescription")
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.id = (select max(id) from prescription)")
 	Prescription getLastestPrescription();
+	
+	@Select("select count(*) from prescription as p, hospital as h where h.name = #{prs.hospital_name} and p.outer_id = #{prs.outer_id}")
+	int countPrescriptionWithHospitalInfo(@Param("prs") Prescription prs);
+	
+	@Delete("delete from prescription where id = #{prsId}")
+	int deletePrescription(@Param("prsId") int prsId);
 	
 }

@@ -58,12 +58,20 @@ public class HospitalService {
 	
 	public boolean doesHospitalExist(Hospital hospital){
 		try{
-			if (hospitalDao.getHospitalwithName(hospital.getName()) != null){
+			if (hospitalDao.getHospitalIdwithName(hospital.getName()) > 0){
 				return true;
 			}
 			return false;
 		} catch (Exception e){
 			return false;
+		}
+	}
+	
+	public int getHospitalIdByName(String hospitalName){
+		try{
+			return hospitalDao.getHospitalIdwithName(hospitalName);
+		} catch (Exception e){
+			return -1;
 		}
 	}
 }

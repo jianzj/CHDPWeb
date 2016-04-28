@@ -1,0 +1,50 @@
+package com.chdp.chdpweb.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.chdp.chdpweb.dao.ProcessDao;
+import com.chdp.chdpweb.bean.Process;
+
+@Repository
+public class ProcessService {
+
+	@Autowired
+	private ProcessDao proDao;
+	
+	public int createProccess(Process newProcess){
+		try{
+			return proDao.createProcess(newProcess);
+		} catch (Exception e){
+			return -1;
+		}
+	}
+	
+	public boolean deleteProcess(int processId){
+		try{
+			proDao.deleteProcess(processId);
+			return true;
+		} catch (Exception e){
+			return false;
+		}
+	}
+	
+	public int getProcessIdwithProcess(Process process){
+		try{
+			return proDao.getProcessIDwithProcess(process);
+		} catch (Exception e){
+			return -1;
+		}
+	}
+	
+	public List<Process> getProcessListwithPrsID(int prsId){
+		try{
+			return proDao.getProcessesByPrsID(prsId);
+		} catch (Exception e){
+			return new ArrayList<Process>();
+		}
+	}
+}
