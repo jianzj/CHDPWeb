@@ -56,6 +56,14 @@ public class PrescriptionService {
 		}
 	}
 	
+	public List<Prescription> listPrsWithParams(int process, String hospitalName){
+		try{
+			return prsDao.getPrescriptionsByParams(process, hospitalName);
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
+	}
+	
 	public boolean updatePrescriptionProcess(Prescription prs){
 		try{
 			prsDao.updatePrescriptionProcess(prs);

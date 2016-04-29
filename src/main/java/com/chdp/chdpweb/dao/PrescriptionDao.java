@@ -19,14 +19,20 @@ public interface PrescriptionDao {
 			"#{prs.need_melt}, #{prs.need_decoct_alone}, #{prs.process}, #{prs.process_id})")
 	int createPrescription(@Param("prs") Prescription prs);
 
-	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.id = #{id}")
+	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
+	          "user as u, process as pro where p.id = #{id} and p.process_id = pro.id and pro.user_id = user.id")
 	Prescription getPrescriptionByID(@Param("id") int id);
 	
 	@Select("select * from prescription where uuid = #{uuid}")
 	Prescription getPrescriptionByUUID(@Param("uuid") String uuid);
 	
-	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.process = #{process}")
+	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
+	          "user as u, process as pro where p.process = #{process} and p.process_id = pro.id and pro.user_id = u.id")
 	List<Prescription> getPrescriptionsByProcess(@Param("process") int process);
+
+	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
+	          "user as u, process as pro where p.process = #{process} and h.name = #{hospitalName} and p.process_id = pro.id and pro.user_id = user.id")
+	List<Prescription> getPrescriptionsByParams(@Param("process") int process, @Param("hospitalName") String hospitalName);
 	
 	@Select("select * from prescription where hospital_id = #{hospital_id} and process = #{process}")
 	List<Prescription> getPrescriptionByHospitalwithProcess(@Param("hospital_id") int hospital_id, @Param("process") int process);

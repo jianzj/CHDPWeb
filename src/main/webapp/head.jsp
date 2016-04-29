@@ -99,13 +99,13 @@ body {
         <div class="row">
             <div class="col-sm-3 col-md-2 sidebar">
                 <ul class="nav nav-sidebar">
-                    <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("当前处方列表")) out.print("class=\"active\""); %>><a href="#">当前处方列表</a></li>
+                    <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("当前处方列表")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/prescription/currentPrescriptionList">当前处方列表</a></li>
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("历史处方列表")) out.print("class=\"active\""); %>><a href="#">历史处方列表</a></li>
                 </ul>
                 <ul class="nav nav-sidebar">
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("接方流程列表")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/process/receiveList">接方流程列表</a></li>
-                    <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("包装流程列表")) out.print("class=\"active\""); %>><a href="">包装流程列表</a></li>
-                    <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("出库流程列表")) out.print("class=\"active\""); %>><a href="">出库流程列表</a></li>
+                    <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("包装流程列表")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/process/packageList">包装流程列表</a></li>
+                    <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("出库流程列表")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/process/shipList">出库流程列表</a></li>
                 </ul>
                 <ul class="nav nav-sidebar">
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("医院维度统计")) out.print("class=\"active\""); %>><a href="">医院维度统计</a></li>

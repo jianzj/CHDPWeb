@@ -26,6 +26,14 @@ public class HospitalService {
 		}
 	}
 	
+	public List<Hospital> getHospitalList(){
+		try{
+			return hospitalDao.getHospitalList();
+		} catch (Exception e){
+			return new ArrayList<Hospital>();
+		}
+	}
+	
 	public boolean addHospital(Hospital hospital){
 		try{
 			hospitalDao.createHospital(hospital);

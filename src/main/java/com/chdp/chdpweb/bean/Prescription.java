@@ -26,6 +26,7 @@ public class Prescription {
 	private String decoct_alone_list;
 	private int process;
 	private int process_id;
+	private String user_name;
 	private String finish_time;
 	
 	public int getId(){
@@ -232,6 +233,13 @@ public class Prescription {
 		this.finish_time = finish_time;
 	}
 
+	public String getUser_name(){
+		return user_name;
+	}
+	
+	public void setUser_name(String userName){
+		this.user_name = userName;
+	}
 }
 
 

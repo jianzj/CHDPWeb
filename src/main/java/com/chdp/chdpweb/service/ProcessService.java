@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.chdp.chdpweb.dao.ProcessDao;
+import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.Process;
 
 @Repository
@@ -45,6 +46,16 @@ public class ProcessService {
 			return proDao.getProcessesByPrsID(prsId);
 		} catch (Exception e){
 			return new ArrayList<Process>();
+		}
+	}
+	
+	public String getProcessName(int process){
+		if (process == Constants.RECEIVE){
+			return "接方";
+		}else if(process == Constants.PACKAGE){
+			return "包装";
+		}else{
+			return "未知状态";
 		}
 	}
 }
