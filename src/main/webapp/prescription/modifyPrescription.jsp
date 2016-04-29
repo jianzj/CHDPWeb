@@ -3,6 +3,7 @@
 <%@ page import="com.chdp.chdpweb.bean.Prescription" %>
 <%@ page import="com.chdp.chdpweb.Constants" %>
 <%@ include file="../head.jsp"%>
+
 <h3 class="sub-header">修改处方</h3>
 <div>
 	<div>
@@ -13,7 +14,7 @@
 			<div class="alert alert-success" role="alert">${successMsg}</div>
 		</c:if>
 	</div>
-	<form class="form-horizontal" action="<%=request.getContextPath()%>/prescription/modify?prsId=${prsModify.id}" method="POST">
+	<form class="form-horizontal" action="<%=request.getContextPath()%>/prescription/receiveModify?prsId=${prsModify.id}" method="POST">
 		<fieldset>
 			<div class="form-group">
 				<label for="hospital_name" class="control-label col-sm-4">医院</label>

@@ -36,7 +36,7 @@
 					<td><c:out value="${prs.create_time}" /></td>
 					<td width="180">
 						<div class="btn-group" role="group" aria-label="...">
-							<a type="button" class="btn btn-default" href="<%=request.getContextPath()%>/prescription/modify?prsId=${prs.id}">处方修改</a>
+							<a type="button" class="btn btn-default" href="<%=request.getContextPath()%>/prescription/receiveModify?prsId=${prs.id}">处方修改</a>
 							<a type="button" class="btn btn-danger" onClick="deletePrs(${prs.id},${prs.process},'${prs.hospital_name}','${prs.outer_id}');">删除处方</a>
 						</div>
 					</td>

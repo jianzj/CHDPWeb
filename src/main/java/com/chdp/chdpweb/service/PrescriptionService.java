@@ -103,4 +103,32 @@ public class PrescriptionService {
 			return false;
 		}
 	}
+	
+	public boolean equalTwoPrescription(Prescription prs1, Prescription prs2){
+		try{
+			if (prs1.getHospital_name().equals(prs2.getHospital_name()) &&
+					prs1.getOuter_id().equals(prs2.getOuter_id()) &&
+					prs1.getPatient_name().equals(prs2.getPatient_name()) &&
+					prs1.getPacket_num() == prs2.getPacket_num() &&
+					prs1.getPrice() == prs2.getPrice() &&
+					prs1.getSex() == prs2.getSex()){
+				return true;
+			}else{
+				return false;
+			}
+		} catch (Exception e){
+			return false;
+		}
+	}
+	
+	public boolean equalHospitalInfo(Prescription prs1, Prescription prs2){
+		try{
+			if (prs1.getHospital_name().equals(prs2.getHospital_name()) && prs1.getOuter_id().equals(prs2.getOuter_id())){
+				return true;
+			}
+			return false;
+		} catch (Exception e){
+			return false;
+		}
+	}
 }

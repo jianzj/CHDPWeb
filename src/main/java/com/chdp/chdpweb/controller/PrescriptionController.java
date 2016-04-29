@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.chdp.chdpweb.service.HospitalService;
 import com.chdp.chdpweb.service.PrescriptionService;
 import com.chdp.chdpweb.service.ProcessService;
+import com.mysql.fabric.Response;
 import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.bean.User;
@@ -101,8 +102,8 @@ public class PrescriptionController {
 	}
 
 	@RequiresRoles("RECEIVE")
-	@RequestMapping(value = "/modify", method = RequestMethod.GET)
-	public String modify(HttpServletRequest request, @Param("prsId") Integer prsId){
+	@RequestMapping(value = "/receiveModify", method = RequestMethod.GET)
+	public String receiveModify(HttpServletRequest request, @Param("prsId") Integer prsId) {
 		
 		if (prsId == null){
 			request.setAttribute("errorMsg", "未知处方ID，无法修改！");
@@ -110,63 +111,58 @@ public class PrescriptionController {
 			request.setAttribute("prsModify", prsService.getPrescription(prsId));
 		}
 		
-		request.setAttribute("modifyPrsFrom", "receiveList");
 		return "prescription/modifyPrescription";
 	}
 	
 	@RequiresRoles("RECEIVE")
-	@RequestMapping(value = "/modify", method = RequestMethod.POST)
-	public void modifyPost(HttpServletRequest request, HttpServletResponse response, @Param("prsId") Integer prsId) throws IOException{
+	@RequestMapping(value = "/receiveModify", method = RequestMethod.POST)
+	public String receiveModifyPost(HttpServletRequest request, @Param("prsId") Integer prsId) {
 		
 		if (prsId == null){
 			request.setAttribute("errorMsg", "未知处方ID，无法修改");
+			request.setAttribute("modifyStatus", "REDIRECT");
+			request.setAttribute("redirectURL", request.getContextPath() + "/process/receiveList.jsp");
 		}else{
-			Prescription prs = prsService.getPrescription(prsId);
+			Prescription currentPrs = prsService.getPrescription(prsId);
+			Prescription newPrs = prsService.getPrescription(prsId);
 			String price = request.getParameter("price");
-			double formatPrice = prsService.formatPricewithPrs(prs, price);
-			prs.setPrice(formatPrice);
 			
+			double formatPrice = prsService.formatPricewithPrs(currentPrs, price);
+			newPrs.setPrice(formatPrice);			
 			String patient_name = request.getParameter("patient_name");
+			newPrs.setPatient_name(patient_name);
 			int packet_num = Integer.parseInt(request.getParameter("packet_num"));
-			if (prs.getPacket_num() != packet_num){
-				prs.setPacket_num(packet_num);
-			}
-			
+			newPrs.setPacket_num(packet_num);
+
 			String hospitalName = request.getParameter("hospital_name");
 			String outer_id = request.getParameter("outer_id");
+			newPrs.setHospital_name(hospitalName);
+			newPrs.setOuter_id(outer_id);
+			newPrs.setSex(Integer.parseInt(request.getParameter("sex")));
 			
-			boolean hospitalInfoChanged = false;
-			if (prs.getHospital_name() != hospitalName || prs.getOuter_id() != outer_id){
-				hospitalInfoChanged = true;
-			}
-			prs.setPatient_name(patient_name);
-			if (hospitalInfoChanged){
-				prs.setHospital_name(hospitalName);
-				prs.setOuter_id(outer_id);
-				if (hospitalService.getHospitalIdByName(hospitalName) <= 0 || prsService.validPrescriptionHospitalInfo(prs)){
+			if (prsService.equalTwoPrescription(currentPrs, newPrs)){
+				request.setAttribute("errorMsg", "您并未作出任何修改");
+			}else{
+				if (!prsService.equalHospitalInfo(currentPrs, newPrs) && (prsService.validPrescriptionHospitalInfo(newPrs) ||
+						hospitalService.getHospitalIdByName(newPrs.getHospital_name()) <= 0)){
 					request.setAttribute("errorMsg", "您输入的医院名称或医院编号有误，请校验后重新输入");
 				}else{
-					if(prsService.updatePrsInReceive(prs)){
+					if(!prsService.equalHospitalInfo(currentPrs, newPrs)){
+						newPrs.setHospital_id(hospitalService.getHospitalIdByName(newPrs.getHospital_name()));
+					}
+					if(prsService.updatePrsInReceive(newPrs)){
 						request.setAttribute("successMsg", "修改处方成功！");
+						request.setAttribute("modifyStatus", "REDIRECT");
+						request.setAttribute("redirectURL", request.getContextPath() + "/process/receiveList.jsp");
 					}else{
 						request.setAttribute("errorMsg", "处方修改失败，请稍后重试！");
 					}
 				}
-			}else{
-				if(prsService.updatePrsInReceive(prs)){
-					request.setAttribute("successMsg", "修改处方成功！");
-				}else{
-					request.setAttribute("errorMsg", "处方修改失败，请稍后重试！");
-				}
 			}
+			request.setAttribute("prsModify", newPrs);
 		}
-		
-		if (request.getAttribute("modifyPrsFrom") != null && request.getAttribute("modifyPrsFrom") == "receiveList"){
-			response.sendRedirect(request.getContextPath() + "/process/receiveList");
-		}else{
-			response.sendRedirect(request.getContextPath() + "/process/receiveList");
-		}
-		
+
+		return "prescription/modifyPrescription";
 	}
 	
 	@RequiresRoles("RECEIVE")

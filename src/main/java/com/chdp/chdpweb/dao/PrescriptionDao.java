@@ -37,9 +37,9 @@ public interface PrescriptionDao {
 	@Update("update prescription set process = #{prs.process}, process_id = #{prs.process_id} where uuid = #{prs.uuid}")
 	int updatePrescriptionProcess(@Param("prs") Prescription prs);
 	
-	@Update("update prescription set outer_id = #{prs.outer_id}, hospital_id = #{prs.hospital_id}, patient_name = #{patient_name}, " +
-	          "sex = #{prs.sex}, packet_num = #{prs.packet_num}, price = #{prs.price} where id = #{prs.idd}")
-	int updatePrescriptionByPhase1(@Param("prescription") Prescription prs);
+	@Update("update prescription set outer_id = #{prs.outer_id}, hospital_id = #{prs.hospital_id}, patient_name = #{prs.patient_name}, " +
+	          "sex = #{prs.sex}, packet_num = #{prs.packet_num}, price = #{prs.price} where id = #{prs.id}")
+	int updatePrescriptionByPhase1(@Param("prs") Prescription prs);
 
 	// This method is used update all sections about if these methods are needed, such as need_decoct first, or need_decoct_later.
 	@Update("update prescription set class_of_medicines = #{prs.class_of_medicines}, need_decoct_first = #{prs.need_decoct_first}, " +
