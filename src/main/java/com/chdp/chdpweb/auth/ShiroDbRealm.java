@@ -28,8 +28,8 @@ public class ShiroDbRealm extends AuthorizingRealm {
 			SimpleAuthorizationInfo simpleAuthorInfo = new SimpleAuthorizationInfo();
 			for (UserAuthority auth : userService.getUserAuthority(user)) {
 				simpleAuthorInfo.addRole(auth.name());
-				return simpleAuthorInfo;
 			}
+			return simpleAuthorInfo;
 		}
 
 		return null;
