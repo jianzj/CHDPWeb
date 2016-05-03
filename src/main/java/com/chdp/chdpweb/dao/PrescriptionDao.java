@@ -23,7 +23,7 @@ public interface PrescriptionDao {
 	          "user as u, process as pro where p.id = #{id} and p.process_id = pro.id and pro.user_id = u.id")
 	Prescription getPrescriptionByID(@Param("id") int id);
 	
-	@Select("select * from prescription where uuid = #{uuid}")
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.uuid = #{uuid} and p.hospital_id = h.id")
 	Prescription getPrescriptionByUUID(@Param("uuid") String uuid);
 	
 	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +

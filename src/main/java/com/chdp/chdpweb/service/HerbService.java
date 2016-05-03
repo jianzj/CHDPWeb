@@ -17,44 +17,61 @@ public class HerbService {
 	@Autowired
 	private HerbDao herbDao;
 
-	public List<Herb> getHerbList(int pageNum){
+	public List<Herb> getHerbList(int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
-		try{
+		try {
 			return herbDao.getHerbs();
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Herb>();
 		}
-		
+
 	}
-	
-	public boolean addHerb(Herb herb){
-		try{
+
+	public List<Herb> getHerbListByType(int type) {
+		try {
+			return herbDao.getHerbsByType(type);
+		} catch (Exception e) {
+			return new ArrayList<Herb>();
+		}
+
+	}
+
+	public List<Herb> getHerbs() {
+		try {
+			return herbDao.getHerbs();
+		} catch (Exception e) {
+			return new ArrayList<Herb>();
+		}
+	}
+
+	public boolean addHerb(Herb herb) {
+		try {
 			herbDao.createHerb(herb);
 			return true;
-		} catch (Exception e){
+		} catch (Exception e) {
 			return false;
 		}
 	}
-	
-	public boolean deleteHerb(int herbId){
-		try{
+
+	public boolean deleteHerb(int herbId) {
+		try {
 			herbDao.deleteHerb(herbId);
 			return true;
-		} catch (Exception e){
+		} catch (Exception e) {
 			return false;
 		}
 	}
-	
-	public boolean doesHerbExist(Herb herb){
-		try{
+
+	public boolean doesHerbExist(Herb herb) {
+		try {
 			Herb currentHerb = herbDao.getHerbByName(herb.getName());
-			if (currentHerb != null && herb.getType() == currentHerb.getType()){
+			if (currentHerb != null && herb.getType() == currentHerb.getType()) {
 				return true;
 			}
 			return false;
-		} catch (Exception e){
+		} catch (Exception e) {
 			return false;
 		}
 	}
-	
+
 }
