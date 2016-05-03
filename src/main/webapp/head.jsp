@@ -99,7 +99,7 @@ body {
         <div class="row">
             <div class="col-sm-3 col-md-2 sidebar">
                 <ul class="nav nav-sidebar">
-                    <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("当前处方列表")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/prescription/currentPrescriptionList">当前处方列表</a></li>
+                    <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("当前处方列表")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/prescription/currentList?process=&hospital=">当前处方列表</a></li>
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("历史处方列表")) out.print("class=\"active\""); %>><a href="#">历史处方列表</a></li>
                 </ul>
                 <ul class="nav nav-sidebar">

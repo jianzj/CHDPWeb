@@ -16,12 +16,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.chdp.chdpweb.service.HospitalService;
 import com.chdp.chdpweb.service.PrescriptionService;
 import com.chdp.chdpweb.service.ProcessService;
+import com.github.pagehelper.PageInfo;
 import com.mysql.fabric.Response;
 import com.chdp.chdpweb.Constants;
+import com.chdp.chdpweb.bean.Hospital;
 import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.bean.User;
 import com.chdp.chdpweb.bean.Process;
@@ -44,6 +47,11 @@ public class PrescriptionController {
 		if (lastestPrs != null){
 			request.setAttribute("lastestPrs", lastestPrs);
 		}
+		
+		List<Hospital> hospitalList = hospitalService.getHospitalList();
+		if (hospitalList.size() > 0){
+			request.setAttribute("hospitalList", hospitalList);
+		}
 		return "prescription/addPrescription";
 	}
 	
@@ -61,10 +69,14 @@ public class PrescriptionController {
 		if (prsService.validPrescriptionHospitalInfo(prs)){
 			request.setAttribute("errorMsg", "与此处方相同医院名称，相同订单编号的处方已经存在，请检查输入！");
 		}else{
-			prs.setUuid(UUID.randomUUID().toString());
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
 			String currentTime = df.format(new Date());
 			prs.setCreate_time(currentTime);
+			
+			//生成UUID，形如20160502213800386, 当前日期+三位随机数
+			int randomNum = (int)(Math.random()*900)+100;
+			String uuid = currentTime + String.valueOf(randomNum);
+			prs.setUuid(uuid);
 			
 			// Set these values as default.
 			prs.setProcess(Constants.RECEIVE);
@@ -96,7 +108,10 @@ public class PrescriptionController {
 				request.setAttribute("errorMsg", "添加处方失败，请稍后重试！");
 			}			
 		}
-				
+		
+		List<Hospital> hospitalList = hospitalService.getHospitalList();
+		request.setAttribute("hospitalList", hospitalList);
+		
 		request.setAttribute("prsAdd", prs);
 		return "prescription/addPrescription";
 	}
@@ -325,12 +340,43 @@ public class PrescriptionController {
 		return "prescription/shipModifyPrescription";
 	}
 	
-	@RequestMapping(value = "/currentPrescriptionList", method = RequestMethod.GET)
-	public String getCurrentList(HttpServletRequest request, @Param("process") Integer process, @Param("hospital") String hospital){
+	@RequestMapping(value = "/currentList", method = RequestMethod.GET)
+	public String getCurrentList(HttpServletRequest request, @RequestParam(name = "pageNum", defaultValue = "1") int pageNum){
 		
-		List<Prescription> prsList = prsService.listPrsWithProcess(9);
+		request.setAttribute("nav", "当前处方列表");
+		
+		String hospital = request.getParameter("hospital");
+		String process = request.getParameter("process");
+		
+		List<Prescription> prsList = null;	
+		if (process != null && !process.equals("") && hospital != null && !hospital.equals("")){
+			int processType = Integer.parseInt(process);
+			prsList = prsService.listPrsWithParams(processType, hospital);
+		}else if (process != null && !process.equals("")){
+			int processType = Integer.parseInt(process);
+			prsList = prsService.listPrsWithProcess(processType);
+		}else if (hospital != null && !hospital.equals("")){
+			prsList = prsService.listPrsWithHospital(hospital);
+		}else{
+			prsList = prsService.listPrsWithProcessUnfinished();
+		}
+		
+		if (process != null && !process.equals("")){
+			request.setAttribute("process", process);
+		}
+		
+		if (hospital != null && !hospital.equals("")){
+			request.setAttribute("hospital", hospital);
+		}
+		
+		List<Hospital> hospitalList = hospitalService.getHospitalList();
+		request.setAttribute("hospitalList", hospitalList);
+		
+		PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
+		request.setAttribute("page", page);	
+
 		request.setAttribute("currentPrsList", prsList);
 		
-		return "prescription/currentPrescriptionList";
+        return "prescription/currentPrescriptionList";
 	}
 }

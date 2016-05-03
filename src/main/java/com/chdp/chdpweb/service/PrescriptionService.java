@@ -6,8 +6,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.dao.PrescriptionDao;
+import com.github.pagehelper.PageHelper;
 
 @Repository
 public class PrescriptionService {
@@ -47,6 +49,23 @@ public class PrescriptionService {
 			return null;
 		}
 	}
+
+	public List<Prescription> listPrsWithProcessUnfinished(){
+		try{
+			return prsDao.getPrescriptionsUnfinished();
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	public List<Prescription> listPrsWithProcessUnfinished(int pageNum){
+		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+		//try{
+			return prsDao.getPrescriptionsUnfinished();
+		//} catch (Exception e){
+		//	return new ArrayList<Prescription>();
+		//}
+	}
 	
 	public List<Prescription> listPrsWithProcess(int process){
 		try{
@@ -56,7 +75,42 @@ public class PrescriptionService {
 		}
 	}
 	
+	public List<Prescription> listPrsWithProcess(int process, int pageNum){
+		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+		try{
+			return prsDao.getPrescriptionsByProcess(process);
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
+	}
+
+	public List<Prescription> listPrsWithHospital(String hospitalName){
+		try{
+			return prsDao.getPrescriptionByHospital(hospitalName);
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	public List<Prescription> listPrsWithHospital(String hospitalName, int pageNum){
+		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+		try{
+			return prsDao.getPrescriptionByHospital(hospitalName);
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
+	}
+	
 	public List<Prescription> listPrsWithParams(int process, String hospitalName){
+		try{
+			return prsDao.getPrescriptionsByParams(process, hospitalName);
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	public List<Prescription> listPrsWithParams(int process, String hospitalName, int pageNum){
+		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try{
 			return prsDao.getPrescriptionsByParams(process, hospitalName);
 		} catch (Exception e){

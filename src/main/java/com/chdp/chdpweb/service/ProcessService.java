@@ -48,7 +48,7 @@ public class ProcessService {
 			return new ArrayList<Process>();
 		}
 	}
-	
+
 	public String getProcessName(int process){
 		if (process == Constants.RECEIVE){
 			return "接方";

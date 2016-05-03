@@ -17,13 +17,40 @@
 		<fieldset>
 			<div class="form-group">
 				<label for="hospital_name" class="control-label col-sm-4">医院</label>
-				<div class="col-sm-4">
+				<div class="col-sm-4 required">
+					<% if(request.getAttribute("hospitalList") != null){ %>
+					<select class="form-control col-sm-4" id="hospital_name" name="hospital_name">
+					<c:forEach var='hospital' items="${hospitalList}">
+						<% if(request.getAttribute("prsAdd") != null){ %>
+						<c:if test="${prsAdd.hospital_name == hospital.name}">
+							<option value="${hospital.name}" selected>${hospital.name}</option>
+						</c:if>
+						<c:if test="${prsAdd.hospital_name != hospital.name}">
+							<option value="${hospital.name}">${hospital.name}</option>
+						</c:if>
+						<% }else if(request.getAttribute("lastestPrs") != null){ %>
+						<c:if test="${lastestPrs.hospital_name == hospital.name}">
+							<option value="${hospital.name}" selected>${hospital.name}</option>
+						</c:if>
+						<c:if test="${lastestPrs.hospital_name != hospital.name}">
+							<option value="${hospital.name}">${hospital.name}</option>
+						</c:if>
+						<% } else { %>
+						<option value="${hospital.name}">${hospital.name}</option>
+						<% } %>
+					</c:forEach>
+					</select>
+					<% }else{ %>
+					<div class="alert alert-danger" role="alert">暂无医院信息，请联系管理员录入相关医院</div>
+					<% } %>
+				</div>
+<!-- 			<div class="col-sm-4">
 					<% if(request.getAttribute("lastestPrs") != null && request.getAttribute("prsAdd") == null){ %>
 						<input type="text" class="form-control" id="hospital_name" name="hospital_name" placeholder="医院名称" value="${lastestPrs.hospital_name}" required>
 					<% }else {%>
 					    <input type="text" class="form-control" id="hospital_name" name="hospital_name" placeholder="医院名称" value="${prsAdd.hospital_name}" required>
 					<% } %>
-				</div>
+				</div> -->
 			</div>
 			<div class="form-group">
 				<label for="outer_id" class="control-label col-sm-4">医院处方登记编号</label>

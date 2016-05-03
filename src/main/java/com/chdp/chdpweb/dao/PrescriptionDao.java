@@ -20,7 +20,7 @@ public interface PrescriptionDao {
 	int createPrescription(@Param("prs") Prescription prs);
 
 	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
-	          "user as u, process as pro where p.id = #{id} and p.process_id = pro.id and pro.user_id = user.id")
+	          "user as u, process as pro where p.id = #{id} and p.process_id = pro.id and pro.user_id = u.id")
 	Prescription getPrescriptionByID(@Param("id") int id);
 	
 	@Select("select * from prescription where uuid = #{uuid}")
@@ -31,15 +31,24 @@ public interface PrescriptionDao {
 	List<Prescription> getPrescriptionsByProcess(@Param("process") int process);
 
 	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
-	          "user as u, process as pro where p.process = #{process} and h.name = #{hospitalName} and p.process_id = pro.id and pro.user_id = user.id")
+	          "user as u, process as pro where p.process = #{process} and h.name = #{hospitalName} and p.process_id = pro.id and pro.user_id = u.id")
 	List<Prescription> getPrescriptionsByParams(@Param("process") int process, @Param("hospitalName") String hospitalName);
+	
+	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
+	          "user as u, process as pro where h.name = #{hospitalName} and h.id = p.hospital_id " +
+			"and p.id = pro.prescription_id and u.id = pro.user_id and pro.id = p.process_id and p.process < 11")
+	List<Prescription> getPrescriptionByHospital(@Param("hospitalName") String hospitalName);	
+	
+	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
+	          "user as u, process as pro where p.hospital_id = h.id " +
+			"and p.id = pro.prescription_id and u.id = pro.user_id and pro.id = p.process_id and p.process < 11")
+	List<Prescription> getPrescriptionsUnfinished();	
+	
+	// Cut Lines
 	
 	@Select("select * from prescription where hospital_id = #{hospital_id} and process = #{process}")
 	List<Prescription> getPrescriptionByHospitalwithProcess(@Param("hospital_id") int hospital_id, @Param("process") int process);
-	
-	@Select("select * from prescription where hospital_id = #{hospital_id}")
-	List<Prescription> getPrescriptionByHospital(@Param("hospital_id") int hospital_id);	
-	
+		
 	@Update("update prescription set process = #{prs.process}, process_id = #{prs.process_id} where uuid = #{prs.uuid}")
 	int updatePrescriptionProcess(@Param("prs") Prescription prs);
 	

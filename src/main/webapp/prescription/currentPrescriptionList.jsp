@@ -3,7 +3,30 @@
 <%@ include file="../head.jsp"%>
 
 <h3 class="sub-header">当前处方列表
-
+	<div class="btn-group">
+	  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	    选择指定医院 <span class="caret"></span>
+	  </button>
+	  <ul class="dropdown-menu">
+	    <c:forEach var='hospital' items="${hospitalList}">
+	        <% if (request.getAttribute("process") != null){ %>
+	        <li><a href="<%=request.getContextPath() %>/prescription/currentList?hospital=${hospital.name}&process=${process}"><c:out value="${hospital.name}" /></a></li>
+	        <% }else{ %>
+	        <li><a href="<%=request.getContextPath() %>/prescription/currentList?hospital=${hospital.name}&process="><c:out value="${hospital.name}" /></a></li>	        
+	        <% } %>
+	    </c:forEach>
+	  </ul>
+	</div>
+    <div class="btn-group">
+	  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	    选择指定医院 <span class="caret"></span>
+	  </button>
+	  <ul class="dropdown-menu">
+	    <c:forEach var='hospital' items="${hospitalList}">
+	        <li><a href="<%=request.getContextPath() %>/process/packageList?hospital=${hospital.name}"><c:out value="${hospital.name}" /></a></li>
+	    </c:forEach>
+	  </ul>
+	</div>
 </h3>
 <div>
 	<c:if test="${not empty errorMsg}">
