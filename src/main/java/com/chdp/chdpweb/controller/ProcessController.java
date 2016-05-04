@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.chdp.chdpweb.service.ProcessService;
 
 @Controller
-@RequestMapping("/app/process")
+@RequestMapping("/process")
 public class ProcessController {
 
 	@Autowired

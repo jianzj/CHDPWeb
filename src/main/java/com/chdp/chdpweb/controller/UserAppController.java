@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.chdp.chdpweb.bean.AuthResult;
+import com.chdp.chdpweb.bean.AppResult;
 import com.chdp.chdpweb.bean.User;
 import com.chdp.chdpweb.service.UserService;
 
@@ -26,7 +26,7 @@ public class UserAppController {
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	@ResponseBody
-	public AuthResult login(HttpServletRequest request) {
+	public AppResult login(HttpServletRequest request) {
 		String usercode = request.getParameter("usercode");
 		String password = request.getParameter("password");
 
@@ -34,7 +34,7 @@ public class UserAppController {
 				userService.encodePassword(usercode, password));
 		Subject currentUser = SecurityUtils.getSubject();
 
-		AuthResult result = new AuthResult();
+		AppResult result = new AppResult();
 		try {
 			currentUser.login(token);
 		} catch (UnknownAccountException e) {
@@ -58,9 +58,9 @@ public class UserAppController {
 
 	@RequestMapping("/logout")
 	@ResponseBody
-	public AuthResult logout() {
+	public AppResult logout() {
 		SecurityUtils.getSubject().logout();
-		AuthResult result = new AuthResult();
+		AppResult result = new AppResult();
 		result.setSuccess(true);
 		return result;
 	}

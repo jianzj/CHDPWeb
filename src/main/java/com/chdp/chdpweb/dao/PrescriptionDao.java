@@ -40,8 +40,18 @@ public interface PrescriptionDao {
 	@Select("select * from prescription where hospital_id = #{hospital_id}")
 	List<Prescription> getPrescriptionByHospital(@Param("hospital_id") int hospital_id);	
 	
-	@Update("update prescription set process = #{prs.process}, process_id = #{prs.process_id} where uuid = #{prs.uuid}")
+	@Update("update prescription set process = #{prs.process}, process_id = #{prs.process_id} where id = #{prs.id}")
 	int updatePrescriptionProcess(@Param("prs") Prescription prs);
+	
+	@Update("update prescription set class_of_medicines = #{prs.class_of_medicines}, process = #{prs.process}, process_id = #{prs.process_id}, "
+			+ "need_decoct_first = #{prs.need_decoct_first}, decoct_first_list = #{prs.decoct_first_list, jdbcType=LONGVARCHAR},"
+			+ "need_decoct_later = #{prs.need_decoct_later}, decoct_later_list = #{prs.decoct_later_list, jdbcType=LONGVARCHAR},"
+			+ "need_wrapped_decoct = #{prs.need_wrapped_decoct}, wrapped_decoct_list = #{prs.wrapped_decoct_list, jdbcType=LONGVARCHAR},"
+			+ "need_take_drenched = #{prs.need_take_drenched}, take_drenched_list = #{prs.take_drenched_list, jdbcType=LONGVARCHAR},"
+			+ "need_melt = #{prs.need_melt}, melt_list = #{prs.melt_list, jdbcType=LONGVARCHAR},"
+			+ "need_decoct_alone = #{prs.need_decoct_alone}, decoct_alone_list = #{prs.decoct_alone_list, jdbcType=LONGVARCHAR}"
+			+ " where id = #{prs.id}")
+	int updatePrescription(@Param("prs") Prescription prs);
 	
 	@Update("update prescription set outer_id = #{prs.outer_id}, hospital_id = #{prs.hospital_id}, patient_name = #{prs.patient_name}, " +
 	          "sex = #{prs.sex}, packet_num = #{prs.packet_num}, price = #{prs.price} where id = #{prs.id}")

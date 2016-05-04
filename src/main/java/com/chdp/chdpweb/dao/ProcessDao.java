@@ -6,6 +6,7 @@ import com.chdp.chdpweb.bean.Process;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -14,6 +15,7 @@ public interface ProcessDao {
 
 	@Insert("insert process(process_type, begin, user_id, prescription_id, previous_process_id) "
 			+ "values(#{proc.process_type}, #{proc.begin}, #{proc.user_id}, #{proc.prescription_id}, #{proc.previous_process_id})")
+	@Options(useGeneratedKeys = true, keyProperty = "proc.id")
 	int createProcess(@Param("proc") Process proc);
 
 	@Update("update process set machine_id = #{proc.machine_id} where id = #{proc.id}")
@@ -50,4 +52,17 @@ public interface ProcessDao {
 	@Select("select p.*, u.name as user_name from process as p, user as u where p.id = (select process_id from prescription where id = #{id}) and p.user_id = u.id")
 	Process getPrescriptionPresentProcess(@Param("id") int id);
 
+	@Update("update process set finish = #{finish}, user_id = #{user_id} where id = #{id}")
+	int finishProcess(@Param("id") int id, @Param("finish") String finish, @Param("user_id") int user_id);
+
+	@Update("update process set finish = #{finish}, user_id = #{user_id}, machine_id = #{machine_id} where id = #{id}")
+	int finishProcessWithMachine(@Param("id") int id, @Param("finish") String finish, @Param("user_id") int user_id,
+			@Param("machine_id") int machine_id);
+
+	@Update("update process set begin = #{begin}, user_id = #{user_id} where id = #{id}")
+	int startProcess(@Param("id") int id, @Param("begin") String begin, @Param("user_id") int user_id);
+
+	@Update("update process set finish = #{finish}, user_id = #{user_id},error_type = #{type}, error_msg = #{reason} where id = #{id}")
+	int cancelProcess(@Param("id") int id, @Param("finish") String finish, @Param("user_id") int user_id,
+			@Param("type") int type, @Param("reason") String reason);
 }
