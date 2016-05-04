@@ -23,7 +23,7 @@
 			<div class="form-group">
 				<label for="description" class="control-label col-sm-4">医院简介</label>
 				<div class="col-sm-8">
-					<input type="text" class="form-control" id="description" name="description" placeholder="医院简介" value="${hospitalAdd.description}">
+					<textarea class="form-control" rows="5" id="description" name="description" placeholder="医院简介">${hospitalAdd.description}</textarea>
 				</div>
 			</div>
 			<div class="form-group">

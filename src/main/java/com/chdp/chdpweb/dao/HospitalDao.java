@@ -23,7 +23,8 @@ public interface HospitalDao {
 	int deleteHospital(@Param("id") int id);
 	
 	// Use to decide if one hospital could be removed.
-	@Select("select count(h.id) from hospital as h, prescription as p where prescription.hospital_id = #{hospitalId}")
+	@Select("select count(*) from hospital as h, prescription as p where " +
+	           "h.id = #{hospitalId} and p.hospital_id = h.id and p.process < 11")
 	int countPrescriptionsWithHospital(@Param("hospitalId") int hospitalId);
 
 	@Select("select id from hospital where name = #{name}")

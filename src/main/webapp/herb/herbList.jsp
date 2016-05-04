@@ -62,7 +62,7 @@
 </div>
 <script>
     var deleteHerb = function(id, herb_name){
-    	$("#assureMsg").html("确认删除中药<strong>"+herb_name+"</strong>？");
+    	$("#assureMsg").html("确认删除中药&nbsp&nbsp<strong>"+herb_name+"</strong>&nbsp&nbsp？");
         $("#assureBtn").attr('href',"<%=request.getContextPath()%>/herb/delete?herbId="+id+"&pageNum=${page.pageNum}");
         $("#assureDlg").modal("show");
     };

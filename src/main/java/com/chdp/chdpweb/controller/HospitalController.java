@@ -68,7 +68,7 @@ public class HospitalController {
 			request.setAttribute("errorMsg", "未知的医院ID！");
 		}else{
 			if (hospitalService.isHospitalInUse(hospitalId)){
-				request.setAttribute("errorMsg", "此医院含有相关联的处方，不能删除！");
+				request.setAttribute("errorMsg", "尚有未完成处方，不能删除！");
 			}else{
 				if (hospitalService.deleteHospital(hospitalId)){
 					request.setAttribute("successMsg", "删除医院成功！");

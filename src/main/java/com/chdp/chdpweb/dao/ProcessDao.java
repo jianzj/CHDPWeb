@@ -34,9 +34,6 @@ public interface ProcessDao {
 	@Select("select * from process where prescription_id = #{prs_id}")
 	List<Process> getProcessesByPrsID(@Param("prs_id") int prs_id);
 
-	@Select("select count(id) from process where machine_id = #{machine_id} and (process_type = 6 or process_type = 7)")
-	int countProcessInMachine(@Param("machine_id") int machine_id);
-
 	@Select("select id from process where process_type = #{process.process_type} and "
 			+ "user_id = #{process.user_id} and prescription_id = #{process.prescription_id} and previous_process_id = #{process.previous_process_id}")
 	int getProcessIDwithProcess(@Param("process") Process process);

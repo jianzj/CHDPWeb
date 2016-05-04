@@ -64,8 +64,7 @@ public class HerbService {
 
 	public boolean doesHerbExist(Herb herb) {
 		try {
-			Herb currentHerb = herbDao.getHerbByName(herb.getName());
-			if (currentHerb != null && herb.getType() == currentHerb.getType()) {
+			if (herbDao.doesHerbExist(herb) > 0){
 				return true;
 			}
 			return false;

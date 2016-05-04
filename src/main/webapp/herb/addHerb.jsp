@@ -18,7 +18,7 @@
 			<div class="form-group">
 				<label for="type" class="control-label col-sm-4">中药类型</label>
 				<div class="col-sm-4 required">
-					<select class="form-control col-sm-4" id="herb_type" name="herb_type">
+					<select class="form-control col-sm-4" id="type" name="type">
 						<option value="<%=Constants.DECOCT_FIRST %>" <%if(request.getAttribute("herbAdd")!=null && ((Herb)request.getAttribute("herbAdd")).getType() == 1) out.print("selected"); %>>先煎</option>
 						<option value="<%=Constants.DECOCT_LATER %>" <%if(request.getAttribute("herbAdd")!=null && ((Herb)request.getAttribute("herbAdd")).getType() == 2) out.print("selected"); %>>后下</option>
 						<option value="<%=Constants.WRAPPED_DECOCT %>" <%if(request.getAttribute("herbAdd")!=null && ((Herb)request.getAttribute("herbAdd")).getType() == 3) out.print("selected"); %>>包煎</option>
@@ -34,7 +34,7 @@
 			<div class="form-group">
 				<label for="description" class="control-label col-sm-4">中药描述</label>
 				<div class="col-sm-8">
-					<input type="text" class="form-control" id="description" name="description" placeholder="中药描述" value="${herbAdd.description}">
+				    <textarea class="form-control" rows="5" id="description" name="description" placeholder="中药描述">${herbAdd.description}</textarea>
 				</div>
 			</div>
 			<div class="form-group">

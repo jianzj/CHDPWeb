@@ -46,11 +46,10 @@ public class MachineController {
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public String addPost(HttpServletRequest request, Machine machine){
 		request.setAttribute("nav", "机器管理");
-		
 		if (machineService.doesMachineExist(machine)){
 			request.setAttribute("errorMsg", "此机器名已经存在，请更改名称后重新添加！");
 		}else{
-			machine.setType(Integer.parseInt(request.getParameter("machine_type")));
+			machine.setType(Integer.parseInt(request.getParameter("type")));
 			if (machineService.addMachine(machine)){
 				request.setAttribute("successMsg", "添加机器成功！");
 			}else{

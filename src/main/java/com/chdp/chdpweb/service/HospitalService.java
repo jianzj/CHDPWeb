@@ -1,6 +1,7 @@
 package com.chdp.chdpweb.service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,9 @@ import org.springframework.stereotype.Repository;
 
 import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.Hospital;
+import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.dao.HospitalDao;
+import com.chdp.chdpweb.dao.PrescriptionDao;
 import com.github.pagehelper.PageHelper;
 
 @Repository
@@ -16,6 +19,8 @@ public class HospitalService {
 
 	@Autowired
 	private HospitalDao hospitalDao;
+	@Autowired
+	private PrescriptionDao prsDao;
 	
 	public List<Hospital> getHospitalList(int pageNum){
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
@@ -57,6 +62,16 @@ public class HospitalService {
 	
 	public boolean deleteHospital(int hospitalId){
 		try{
+		/**	 Not sure if this is used, list it here.
+			List<Prescription> prsList = prsDao.getPrescriptionByHospitalwithProcess(hospitalId, Constants.FINISH);
+			Iterator<Prescription> itr = prsList.iterator();
+			Prescription deletedPrs = null;
+			while(itr.hasNext()){
+				deletedPrs = itr.next();
+				prsDao.deletePrescription(deletedPrs.getId());
+			}
+			**/
+			
 			hospitalDao.deleteHospital(hospitalId);
 			return true;
 		} catch (Exception e){

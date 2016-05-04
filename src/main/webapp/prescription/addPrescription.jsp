@@ -19,38 +19,35 @@
 				<label for="hospital_name" class="control-label col-sm-4">医院</label>
 				<div class="col-sm-4 required">
 					<% if(request.getAttribute("hospitalList") != null){ %>
-					<select class="form-control col-sm-4" id="hospital_name" name="hospital_name">
-					<c:forEach var='hospital' items="${hospitalList}">
-						<% if(request.getAttribute("prsAdd") != null){ %>
-						<c:if test="${prsAdd.hospital_name == hospital.name}">
-							<option value="${hospital.name}" selected>${hospital.name}</option>
-						</c:if>
-						<c:if test="${prsAdd.hospital_name != hospital.name}">
-							<option value="${hospital.name}">${hospital.name}</option>
-						</c:if>
-						<% }else if(request.getAttribute("lastestPrs") != null){ %>
-						<c:if test="${lastestPrs.hospital_name == hospital.name}">
-							<option value="${hospital.name}" selected>${hospital.name}</option>
-						</c:if>
-						<c:if test="${lastestPrs.hospital_name != hospital.name}">
-							<option value="${hospital.name}">${hospital.name}</option>
-						</c:if>
+					<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital_name" name="hospital_name">
+						<% if(request.getAttribute("prsAdd") != null) { %>
+						<c:forEach var='hospital' items="${hospitalList}">
+							<c:if test="${prsAdd.hospital_name == hospital.name}">
+								<option value="${hospital.name}" selected>${hospital.name}</option>						
+							</c:if>
+							<c:if test="${prsAdd.hospital_name != hospital.name}">
+								<option value="${hospital.name}">${hospital.name}</option>						
+							</c:if>
+						</c:forEach>
+						<% } else if (request.getAttribute("lastestPrs") != null){ %>
+						<c:forEach var='hospital' items="${hospitalList}">
+							<c:if test="${lastestPrs.hospital_name == hospital.name}">
+								<option value="${hospital.name}" selected>${hospital.name}</option>						
+							</c:if>
+							<c:if test="${lastestPrs.hospital_name != hospital.name}">
+								<option value="${hospital.name}">${hospital.name}</option>						
+							</c:if>
+						</c:forEach>				
 						<% } else { %>
-						<option value="${hospital.name}">${hospital.name}</option>
+						<c:forEach var='hospital' items="${hospitalList}">
+							<option value="${hospital.name}">${hospital.name}</option>
+						</c:forEach>
 						<% } %>
-					</c:forEach>
 					</select>
 					<% }else{ %>
 					<div class="alert alert-danger" role="alert">暂无医院信息，请联系管理员录入相关医院</div>
 					<% } %>
 				</div>
-<!-- 			<div class="col-sm-4">
-					<% if(request.getAttribute("lastestPrs") != null && request.getAttribute("prsAdd") == null){ %>
-						<input type="text" class="form-control" id="hospital_name" name="hospital_name" placeholder="医院名称" value="${lastestPrs.hospital_name}" required>
-					<% }else {%>
-					    <input type="text" class="form-control" id="hospital_name" name="hospital_name" placeholder="医院名称" value="${prsAdd.hospital_name}" required>
-					<% } %>
-				</div> -->
 			</div>
 			<div class="form-group">
 				<label for="outer_id" class="control-label col-sm-4">医院处方登记编号</label>
@@ -87,7 +84,7 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="packet_num" class="control-label col-sm-4">帖数</label>
+				<label for="packet_num" class="control-label col-sm-4">帖数</label>                        
 				<div class="col-sm-4">
 					<% if(request.getAttribute("lastestPrs") != null && request.getAttribute("prsAdd") == null){ %>
 					<input type="number" class="form-control" id="packet_num" name="packet_num" placeholder="贴数" value="${lastestPrs.packet_num}" required>
@@ -100,9 +97,9 @@
 				<label for="price" class="control-label col-sm-4">金额</label>
 				<div class="col-sm-4">
 					<% if(request.getAttribute("lastestPrs") != null && request.getAttribute("prsAdd") == null){ %>
-					<input type="text" class="form-control" id="price" name="price" placeholder="价格" value="${lastestPrs.price}" required>
+					<input type="text" class="form-control" id="prs_price" name="prs_price" placeholder="价格" value="${lastestPrs.price}" required>
 					<% }else {%>
-					<input type="text" class="form-control" id="price" name="price" placeholder="价格" value="${prsAdd.price}" required>
+					<input type="text" class="form-control" id="prs_price" name="prs_price" placeholder="价格" value="${prsAdd.price}" required>
 					<% } %>
 				</div>
 			</div>

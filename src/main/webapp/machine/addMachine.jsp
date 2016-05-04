@@ -18,7 +18,7 @@
 			<div class="form-group">
 				<label for="type" class="control-label col-sm-4">机器型号</label>
 				<div class="col-sm-4 required">
-					<select class="form-control col-sm-4" id="machine_type" name="machine_type">
+					<select class="form-control col-sm-4" id="type" name="type">
 						<option value="<%=Constants.DECOCTION_MACHINE %>" <%if(request.getAttribute("machineAdd")!=null && ((Machine)request.getAttribute("machineAdd")).getType() == 1) out.print("selected"); %>>煎煮机</option>
 						<option value="<%=Constants.FILLING_MACHINE %>" <%if(request.getAttribute("machineAdd")!=null && ((Machine)request.getAttribute("machineAdd")).getType() == 2) out.print("selected"); %>>灌装机</option>
 					</select>
@@ -33,7 +33,7 @@
 			<div class="form-group">
 				<label for="description" class="control-label col-sm-4">机器描述</label>
 				<div class="col-sm-8">
-					<input type="text" class="form-control" id="description" name="description" placeholder="机器描述" value="${machineAdd.description}">
+					<textarea class="form-control" rows="5" id="description" name="description" placeholder="机器描述">${machineAdd.description}</textarea>
 				</div>
 			</div>
 			<div class="form-group">

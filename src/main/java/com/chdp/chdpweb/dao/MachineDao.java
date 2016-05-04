@@ -25,4 +25,10 @@ public interface MachineDao {
 	
 	@Delete("delete from machine where id = #{id}")
 	int deleteMachine(@Param("id") int id);
+	
+	@Select("select count(*) from machine where name = #{machine.name} and type = #{machine.type}")
+	int doesMachineExist(@Param("machine") Machine machine);
+	
+	@Select("select count(*) from machine as m, process as p where m.id = #{machineId} and p.machine_id = m.id and p.process_type < 11")
+	int isMachineInUse(@Param("machineId") int machineId);
 }

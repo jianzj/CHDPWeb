@@ -20,14 +20,14 @@ public interface PrescriptionDao {
 	int createPrescription(@Param("prs") Prescription prs);
 
 	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
-	          "user as u, process as pro where p.id = #{id} and p.process_id = pro.id and pro.user_id = u.id")
+	          "user as u, process as pro where p.id = #{id} and p.hospital_id = h.id and p.process_id = pro.id and pro.user_id = u.id")
 	Prescription getPrescriptionByID(@Param("id") int id);
 	
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.uuid = #{uuid} and p.hospital_id = h.id")
 	Prescription getPrescriptionByUUID(@Param("uuid") String uuid);
 	
 	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
-	          "user as u, process as pro where p.process = #{process} and p.process_id = pro.id and pro.user_id = u.id")
+	          "user as u, process as pro where p.process = #{process} and p.hospital_id = h.id and p.process_id = pro.id and pro.user_id = u.id")
 	List<Prescription> getPrescriptionsByProcess(@Param("process") int process);
 
 	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
@@ -42,7 +42,12 @@ public interface PrescriptionDao {
 	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
 	          "user as u, process as pro where p.hospital_id = h.id " +
 			"and p.id = pro.prescription_id and u.id = pro.user_id and pro.id = p.process_id and p.process < 11")
-	List<Prescription> getPrescriptionsUnfinished();	
+	List<Prescription> getPrescriptionsUnfinished();
+	
+	//获取在一段时间内指定一家医院完成的处方
+	@Select("select count(*) from prescription as p, hospital as h where h.name = #{hospital} and p.hospital_id = h.id and p.process = 11 " +
+	          "and p.create_time > #{start} and p.finish_time < #{end}")
+	int countPrsNumForHospital(@Param("hospitalName") String hospitalName, @Param("start") String start, @Param("end") String end);
 	
 	// Cut Lines
 	
@@ -67,13 +72,27 @@ public interface PrescriptionDao {
 	@Update("update prescription set finish_time = #{prs.finish_time} where uuid = #{prs.uuid}")
 	int updatePrescriptionFinishTime(@Param("prs") Prescription prs);
 	
-	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.id = (select max(id) from prescription)")
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.id = (select max(id) from prescription) and p.hospital_id = h.id")
 	Prescription getLastestPrescription();
 	
-	@Select("select count(*) from prescription as p, hospital as h where h.name = #{prs.hospital_name} and p.outer_id = #{prs.outer_id}")
+	@Select("select count(*) from prescription as p, hospital as h where h.name = #{prs.hospital_name} and p.outer_id = #{prs.outer_id} and p.hospital_id = h.id")
 	int countPrescriptionWithHospitalInfo(@Param("prs") Prescription prs);
 	
 	@Delete("delete from prescription where id = #{prsId}")
 	int deletePrescription(@Param("prsId") int prsId);
 	
+	// New added
+	// Used for receiveList/ to get PrsList with Process type. No user_name included.
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h " +
+	          "where p.process = #{process} and p.hospital_id = h.id")
+	List<Prescription> getPrsListWithProcess(@Param("process") int process);
+
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h " +
+	          "where p.id = #{id} and p.hospital_id = h.id")
+	Prescription getPrswithIdNoUser(@Param("id") int id);
+	
+	// Used for receiveList/ to get PrsList with Process type. No user_name included.
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h " +
+	          "where p.process = #{process} and h.name = #{hospitalName} and p.hospital_id = h.id")
+	List<Prescription> getPrsListWithProAndHospital(@Param("process") int process, @Param("hospitalName") String hospitalName);
 }

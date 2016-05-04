@@ -46,7 +46,7 @@ public class HerbController {
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public String addPost(HttpServletRequest request, Herb herb){
 		request.setAttribute("nav", "中药管理");
-		herb.setType(Integer.parseInt(request.getParameter("herb_type")));
+		herb.setType(Integer.parseInt(request.getParameter("type")));
 		if (herbService.doesHerbExist(herb)){
 			request.setAttribute("errorMsg", "相同类型、相同名称的中药已经存在，请调整后添加！");
 		}else{

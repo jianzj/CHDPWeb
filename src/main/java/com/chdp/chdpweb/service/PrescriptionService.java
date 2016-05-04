@@ -25,6 +25,14 @@ public class PrescriptionService {
 		}
 	}
 	
+	public Prescription getPrsNoUser(int id){
+		try{
+			return prsDao.getPrswithIdNoUser(id);
+		} catch (Exception e){
+			return null;
+		}
+	}
+	
 	public Prescription getLastestPrs(){
 		try{
 			return prsDao.getLastestPrescription();
@@ -60,16 +68,34 @@ public class PrescriptionService {
 	
 	public List<Prescription> listPrsWithProcessUnfinished(int pageNum){
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
-		//try{
+		try{
 			return prsDao.getPrescriptionsUnfinished();
-		//} catch (Exception e){
-		//	return new ArrayList<Prescription>();
-		//}
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
 	}
 	
 	public List<Prescription> listPrsWithProcess(int process){
 		try{
 			return prsDao.getPrescriptionsByProcess(process);
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	// No user_name included
+	public List<Prescription> listPrsWithProcessNoUser(int process){
+		try{
+			return prsDao.getPrsListWithProcess(process);
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	// No user_name included
+	public List<Prescription> listPrsWithProHospitalNoUser(int process, String hospital){
+		try{
+			return prsDao.getPrsListWithProAndHospital(process, hospital);
 		} catch (Exception e){
 			return new ArrayList<Prescription>();
 		}
@@ -157,6 +183,15 @@ public class PrescriptionService {
 		}
 	}
 	
+	public boolean updatePrsBasicInfo(Prescription prs){
+		try{
+			prsDao.updatePrescriptionByPhase1(prs);
+			return true;
+		} catch (Exception e){
+			return false;
+		}
+	}
+	
 	public boolean updatePrsInReceive(Prescription prs){
 		try{
 			prsDao.updatePrescriptionByPhase1(prs);
@@ -189,6 +224,28 @@ public class PrescriptionService {
 				return true;
 			}
 			return false;
+		} catch (Exception e){
+			return false;
+		}
+	}
+	
+	public int countPrsNumForHospital(String hospital, String start, String end){
+		try{
+			return prsDao.countPrsNumForHospital(hospital, start, end);
+		} catch (Exception e){
+			return 0;
+		}
+	}
+	
+	public boolean printReceiveLabel(String uuid){
+		
+		return true;
+	}
+	
+	public boolean updatePrsProcess(Prescription prs){
+		try{
+			prsDao.updatePrescriptionProcess(prs);
+			return true;
 		} catch (Exception e){
 			return false;
 		}

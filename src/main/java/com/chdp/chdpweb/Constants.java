@@ -1,7 +1,7 @@
 package com.chdp.chdpweb;
 
 public class Constants {
-	public static final int PAGE_SIZE = 10;
+	public static final int PAGE_SIZE = 3;
 	public static final String DEFAULT_PASSWORD = "123456";
 	
 	//These params are for Machine

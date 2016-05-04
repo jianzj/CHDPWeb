@@ -26,4 +26,6 @@ public interface HerbDao {
 	@Delete("delete from herb where id = #{id}")
 	int deleteHerb(@Param("id") int id);
 	
+	@Select("select count(*) from herb where name = #{herb.name} and type = #{herb.type}")
+	int doesHerbExist(@Param("herb") Herb herb);
 }

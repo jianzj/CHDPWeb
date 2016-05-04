@@ -78,4 +78,28 @@ public class ProcessService {
 		}
 		return list;
 	}
+	
+	public List<Process> getProcessChainWithProcessId(int id){
+		List<Process> list = new ArrayList<Process>();
+		
+		try{
+			Process prs = proDao.getProcessesById(id);
+			if (prs.getPrevious_process_id() > 0){
+				list = this.getProcessChainWithProcessId(prs.getPrevious_process_id());
+			}
+			list.add(prs);
+		}catch (Exception e){
+			return list;
+		}
+		return list;
+	}
+	
+	public boolean updateProcessTime(Process process){
+		try{
+			proDao.refreshProcessTime(process);
+			return true;
+		} catch (Exception e){
+			return false;
+		}
+	}
 }
