@@ -112,7 +112,7 @@ public class PrescriptionService {
 
 	public List<Prescription> listPrsWithHospital(String hospitalName){
 		try{
-			return prsDao.getPrescriptionByHospital(hospitalName);
+			return prsDao.getPrescriptionByHospitalName(hospitalName);
 		} catch (Exception e){
 			return new ArrayList<Prescription>();
 		}
@@ -121,7 +121,7 @@ public class PrescriptionService {
 	public List<Prescription> listPrsWithHospital(String hospitalName, int pageNum){
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try{
-			return prsDao.getPrescriptionByHospital(hospitalName);
+			return prsDao.getPrescriptionByHospitalName(hospitalName);
 		} catch (Exception e){
 			return new ArrayList<Prescription>();
 		}

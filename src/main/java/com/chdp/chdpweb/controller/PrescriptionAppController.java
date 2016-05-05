@@ -20,7 +20,7 @@ public class PrescriptionAppController {
 
 	@RequestMapping(value = "/getPrescription", method = RequestMethod.POST)
 	@ResponseBody
-	public Prescription receiveModify(HttpServletRequest request) {
+	public Prescription getPrescription(HttpServletRequest request) {
 		String uuid = request.getParameter("uuid");
 		if (uuid == null) {
 			return null;
