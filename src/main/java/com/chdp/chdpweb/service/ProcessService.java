@@ -24,257 +24,305 @@ import com.chdp.chdpweb.bean.User;
 @Repository
 public class ProcessService {
 
-	@Autowired
-	private ProcessDao proDao;
+    @Autowired
+    private ProcessDao proDao;
 
-	@Autowired
-	private PrescriptionDao prsDao;
+    @Autowired
+    private PrescriptionDao prsDao;
 
-	@Autowired
-	private DataSourceTransactionManager transactionManager;
+    @Autowired
+    private DataSourceTransactionManager transactionManager;
 
-	public int createProccess(Process newProcess) {
-		try {
-			return proDao.createProcess(newProcess);
-		} catch (Exception e) {
-			return -1;
-		}
-	}
+    public int createProccess(Process newProcess) {
+        try {
+            return proDao.createProcess(newProcess);
+        } catch (Exception e) {
+            return -1;
+        }
+    }
 
-	public boolean deleteProcess(int processId) {
-		try {
-			proDao.deleteProcess(processId);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
+    public boolean deleteProcess(int processId) {
+        try {
+            proDao.deleteProcess(processId);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-	public int getProcessIdwithProcess(Process process) {
-		try {
-			return proDao.getProcessIDwithProcess(process);
-		} catch (Exception e) {
-			return -1;
-		}
-	}
+    public int getProcessIdwithProcess(Process process) {
+        try {
+            return proDao.getProcessIDwithProcess(process);
+        } catch (Exception e) {
+            return -1;
+        }
+    }
 
-	public List<Process> getProcessListwithPrsID(int prsId) {
-		try {
-			return proDao.getProcessesByPrsID(prsId);
-		} catch (Exception e) {
-			return new ArrayList<Process>();
-		}
-	}
+    public List<Process> getProcessListwithPrsID(int prsId) {
+        try {
+            return proDao.getProcessesByPrsID(prsId);
+        } catch (Exception e) {
+            return new ArrayList<Process>();
+        }
+    }
 
-	public String getProcessName(int process) {
-		if (process == Constants.RECEIVE) {
-			return "接方";
-		} else if (process == Constants.PACKAGE) {
-			return "包装";
-		} else {
-			return "未知状态";
-		}
-	}
+    public String getProcessName(int process) {
+        if (process == Constants.RECEIVE) {
+            return "接方";
+        } else if (process == Constants.PACKAGE) {
+            return "包装";
+        } else {
+            return "未知状态";
+        }
+    }
 
-	public Process getProcessById(int id) {
-		try {
-			return proDao.getProcessesById(id);
-		} catch (Exception e) {
-			return null;
-		}
-	}
+    public Process getProcessById(int id) {
+        try {
+            return proDao.getProcessesById(id);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
-	public List<Process> getPresentPreviousProcess(int id) {
-		List<Process> list = new ArrayList<Process>();
-		try {
-			Process present = proDao.getPrescriptionPresentProcess(id);
-			list.add(present);
-			list.add(proDao.getProcessesById(present.getPrevious_process_id()));
-		} catch (Exception e) {
-			return list;
-		}
-		return list;
-	}
+    public List<Process> getPresentPreviousProcess(int id) {
+        List<Process> list = new ArrayList<Process>();
+        try {
+            Process present = proDao.getPrescriptionPresentProcess(id);
+            list.add(present);
+            list.add(proDao.getProcessesById(present.getPrevious_process_id()));
+        } catch (Exception e) {
+            return list;
+        }
+        return list;
+    }
 
-	public AppResult forwardProcess(int prsId, int procId, Prescription prescription) {
-		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-		TransactionStatus status = transactionManager.getTransaction(def);
-		AppResult result = new AppResult();
-		try {
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String currentTime = df.format(new Date());
-			User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
-			proDao.finishProcess(procId, currentTime, user.getId());
+    public AppResult forwardProcess(int prsId, int procId, Prescription prescription) {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        AppResult result = new AppResult();
+        try {
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String currentTime = df.format(new Date());
+            User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
+            proDao.finishProcess(procId, currentTime, user.getId());
 
-			try {
-				Process proc = new Process();
-				proc.setBegin(currentTime);
-				proc.setProcess_type(Constants.MIX);
-				proc.setPrescription_id(prsId);
-				proc.setPrevious_process_id(procId);
-				proc.setUser_id(user.getId());
-				proDao.createProcess(proc);
+            try {
+                Process proc = new Process();
+                proc.setBegin(currentTime);
+                proc.setProcess_type(Constants.MIX);
+                proc.setPrescription_id(prsId);
+                proc.setPrevious_process_id(procId);
+                proc.setUser_id(user.getId());
+                proDao.createProcess(proc);
 
-				try {
-					prescription.setProcess(Constants.MIX);
-					prescription.setProcess_id(proc.getId());
+                try {
+                    prescription.setProcess(Constants.MIX);
+                    prescription.setProcess_id(proc.getId());
 
-					prsDao.updatePrescription(prescription);
-				} catch (Exception e) {
-					transactionManager.rollback(status);
-					result.setErrorMsg("更新处方信息失败");
-					result.setSuccess(false);
+                    prsDao.updatePrescription(prescription);
+                } catch (Exception e) {
+                    transactionManager.rollback(status);
+                    result.setErrorMsg("更新处方信息失败");
+                    result.setSuccess(false);
 
-					return result;
-				}
-			} catch (Exception e) {
-				transactionManager.rollback(status);
-				result.setErrorMsg("新建调配流程失败");
-				result.setSuccess(false);
+                    return result;
+                }
+            } catch (Exception e) {
+                transactionManager.rollback(status);
+                result.setErrorMsg("新建调配流程失败");
+                result.setSuccess(false);
 
-				return result;
-			}
-		} catch (Exception e) {
-			transactionManager.rollback(status);
-			result.setErrorMsg("更新审方流程失败");
-			result.setSuccess(false);
+                return result;
+            }
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+            result.setErrorMsg("更新审方流程失败");
+            result.setSuccess(false);
 
-			return result;
-		}
+            return result;
+        }
 
-		transactionManager.commit(status);
-		result.setSuccess(true);
-		return result;
-	}
+        transactionManager.commit(status);
+        result.setSuccess(true);
+        return result;
+    }
 
-	public AppResult forwardProcess(int prsId, int procId, int forwardTo, int machineId) {
-		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-		TransactionStatus status = transactionManager.getTransaction(def);
-		AppResult result = new AppResult();
-		try {
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String currentTime = df.format(new Date());
-			User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
-			if (forwardTo != Constants.DECOCT) {
-				if (machineId == 0)
-					proDao.finishProcess(procId, currentTime, user.getId());
-				else
-					proDao.finishProcessWithMachine(procId, currentTime, user.getId(), machineId);
-			} else
-				proDao.startProcess(procId, currentTime, user.getId());
+    public AppResult forwardProcess(int prsId, int procId, int forwardTo, int machineId) {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        AppResult result = new AppResult();
+        try {
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String currentTime = df.format(new Date());
+            User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
+            if (forwardTo != Constants.DECOCT) {
+                if (machineId == 0)
+                    proDao.finishProcess(procId, currentTime, user.getId());
+                else
+                    proDao.finishProcessWithMachine(procId, currentTime, user.getId(), machineId);
+            } else
+                proDao.startProcess(procId, currentTime, user.getId());
 
-			try {
-				Process proc = new Process();
-				if (forwardTo != Constants.SOAK && forwardTo != Constants.DECOCT)
-					proc.setBegin(currentTime);
-				proc.setProcess_type(forwardTo);
-				proc.setPrescription_id(prsId);
-				proc.setPrevious_process_id(procId);
-				proc.setUser_id(user.getId());
-				proDao.createProcess(proc);
+            try {
+                if (forwardTo != Constants.SHIP) {
+                    Process proc = new Process();
+                    if (forwardTo != Constants.SOAK && forwardTo != Constants.DECOCT)
+                        proc.setBegin(currentTime);
+                    proc.setProcess_type(forwardTo);
+                    proc.setPrescription_id(prsId);
+                    proc.setPrevious_process_id(procId);
+                    proc.setUser_id(user.getId());
+                    proDao.createProcess(proc);
+                    try {
+                        Prescription prs = new Prescription();
+                        prs.setId(prsId);
+                        prs.setProcess(forwardTo);
+                        prs.setProcess_id(proc.getId());
+                        prsDao.updatePrescriptionProcess(prs);
+                    } catch (Exception e) {
+                        transactionManager.rollback(status);
+                        result.setErrorMsg("更新处方信息失败");
+                        result.setSuccess(false);
+    
+                        return result;
+                    }
+                }else{
+                    try {
+                        Prescription prs = new Prescription();
+                        prs.setId(prsId);
+                        prs.setProcess(forwardTo);
+                        prs.setProcess_id(-1);
+                        prsDao.updatePrescriptionProcess(prs);
+                    } catch (Exception e) {
+                        transactionManager.rollback(status);
+                        result.setErrorMsg("更新处方信息失败");
+                        result.setSuccess(false);
+    
+                        return result;
+                    }
+                }
+            } catch (Exception e) {
+                transactionManager.rollback(status);
+                result.setErrorMsg("新建" + Constants.getProcessName(forwardTo) + "流程失败");
+                result.setSuccess(false);
 
-				try {
-					Prescription prs = new Prescription();
-					prs.setId(prsId);
-					prs.setProcess(forwardTo);
-					prs.setProcess_id(proc.getId());
-					prsDao.updatePrescriptionProcess(prs);
-				} catch (Exception e) {
-					transactionManager.rollback(status);
-					result.setErrorMsg("更新处方信息失败");
-					result.setSuccess(false);
+                return result;
+            }
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+            result.setErrorMsg("更新" + Constants.getProcessName(forwardTo - 1) + "流程失败");
+            result.setSuccess(false);
 
-					return result;
-				}
-			} catch (Exception e) {
-				transactionManager.rollback(status);
-				result.setErrorMsg("新建" + Constants.getProcessName(forwardTo) + "流程失败");
-				result.setSuccess(false);
+            return result;
+        }
 
-				return result;
-			}
-		} catch (Exception e) {
-			transactionManager.rollback(status);
-			result.setErrorMsg("更新" + Constants.getProcessName(forwardTo - 1) + "流程失败");
-			result.setSuccess(false);
+        transactionManager.commit(status);
+        result.setSuccess(true);
+        return result;
+    }
 
-			return result;
-		}
+    public AppResult backwardProcess(int prsId, int procId, int backTo, int type, String reason) {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        AppResult result = new AppResult();
+        try {
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String currentTime = df.format(new Date());
+            User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
+            proDao.cancelProcess(procId, currentTime, user.getId(), type, reason);
 
-		transactionManager.commit(status);
-		result.setSuccess(true);
-		return result;
-	}
+            try {
+                Process proc = new Process();
+                if (backTo != Constants.SOAK && backTo != Constants.DECOCT)
+                    proc.setBegin(currentTime);
+                proc.setProcess_type(backTo);
+                proc.setPrescription_id(prsId);
+                proc.setPrevious_process_id(procId);
+                proc.setUser_id(user.getId());
+                proDao.createProcess(proc);
 
-	public AppResult backwardProcess(int prsId, int procId, int backTo, int type, String reason) {
-		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-		TransactionStatus status = transactionManager.getTransaction(def);
-		AppResult result = new AppResult();
-		try {
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String currentTime = df.format(new Date());
-			User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
-			proDao.cancelProcess(procId, currentTime, user.getId(), type, reason);
+                try {
+                    Prescription prs = new Prescription();
+                    prs.setId(prsId);
+                    prs.setProcess(backTo);
+                    prs.setProcess_id(proc.getId());
+                    prsDao.updatePrescriptionProcess(prs);
+                } catch (Exception e) {
+                    transactionManager.rollback(status);
+                    result.setErrorMsg("更新处方信息失败");
+                    result.setSuccess(false);
 
-			try {
-				Process proc = new Process();
-				if (backTo != Constants.SOAK && backTo != Constants.DECOCT)
-					proc.setBegin(currentTime);
-				proc.setProcess_type(backTo);
-				proc.setPrescription_id(prsId);
-				proc.setPrevious_process_id(procId);
-				proc.setUser_id(user.getId());
-				proDao.createProcess(proc);
+                    return result;
+                }
+            } catch (Exception e) {
+                transactionManager.rollback(status);
+                result.setErrorMsg("新建" + Constants.getProcessName(backTo) + "流程失败");
+                result.setSuccess(false);
 
-				try {
-					Prescription prs = new Prescription();
-					prs.setId(prsId);
-					prs.setProcess(backTo);
-					prs.setProcess_id(proc.getId());
-					prsDao.updatePrescriptionProcess(prs);
-				} catch (Exception e) {
-					transactionManager.rollback(status);
-					result.setErrorMsg("更新处方信息失败");
-					result.setSuccess(false);
+                return result;
+            }
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+            result.setErrorMsg("更新" + Constants.getProcessName(backTo + 1) + "流程失败");
+            result.setSuccess(false);
 
-					return result;
-				}
-			} catch (Exception e) {
-				transactionManager.rollback(status);
-				result.setErrorMsg("新建" + Constants.getProcessName(backTo) + "流程失败");
-				result.setSuccess(false);
+            return result;
+        }
 
-				return result;
-			}
-		} catch (Exception e) {
-			transactionManager.rollback(status);
-			result.setErrorMsg("更新" + Constants.getProcessName(backTo + 1) + "流程失败");
-			result.setSuccess(false);
+        transactionManager.commit(status);
+        result.setSuccess(true);
+        return result;
+    }
 
-			return result;
-		}
+    public AppResult startProcess(int procId, int proc) {
+        AppResult result = new AppResult();
+        try {
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String currentTime = df.format(new Date());
+            User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
+            proDao.startProcess(procId, currentTime, user.getId());
+            result.setSuccess(true);
+            return result;
+        } catch (Exception e) {
+            result.setErrorMsg("更新" + Constants.getProcessName(proc) + "流程失败");
+            result.setSuccess(false);
+            return result;
+        }
+    }
 
-		transactionManager.commit(status);
-		result.setSuccess(true);
-		return result;
-	}
+    public AppResult checkAndFinish(int procId) {
+        AppResult result = new AppResult();
 
-	public AppResult startProcess(int procId, int proc) {
-		AppResult result = new AppResult();
-		try {
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String currentTime = df.format(new Date());
-			User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
-			proDao.startProcess(procId, currentTime, user.getId());
-			result.setSuccess(true);
-			return result;
-		} catch (Exception e) {
-			result.setErrorMsg("更新" + Constants.getProcessName(proc) + "流程失败");
-			result.setSuccess(false);
-			return result;
-		}
-	}
+        try {
+            Process proc = proDao.getProcessesById(procId);
+
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            long now = System.currentTimeMillis();
+            long begin = df.parse(proc.getBegin()).getTime();
+            if (now - begin < Constants.SOAK_TIME) {
+                result.setErrorMsg("浸泡时间小于要求，请在" + Math.ceil((Constants.SOAK_TIME - now + begin) / 1000 / 60.0) + "分钟后再进行煎煮");
+                result.setSuccess(false);
+                return result;
+            }
+
+            try {
+                String currentTime = df.format(new Date());
+                proDao.finishProcess(procId, currentTime, proc.getUser_id());
+                result.setSuccess(true);
+                return result;
+            } catch (Exception e) {
+                result.setErrorMsg("检查浸泡时间失败");
+                result.setSuccess(false);
+                return result;
+            }
+
+        } catch (Exception e) {
+            result.setErrorMsg("检查浸泡时间失败");
+            result.setSuccess(false);
+            return result;
+        }
+    }
 }

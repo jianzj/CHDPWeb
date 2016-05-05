@@ -126,6 +126,14 @@ public class ProcessAppController {
 
 		return procService.startProcess(procId, proc);
 	}
+	
+	@RequestMapping(value = "/checkAndFinish", method = RequestMethod.POST)
+    @ResponseBody
+    public AppResult checkAndFinish(HttpServletRequest request) {
+        int procId = Integer.parseInt(request.getParameter("procId"));
+
+        return procService.checkAndFinish(procId);
+    }
 
 	@RequestMapping(value = "/decoct", method = RequestMethod.POST)
 	@ResponseBody

@@ -12,20 +12,27 @@ import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.service.PrescriptionService;
 
 @Controller
-@RequestMapping("/app/prescription")
-public class PrescriptionAppController {
+@RequestMapping("/app/ordr")
+public class OrderAppController {
 
 	@Autowired
-	private PrescriptionService prsService;
+	private OrderService orderService;
 
-	@RequestMapping(value = "/getPrescription", method = RequestMethod.POST)
+	@RequestMapping(value = "/getOrder", method = RequestMethod.POST)
 	@ResponseBody
-	public Prescription getPrescription(HttpServletRequest request) {
+	public Order getOrder(HttpServletRequest request) {
 		String uuid = request.getParameter("uuid");
 		if (uuid == null) {
 			return null;
 		} else {
-			return prsService.getPrescriptionByUuid(uuid);
+			return orderService.getOrderByUuid(uuid);
 		}
 	}
+	
+	@RequestMapping(value = "/finishOrder", method = RequestMethod.POST)
+    @ResponseBody
+    public AppResult finishOrder(HttpServletRequest request) {
+        int orderId = Integer.parseInt(request.getParameter("orderId"));
+        return orderService.finishOrder(orderId);
+    }
 }
