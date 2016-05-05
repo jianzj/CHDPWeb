@@ -32,9 +32,17 @@ public interface PrescriptionDao {
 	List<Prescription> getPrescriptionsByProcess(@Param("process") int process);
 
 	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
+	          "user as u, process as pro where p.process = #{process} and p.hospital_id = h.id and p.process_id = pro.id and pro.user_id = u.id and p.create_time > #{start} and p.finish_time < #{end}")
+	List<Prescription> getPrescriptionsByProcessAndTime(@Param("process") int process, @Param("start") String start, @Param("end") String end);
+	
+	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
 	          "user as u, process as pro where p.process = #{process} and h.name = #{hospitalName} and p.process_id = pro.id and pro.user_id = u.id")
 	List<Prescription> getPrescriptionsByParams(@Param("process") int process, @Param("hospitalName") String hospitalName);
-    
+ 
+	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
+	          "user as u, process as pro where p.process = #{process} and h.name = #{hospitalName} and p.process_id = pro.id and pro.user_id = u.id and p.create_time > #{start} and p.finish_time < #{end}")
+	List<Prescription> getPrescriptionsByParamsAndTime(@Param("process") int process, @Param("hospitalName") String hospitalName, @Param("start") String start, @Param("end") String end);
+	
 	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
 	          "user as u, process as pro where h.name = #{hospitalName} and h.id = p.hospital_id " +
 			"and p.id = pro.prescription_id and u.id = pro.user_id and pro.id = p.process_id and p.process < 11")

@@ -127,6 +127,15 @@ public class PrescriptionService {
 			return new ArrayList<Prescription>();
 		}
 	}
+	
+	public List<Prescription> listPrsWithProcessAndTime(int process, int pageNum, String start, String end){
+		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+		try{
+			return prsDao.getPrescriptionsByProcessAndTime(process, start, end);
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
+	}
 
 	public List<Prescription> listPrsWithHospital(String hospitalName){
 		try{
@@ -157,6 +166,15 @@ public class PrescriptionService {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try{
 			return prsDao.getPrescriptionsByParams(process, hospitalName);
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	public List<Prescription> listPrsWithParamsAndTime(int process, String hospitalName, int pageNum, String start, String end){
+		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+		try{
+			return prsDao.getPrescriptionsByParamsAndTime(process, hospitalName, start, end);
 		} catch (Exception e){
 			return new ArrayList<Prescription>();
 		}
@@ -262,6 +280,14 @@ public class PrescriptionService {
 
 	public boolean printPackageLabel(String uuid){
 		
+		return true;
+	}
+	
+	public boolean printSinglePackage(String uuid){
+		return true;
+	}
+	
+	public boolean printSinglePrs(String uuid){
 		return true;
 	}
 	

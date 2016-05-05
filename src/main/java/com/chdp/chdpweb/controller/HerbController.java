@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.chdp.chdpweb.bean.Herb;
-import com.chdp.chdpweb.bean.Machine;
 import com.chdp.chdpweb.service.HerbService;
-import com.chdp.chdpweb.service.MachineService;
 import com.github.pagehelper.PageInfo;
 
 @Controller

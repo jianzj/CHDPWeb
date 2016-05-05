@@ -3,12 +3,10 @@
 <%@ page import="com.chdp.chdpweb.Constants" %>
 <%@ page import="com.chdp.chdpweb.bean.Process" %>
 <%@ page import="com.chdp.chdpweb.bean.Prescription" %>
-<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.*" %>
 <%@ include file="../head.jsp"%>
 
-<h3 class="sub-header">处方流转详细信息
-
-</h3>
+<h3 class="sub-header">处方流转详细信息</h3>
 
 <div class="table-responsive">
 	<table class="table table-striped">
@@ -24,15 +22,15 @@
 			</tr>
 		</thead>
 		<tbody>
-			<c:if test="${not empty prescription}">
+			<c:if test="${not empty currentPrs}">
 				<tr>
-					<td><c:out value="${prescription.id}" /></td>
-					<td><c:out value="${prescription.hospital_name}" /></td>
-					<td><c:out value="${prescription.outer_id}" /></td>
-					<td><c:out value="${prescription.patient_name}" /></td>
-					<td><c:out value="${prescription.packet_num}" /></td>
-					<td><c:out value="${prescription.price}" /></td>
-					<td><c:out value="${prescription.create_time}" /></td>
+					<td><c:out value="${currentPrs.id}" /></td>
+					<td><c:out value="${currentPrs.hospital_name}" /></td>
+					<td><c:out value="${currentPrs.outer_id}" /></td>
+					<td><c:out value="${currentPrs.patient_name}" /></td>
+					<td><c:out value="${currentPrs.packet_num}" /></td>
+					<td><c:out value="${currentPrs.price}" /></td>
+					<td><c:out value="${currentPrs.create_time}" /></td>
 				</tr>			
 			</c:if>
 		</tbody>
@@ -41,546 +39,62 @@
 
 <div class="container">
 	<div class="row bs-wizard" style="border-bottom:0;">
-		<% if (request.getAttribute("processMap") != null && ((HashMap)request.getAttribute("processMap")).containsKey(Constants.RECEIVE)){ %>
-		<%     Process pro = (Process)((HashMap)request.getAttribute("processMap")).get(Constants.RECEIVE); %>
-		<%     if (request.getAttribute("prescription") != null && ((Prescription)request.getAttribute("prescription")).getProcess() > pro.getProcess_type()){ %>
-		<div class="col-xs-3 bs-wizard-step complete">
-		  <div class="text-center bs-wizard-stepnum">接方</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
+		<!-- 已完成的Process -->
+		<% if (request.getAttribute("processList") != null && request.getAttribute("currentPrs") != null){ %>
+		<%     Iterator<Process> itr = ((List<Process>)request.getAttribute("processList")).iterator(); %>
+		<%     Prescription currentPrs = (Prescription)request.getAttribute("currentPrs"); %>
+		<%     Process proc = null; %>
+		<%     while (itr.hasNext()){ %>
+		<%         proc = itr.next(); %>
+			<%     if (currentPrs.getProcess() > proc.getProcess_type()){ %>
+			<div class="col-xs-3 bs-wizard-step complete">
+			<%     }else{ %>
+			<div class="col-xs-3 bs-wizard-step active">
+			<%     } %>
+			<div class="text-center bs-wizard-stepnum"><%=Constants.getProcessName(proc.getProcess_type()) %></div>
+		    <div class="progress"><div class="progress-bar"></div></div>
+		    <a href="#" class="bs-wizard-dot"></a>
+		    <div class="bs-wizard-info text-center list-group">
 		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: <%=pro.getFinish() %><br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		<% if (pro.getError_type() == 0){ %>
-		 		是否出错: 否<br/>
-		 		原因: 无
-		 		<% }else{ %>
-		 		是否出错: 是<br/>
-		 		原因: <%=pro.getError_msg() %>	 		
+		 		<% if (proc.getProcess_type() != Constants.DECOCT){ %>
+		 		处理时间: <%=proc.getFinish() %><br/>
+		 		<% }else { %>
+		 		煎煮时间:<%=Constants.getDecoctTime(proc.getBegin(), proc.getFinish(), 1) %><br/>
+		 		保温时间:<%=Constants.getHeatTime(proc.getFinish(), 1) %><br/>
+		 		<% } %>
+		 		处理人: <%=proc.getUser_name() %><br/>
+		 		<% if (proc.getError_type() == 0){ %>
+		 		顺利通过
+		 		<% } else { %>
+		 		出错: <%=Constants.getErrorName(proc.getError_type()) %><br/>
+		 		出错原因: <%=proc.getError_msg() %>
 		 		<% } %>
 		 	</span>
-		  </div>
-		</div>
-		<%     }else{ %>
-		<div class="col-xs-3 bs-wizard-step active">
-		  <div class="text-center bs-wizard-stepnum">接方</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: 尚未结束<br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
+		    </div>
+		    </div>
 		<%     } %>
-		<% }else{ %>
-		<div class="col-xs-3 bs-wizard-step disabled">
-		  <div class="text-center bs-wizard-stepnum">接方</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: 尚未开始<br/>
-		 		结束时间: 尚未开始<br/>
-		 		处理人: 暂无<br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
 		<% } %>
-		<% if (request.getAttribute("processMap") != null && ((HashMap)request.getAttribute("processMap")).containsKey(Constants.CHECK)){ %>
-		<%     Process pro = (Process)((HashMap)request.getAttribute("processMap")).get(Constants.CHECK); %>
-		<%     if (request.getAttribute("prescription") != null && ((Prescription)request.getAttribute("prescription")).getProcess() > pro.getProcess_type()){ %>
-		<div class="col-xs-3 bs-wizard-step complete">
-		  <div class="text-center bs-wizard-stepnum">审方</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: <%=pro.getFinish() %><br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		<% if (pro.getError_type() == 0){ %>
-		 		是否出错: 否<br/>
-		 		原因: 无
-		 		<% }else{ %>
-		 		是否出错: 是<br/>
-		 		原因: <%=pro.getError_msg() %>	 		
-		 		<% } %>
-		 	</span>
-		  </div>
-		</div>
-		<%     }else{ %>
-		<div class="col-xs-3 bs-wizard-step active">
-		  <div class="text-center bs-wizard-stepnum">审方</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: 尚未结束<br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<%     } %>
-		<% }else{ %>
-		<div class="col-xs-3 bs-wizard-step disabled">
-		  <div class="text-center bs-wizard-stepnum">审方</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: 尚未开始<br/>
-		 		结束时间: 尚未开始<br/>
-		 		处理人: 暂无<br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<% } %>
-		<% if (request.getAttribute("processMap") != null && ((HashMap)request.getAttribute("processMap")).containsKey(Constants.MIX)){ %>
-		<%     Process pro = (Process)((HashMap)request.getAttribute("processMap")).get(Constants.MIX); %>
-		<%     if (request.getAttribute("prescription") != null && ((Prescription)request.getAttribute("prescription")).getProcess() > pro.getProcess_type()){ %>
-		<div class="col-xs-3 bs-wizard-step complete">
-		  <div class="text-center bs-wizard-stepnum">调配</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: <%=pro.getFinish() %><br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		<% if (pro.getError_type() == 0){ %>
-		 		是否出错: 否<br/>
-		 		原因: 无
-		 		<% }else{ %>
-		 		是否出错: 是<br/>
-		 		原因: <%=pro.getError_msg() %>	 		
-		 		<% } %>
-		 	</span>
-		  </div>
-		</div>
-		<%     }else{ %>
-		<div class="col-xs-3 bs-wizard-step active">
-		  <div class="text-center bs-wizard-stepnum">调配</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: 尚未结束<br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<%     } %>
-		<% }else{ %>
-		<div class="col-xs-3 bs-wizard-step disabled">
-		  <div class="text-center bs-wizard-stepnum">调配</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: 尚未开始<br/>
-		 		结束时间: 尚未开始<br/>
-		 		处理人: 暂无<br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<% } %>
-		<% if (request.getAttribute("processMap") != null && ((HashMap)request.getAttribute("processMap")).containsKey(Constants.MIXCHECK)){ %>
-		<%     Process pro = (Process)((HashMap)request.getAttribute("processMap")).get(Constants.MIXCHECK); %>
-		<%     if (request.getAttribute("prescription") != null && ((Prescription)request.getAttribute("prescription")).getProcess() > pro.getProcess_type()){ %>
-		<div class="col-xs-3 bs-wizard-step complete">
-		  <div class="text-center bs-wizard-stepnum">调配审核</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: <%=pro.getFinish() %><br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		<% if (pro.getError_type() == 0){ %>
-		 		是否出错: 否<br/>
-		 		原因: 无
-		 		<% }else{ %>
-		 		是否出错: 是<br/>
-		 		原因: <%=pro.getError_msg() %>	 		
-		 		<% } %>
-		 	</span>
-		  </div>
-		</div>
-		<%     }else{ %>
-		<div class="col-xs-3 bs-wizard-step active">
-		  <div class="text-center bs-wizard-stepnum">调配审核</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: 尚未结束<br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<%     } %>
-		<% }else{ %>
-		<div class="col-xs-3 bs-wizard-step disabled">
-		  <div class="text-center bs-wizard-stepnum">调配审核</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: 尚未开始<br/>
-		 		结束时间: 尚未开始<br/>
-		 		处理人: 暂无<br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<% } %>
-		<% if (request.getAttribute("processMap") != null && ((HashMap)request.getAttribute("processMap")).containsKey(Constants.SOAK)){ %>
-		<%     Process pro = (Process)((HashMap)request.getAttribute("processMap")).get(Constants.SOAK); %>
-		<%     if (request.getAttribute("prescription") != null && ((Prescription)request.getAttribute("prescription")).getProcess() > pro.getProcess_type()){ %>
-		<div class="col-xs-3 bs-wizard-step complete">
-		  <div class="text-center bs-wizard-stepnum">浸泡</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: <%=pro.getFinish() %><br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		<% if (pro.getError_type() == 0){ %>
-		 		是否出错: 否<br/>
-		 		原因: 无
-		 		<% }else{ %>
-		 		是否出错: 是<br/>
-		 		原因: <%=pro.getError_msg() %>	 		
-		 		<% } %>
-		 	</span>
-		  </div>
-		</div>
-		<%     }else{ %>
-		<div class="col-xs-3 bs-wizard-step active">
-		  <div class="text-center bs-wizard-stepnum">浸泡</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: 尚未结束<br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<%     } %>
-		<% }else{ %>
-		<div class="col-xs-3 bs-wizard-step disabled">
-		  <div class="text-center bs-wizard-stepnum">浸泡</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: 尚未开始<br/>
-		 		结束时间: 尚未开始<br/>
-		 		处理人: 暂无<br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<% } %>
-		<% if (request.getAttribute("processMap") != null && ((HashMap)request.getAttribute("processMap")).containsKey(Constants.DECOCT)){ %>
-		<%     Process pro = (Process)((HashMap)request.getAttribute("processMap")).get(Constants.DECOCT); %>
-		<%     if (request.getAttribute("prescription") != null && ((Prescription)request.getAttribute("prescription")).getProcess() > pro.getProcess_type()){ %>
-		<div class="col-xs-3 bs-wizard-step complete">
-		  <div class="text-center bs-wizard-stepnum">煎煮</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: <%=pro.getFinish() %><br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		<% if (pro.getError_type() == 0){ %>
-		 		是否出错: 否<br/>
-		 		原因: 无
-		 		<% }else{ %>
-		 		是否出错: 是<br/>
-		 		原因: <%=pro.getError_msg() %>	 		
-		 		<% } %>
-		 	</span>
-		  </div>
-		</div>
-		<%     }else{ %>
-		<div class="col-xs-3 bs-wizard-step active">
-		  <div class="text-center bs-wizard-stepnum">煎煮</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: 尚未结束<br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<%     } %>
-		<% }else{ %>
-		<div class="col-xs-3 bs-wizard-step disabled">
-		  <div class="text-center bs-wizard-stepnum">煎煮</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: 尚未开始<br/>
-		 		结束时间: 尚未开始<br/>
-		 		处理人: 暂无<br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<% } %>
-		<% if (request.getAttribute("processMap") != null && ((HashMap)request.getAttribute("processMap")).containsKey(Constants.POUR)){ %>
-		<%     Process pro = (Process)((HashMap)request.getAttribute("processMap")).get(Constants.POUR); %>
-		<%     if (request.getAttribute("prescription") != null && ((Prescription)request.getAttribute("prescription")).getProcess() > pro.getProcess_type()){ %>
-		<div class="col-xs-3 bs-wizard-step complete">
-		  <div class="text-center bs-wizard-stepnum">灌装</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: <%=pro.getFinish() %><br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		<% if (pro.getError_type() == 0){ %>
-		 		是否出错: 否<br/>
-		 		原因: 无
-		 		<% }else{ %>
-		 		是否出错: 是<br/>
-		 		原因: <%=pro.getError_msg() %>	 		
-		 		<% } %>
-		 	</span>
-		  </div>
-		</div>
-		<%     }else{ %>
-		<div class="col-xs-3 bs-wizard-step active">
-		  <div class="text-center bs-wizard-stepnum">灌装</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: 尚未结束<br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<%     } %>
-		<% }else{ %>
-		<div class="col-xs-3 bs-wizard-step disabled">
-		  <div class="text-center bs-wizard-stepnum">灌装</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: 尚未开始<br/>
-		 		结束时间: 尚未开始<br/>
-		 		处理人: 暂无<br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<% } %>
-		<% if (request.getAttribute("processMap") != null && ((HashMap)request.getAttribute("processMap")).containsKey(Constants.CLEAN)){ %>
-		<%     Process pro = (Process)((HashMap)request.getAttribute("processMap")).get(Constants.CLEAN); %>
-		<%     if (request.getAttribute("prescription") != null && ((Prescription)request.getAttribute("prescription")).getProcess() > pro.getProcess_type()){ %>
-		<div class="col-xs-3 bs-wizard-step complete">
-		  <div class="text-center bs-wizard-stepnum">清场</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: <%=pro.getFinish() %><br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		<% if (pro.getError_type() == 0){ %>
-		 		是否出错: 否<br/>
-		 		原因: 无
-		 		<% }else{ %>
-		 		是否出错: 是<br/>
-		 		原因: <%=pro.getError_msg() %>	 		
-		 		<% } %>
-		 	</span>
-		  </div>
-		</div>
-		<%     }else{ %>
-		<div class="col-xs-3 bs-wizard-step active">
-		  <div class="text-center bs-wizard-stepnum">清场</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: 尚未结束<br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<%     } %>
-		<% }else{ %>
-		<div class="col-xs-3 bs-wizard-step disabled">
-		  <div class="text-center bs-wizard-stepnum">清场</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: 尚未开始<br/>
-		 		结束时间: 尚未开始<br/>
-		 		处理人: 暂无<br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<% } %>
-		<% if (request.getAttribute("processMap") != null && ((HashMap)request.getAttribute("processMap")).containsKey(Constants.PACKAGE)){ %>
-		<%     Process pro = (Process)((HashMap)request.getAttribute("processMap")).get(Constants.PACKAGE); %>
-		<%     if (request.getAttribute("prescription") != null && ((Prescription)request.getAttribute("prescription")).getProcess() > pro.getProcess_type()){ %>
-		<div class="col-xs-3 bs-wizard-step complete">
-		  <div class="text-center bs-wizard-stepnum">包装</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: <%=pro.getFinish() %><br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		<% if (pro.getError_type() == 0){ %>
-		 		是否出错: 否<br/>
-		 		原因: 无
-		 		<% }else{ %>
-		 		是否出错: 是<br/>
-		 		原因: <%=pro.getError_msg() %>	 		
-		 		<% } %>
-		 	</span>
-		  </div>
-		</div>
-		<%     }else{ %>
-		<div class="col-xs-3 bs-wizard-step active">
-		  <div class="text-center bs-wizard-stepnum">包装</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: 尚未结束<br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<%     } %>
-		<% }else{ %>
-		<div class="col-xs-3 bs-wizard-step disabled">
-		  <div class="text-center bs-wizard-stepnum">包装</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: 尚未开始<br/>
-		 		结束时间: 尚未开始<br/>
-		 		处理人: 暂无<br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<% } %>
-		<% if (request.getAttribute("processMap") != null && ((HashMap)request.getAttribute("processMap")).containsKey(Constants.SHIP)){ %>
-		<%     Process pro = (Process)((HashMap)request.getAttribute("processMap")).get(Constants.SHIP); %>
-		<%     if (request.getAttribute("prescription") != null && ((Prescription)request.getAttribute("prescription")).getProcess() > pro.getProcess_type()){ %>
-		<div class="col-xs-3 bs-wizard-step complete">
-		  <div class="text-center bs-wizard-stepnum">出库</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: <%=pro.getFinish() %><br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		<% if (pro.getError_type() == 0){ %>
-		 		是否出错: 否<br/>
-		 		原因: 无
-		 		<% }else{ %>
-		 		是否出错: 是<br/>
-		 		原因: <%=pro.getError_msg() %>	 		
-		 		<% } %>
-		 	</span>
-		  </div>
-		</div>
-		<%     }else{ %>
-		<div class="col-xs-3 bs-wizard-step active">
-		  <div class="text-center bs-wizard-stepnum">出库</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: <%=pro.getBegin() %><br/>
-		 		结束时间: 尚未结束<br/>
-		 		处理人: <%=pro.getUser_name() %><br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<%     } %>
-		<% }else{ %>
-		<div class="col-xs-3 bs-wizard-step disabled">
-		  <div class="text-center bs-wizard-stepnum">出库</div>
-		  <div class="progress"><div class="progress-bar"></div></div>
-		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		开始时间: 尚未开始<br/>
-		 		结束时间: 尚未开始<br/>
-		 		处理人: 暂无<br/>
-		 		是否出错: 暂无<br/>
-		 		原因: 暂无
-		 	</span>
-		  </div>
-		</div>
-		<% } %>
+		</div>	
 	</div>
+	
+	<% if (request.getAttribute("currentPrs") != null) { %>
+	<div class="row bs-wizard" style="border-bottom:0;">
+	<% Prescription currentPrs = (Prescription)request.getAttribute("currentPrs"); %>
+	<% int process_type = currentPrs.getProcess() + 1; %>
+	<% while (process_type < 11){ %>
+		<div class="col-xs-3 bs-wizard-step disabled">
+		  <div class="text-center bs-wizard-stepnum"><%=Constants.getProcessName(process_type) %></div>
+		  <div class="progress"><div class="progress-bar"></div></div>
+		  <a href="#" class="bs-wizard-dot"></a>
+		  <div class="bs-wizard-info text-center list-group">
+		 	<span class="list-group-item">
+		 		尚未开始！
+		 	</span>
+		  </div>
+		</div>	
+	<%     process_type += 1; %>
+	<% } %>
+	</div>
+	<% } %>
 </div>
 <%@ include file="../foot.jsp"%>

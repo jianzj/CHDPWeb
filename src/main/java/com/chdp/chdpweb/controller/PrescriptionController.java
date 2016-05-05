@@ -164,6 +164,14 @@ public class PrescriptionController {
 				prsList = prsService.listPrsWithProcessNoUser(Constants.SHIP);
 				request.setAttribute("shipList", prsList);
 				return "process/shipList";
+			}else if(from.equals("CURRENT")){
+				prsList = prsService.listPrsWithProcessUnfinished(1);
+				request.setAttribute("hospital", "ALL");
+				request.setAttribute("process", 0);
+				request.setAttribute("currentPrsList", prsList);
+				PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
+				request.setAttribute("page", page);	
+				return "prescription/currentPrsList";
 			}
 		}
 		
@@ -183,6 +191,15 @@ public class PrescriptionController {
 			prsList = prsService.listPrsWithProcessNoUser(Constants.SHIP);
 			request.setAttribute("shipList", prsList);
 			return "process/shipList";
+		}else if(from.equals("CURRENT") && ((currentUser.getAuthority()&1024) == 0)){
+			request.setAttribute("errorMsg", "您暂无此操作权限！");
+			prsList = prsService.listPrsWithProcessUnfinished(1);
+			request.setAttribute("hospital", "ALL");
+			request.setAttribute("process", 0);
+			request.setAttribute("currentPrsList", prsList);
+			PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
+			request.setAttribute("page", page);	
+			return "prescription/currentPrsList";
 		}
 		
 		Prescription prs = prsService.getPrescription(prsId);
@@ -219,6 +236,13 @@ public class PrescriptionController {
 				prsList = prsService.listPrsWithProcessNoUser(Constants.SHIP);
 				request.setAttribute("shipList", prsList);
 				return "process/shipList";
+			}else if(from.equals("ALL")){
+				prsList = prsService.listPrsWithProcessUnfinished(1);
+				request.setAttribute("process", 0);
+				request.setAttribute("currentPrsList", prsList);
+				PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
+				request.setAttribute("page", page);	
+				return "prescription/currentPrsList";
 			}
 		}
 		
@@ -238,6 +262,14 @@ public class PrescriptionController {
 			prsList = prsService.listPrsWithProcessNoUser(Constants.SHIP);
 			request.setAttribute("shipList", prsList);
 			return "process/shipList";
+		}else if(from.equals("CURRENT") && ((currentUser.getAuthority()&1024) == 0)){
+			request.setAttribute("errorMsg", "您暂无此操作权限！");
+			prsList = prsService.listPrsWithProcessUnfinished(1);
+			request.setAttribute("process", 0);
+			request.setAttribute("currentPrsList", prsList);
+			PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
+			request.setAttribute("page", page);	
+			return "prescription/currentPrsList";
 		}
 		
 		Prescription currentPrs = prsService.getPrsNoUser(prsId);
@@ -292,6 +324,13 @@ public class PrescriptionController {
 			prsList = prsService.listPrsWithProcessNoUser(Constants.SHIP);
 			request.setAttribute("shipList", prsList);
 			return "process/shipList";
+		}else if (from.equals("CURRENT")){
+			prsList = prsService.listPrsWithProcessUnfinished(1);
+			request.setAttribute("process", 0);
+			request.setAttribute("currentPrsList", prsList);
+			PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
+			request.setAttribute("page", page);	
+			return "prescription/currentPrsList";
 		}
 		return "process/receiveList";
 	}
@@ -338,6 +377,7 @@ public class PrescriptionController {
 		return "process/receiveList";
 	}
 	
+	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/currentList", method = RequestMethod.GET)
 	public String getCurrentList(HttpServletRequest request, @RequestParam(name = "pageNum", defaultValue = "1") int pageNum){
 		
@@ -345,8 +385,6 @@ public class PrescriptionController {
 		
 		String hospital = request.getParameter("hospital");
 		String process = request.getParameter("process");
-		
-		//Initial these two params to make things easier.
 		if (hospital == null){
 			hospital = "ALL";
 		}
@@ -373,16 +411,58 @@ public class PrescriptionController {
 		}
 		
 		request.setAttribute("hospital", hospital);
-		request.setAttribute("process", process);
+		request.setAttribute("process", process_type);
 		
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
 		
+		request.setAttribute("currentPrsList", prsList);
 		PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
 		request.setAttribute("page", page);	
-		request.setAttribute("currentPrsList", prsList);
 	
-        return "prescription/currentPrescriptionList";
+        return "prescription/currentPrsList";
+	}
+	
+	@RequiresRoles("ADMIN")
+	@RequestMapping(value = "/historyList", method = RequestMethod.GET)
+	public String getHistoryList(HttpServletRequest request, @RequestParam(name = "pageNum", defaultValue = "1") int pageNum){
+		
+		request.setAttribute("nav", "历史处方列表");
+		
+		String hospital = request.getParameter("hospital");
+		String start = request.getParameter("start");
+		String end = request.getParameter("end");
+		if (hospital == null){
+			hospital = "ALL";
+		}
+		if (start == null){
+			start = "2010-07-18 00:00:00";
+		}
+		if (end == null){
+			end = "2099-07-18 00:00:00";
+		}
+		System.out.println(start);
+		System.out.println(end);
+		System.out.println(hospital);
+		List<Prescription> prsList = null;
+		if(hospital.equals("ALL")){
+			prsList = prsService.listPrsWithProcessAndTime(Constants.FINISH, pageNum, start, end);
+		}else{
+			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospital, pageNum, start, end);
+		}
+		
+		request.setAttribute("hospital", hospital);
+		request.setAttribute("start", start);
+		request.setAttribute("end", end);
+
+		List<Hospital> hospitalList = hospitalService.getHospitalList();
+		request.setAttribute("hospitalList", hospitalList);
+		
+		request.setAttribute("historyPrsList", prsList);
+		PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
+		request.setAttribute("page", page);	
+	
+        return "prescription/historyPrsList";
 	}
 	
 	@RequestMapping(value = "/hospitalDimensionList", method = RequestMethod.GET)
@@ -418,6 +498,83 @@ public class PrescriptionController {
 		request.setAttribute("hospitalList", updatedList);
 		
 		return "prescription/hospitalDimension";
+	}
+	
+	@RequiresRoles("ADMIN")
+	@RequestMapping(value = "/printSingleLabel")
+	public String printSingleLabelPackage(HttpServletRequest request, @Param("hospital") String hospital, @Param("process") Integer process,
+											@Param("pageNum") Integer pageNum, @Param("printType") String printType, @Param("from") String from, @Param("prsId") Integer prsId){
+		if (hospital == null){
+			hospital = "ALL";
+		}
+		if (process == null){
+			process = 0;
+		}
+		request.setAttribute("hospital", hospital);
+		request.setAttribute("process", process);
+		
+		if (pageNum == null){
+			pageNum = 1;
+		}
+		request.setAttribute("pageNum", pageNum);
+		
+		if (printType == null){
+			printType = "PACKAGE";
+		}
+		request.setAttribute("printType", printType);
+		
+		if (from == null){
+			from = "CURRENT";
+		}
+		request.setAttribute("from", from);
+		
+		if (from.equals("CURRENT")){
+			request.setAttribute("nav", "当前处方列表");
+		}
+		
+		if (prsId == null){
+			request.setAttribute("errorMsg", "未知处方无法打印！");
+		}else{
+			Prescription prs = prsService.getPrsNoUser(prsId);
+			if (printType.equals("PACKAGE")){
+				if(prsService.printSinglePackage(prs.getUuid() )){
+					request.setAttribute("successMsg", "打印成功！");
+				}else{
+					request.setAttribute("errorMsg", "打印失败，请稍后重试！");
+				}
+			}else if(printType.equals("PRS")){
+				if(prsService.printSinglePrs(prs.getUuid() )){
+					request.setAttribute("successMsg", "打印成功！");
+				}else{
+					request.setAttribute("errorMsg", "打印失败，请稍后重试！");
+				}
+			}
+		}
+				
+		List<Prescription> prsList = null;
+		
+		if (hospital.equals("ALL") && process == 0){
+			prsList = prsService.listPrsWithProcessUnfinished(pageNum);
+		}else if (hospital.equals("ALL")){
+			prsList = prsService.listPrsWithProcess(process, pageNum);
+		}else if (process == 0){
+			prsList = prsService.listPrsWithHospital(hospital, pageNum);
+		}else{
+			prsList = prsService.listPrsWithParams(process, hospital, pageNum);
+		}
+		
+		List<Hospital> hospitalList = hospitalService.getHospitalList();
+		request.setAttribute("hospitalList", hospitalList);
+		
+		request.setAttribute("currentPrsList", prsList);
+		PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
+		request.setAttribute("page", page);	
+	
+		if (from.equals("CURRENT")){
+			return "prescription/currentPrsList";
+		}
+        return "prescription/currentPrsList";
+		
 	}
 	
 	@RequiresRoles("RECEIVE")

@@ -9,8 +9,8 @@
 		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital" name="hospital">
 			<option value="ALL">全部医院</option>
 			
-			<c:forEach var='hospital' items="${hospitalList}">
-				<option value="${hospital.name}">${hospital.name}</option>
+			<c:forEach var='hosp' items="${hospitalList}">
+				<option value="${hosp.name}">${hosp.name}</option>
 			</c:forEach>
 		</select>
 		<select class="selectpicker" data-live-search="true" data-with="fit" id="process" name="process">
@@ -61,15 +61,28 @@
 					<td><c:out value="${prs.packet_num}" /></td>
 					<td>
 					<c:if test="${prs.process == 1}"><c:out value="接方" /></c:if>
+					<c:if test="${prs.process == 2}"><c:out value="审方" /></c:if>
+					<c:if test="${prs.process == 3}"><c:out value="调配" /></c:if>
+					<c:if test="${prs.process == 4}"><c:out value="调配审核" /></c:if>
+					<c:if test="${prs.process == 5}"><c:out value="浸泡" /></c:if>
+					<c:if test="${prs.process == 6}"><c:out value="煎煮" /></c:if>
+					<c:if test="${prs.process == 7}"><c:out value="灌装" /></c:if>
+					<c:if test="${prs.process == 8}"><c:out value="清场" /></c:if>
 					<c:if test="${prs.process == 9}"><c:out value="包装" /></c:if>
+					<c:if test="${prs.process == 10}"><c:out value="出库" /></c:if>
 					</td>
 					<td><c:out value="${prs.user_name}" /></td>
-					<td width="340">
+					<td width="320">
 						<div class="btn-group" role="group" aria-label="...">
-						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/process/showAll?prsId=${prs.id}&from=currentList">状态</a>
-							<a type="button" class="btn btn-default" href="">修改</a>
-							<a type="button" class="btn btn-primary" href="">打印标签</a>
-							<a type="button" class="btn btn-success" onClick="">打印包装标签</a>
+							<% if (request.getParameter("pageNum") == null){ %>
+							<% 		request.setAttribute("page_num", 1); %>
+							<% }else{ %>
+							<% 		request.setAttribute("page_num", request.getParameter("pageNum")); %>
+							<% } %>
+						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/process/showAllProcs?prsId=${prs.id}&from=CURRENT">状态</a>
+							<a type="button" class="btn btn-default" href="<%=request.getContextPath()%>/prescription/modify?prsId=${prs.id}&from=CURRENT">修改</a>
+							<a type="button" class="btn btn-primary" onClick="printSinglePrs(${prs.id},'${hospital}',${process},${page_num},'${prs.hospital_name}','${prs.outer_id}')">打印标签</a>
+							<a type="button" class="btn btn-success" onClick="printSinglePackage(${prs.id},'${hospital}',${process},${page_num},'${prs.hospital_name}','${prs.outer_id}')">打印包装标签</a>
 						</div>
 					</td>
 				</tr>
@@ -78,11 +91,9 @@
 	</table>
 </div>
 <div class="text-right">
-	<% if (request.getAttribute("hospital") != null && request.getAttribute("process") != null){ %>
-	<c:set var="pageUrl" value="prescription/currentList?hospital=${hospital}&process=${process}"/>
-	<% }else{ %>
+	<% request.setAttribute("hospital", (String)request.getAttribute("hospital")); %>
+	<% request.setAttribute("process", (Integer)request.getAttribute("process")); %>
 	<c:set var="pageUrl" value="prescription/currentList" />
-	<% } %>
 	<%@ include file="../common/nav.jsp"%>
 </div>
 <div class="modal fade" id="assureDlg" tabindex="-1" role="dialog">
@@ -97,10 +108,16 @@
 	</div>
 </div>
 <script>
-    var deletePrs = function(id, process, hospital_name, outer_id){
-    	$("#assureMsg").html("确认删除处方 <strong>"+hospital_name+":"+outer_id+"</strong>？");
-        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/delete?prsId="+id+"&process="+process);
-        $("#assureDlg").modal("show");
-    };
+	var printSinglePackage = function(id, selectedHospital, process, pageNum, hospital_name, outer_id){
+		$("#assureMsg").html("打印处方包装标签 <strong>"+hospital_name+":"+outer_id+"</strong> ？");
+	    $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printSingleLabel?printType=PACKAGE&from=CURRENT&prsId="+id+"&process="+process+"&hospital="+selectedHospital+"&pageNum="+pageNum);
+	    $("#assureDlg").modal("show");
+	};
+
+	var printSinglePrs = function(id, selectedHospital, process, pageNum, hospital_name, outer_id){
+		$("#assureMsg").html("打印处方标签 <strong>"+hospital_name+":"+outer_id+"</strong> ？");
+	    $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printSingleLabel?printType=PRS&from=CURRENT&prsId="+id+"&process="+process+"&hospital="+selectedHospital+"&pageNum="+pageNum);
+	    $("#assureDlg").modal("show");
+	};
 </script>
 <%@ include file="../foot.jsp"%>

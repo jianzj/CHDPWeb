@@ -18,10 +18,10 @@
 		%>
 		<c:forEach var="p" begin="${start}" end="${end}">
 			<li <c:if test="${page.pageNum==p}"> class="active"</c:if>><a
-				href="<%=request.getContextPath()%>/${pageUrl}?pageNum=${p}">${p}</a></li>
+				href="<%=request.getContextPath()%>/${pageUrl}?start=${start}&end=${end}&hospital=${hospital}&process=${process}&pageNum=${p}">${p}</a></li>
 		</c:forEach>
 		<li <c:if test="${!page.hasNextPage}"> class="disabled"</c:if>><a
-			href="<c:if test="${page.hasNextPage}"><%=request.getContextPath()%>/${pageUrl}?pageNum=${page.pageNum+1}</c:if>"
+			href="<c:if test="${page.hasNextPage}"><%=request.getContextPath()%>/${pageUrl}?start=${start}&end=${end}&hospital=${hospital}&process=${process}&pageNum=${page.pageNum+1}</c:if>"
 			aria-label="下一页"> <span aria-hidden="true">&raquo;</span>
 		</a></li>
 	</ul>

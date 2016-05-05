@@ -1,9 +1,6 @@
 package com.chdp.chdpweb.controller;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -107,36 +104,29 @@ public class ProcessController {
 	 	return "process/shipList";
 	 }
 	
-	@RequestMapping(value = "/showAll", method = RequestMethod.GET)
-	public String showAllProcesses(HttpServletRequest request, @Param("prsId") Integer prsId){
-		
-		String from = request.getParameter("from");
+	@RequiresRoles(value = "ADMIN")
+	@RequestMapping(value = "/showAllProcs", method = RequestMethod.GET)
+	public String showAllProcesses(HttpServletRequest request, @Param("prsId") Integer prsId, @Param("from") String from){
+
 		if (from == null){
-			from = "currentList";
+			from = "CURRENT";
 		}
 		
 		if (prsId == null){
 			request.setAttribute("errorMsg", "未知处方ID！");
-			if (from.equals("currentList")){
+			if (from.equals("CURRENT")){
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/currentList";
-			}else{
+			}else if (from.equals("HISTORY")){
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/historyList";
 			}
 		}
 		
+		request.setAttribute("from", from);
+		
 		Prescription prs = prsService.getPrescription(prsId);
 		List<Process> processList = proService.getProcessChainWithProcessId(prs.getProcess_id());
-		Map<Integer, Process> processMap = new HashMap<Integer, Process>();
-		int count = 1;
-        Iterator<Process> itr = processList.iterator();
-		while (itr.hasNext() && count <= processList.size()){
-			Process tempProc = itr.next();
-			processMap.put(count, tempProc);
-			count += 1;
-		}
-		
-		request.setAttribute("processMap", processMap);
-		request.setAttribute("prescription", prs);
+		request.setAttribute("processList", processList);
+		request.setAttribute("currentPrs", prs);
 		
 		return "process/processDetail";
 	}
