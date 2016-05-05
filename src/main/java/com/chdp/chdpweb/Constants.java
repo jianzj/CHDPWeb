@@ -65,4 +65,6 @@ public class Constants {
     
     public static final int ORDER_BEGIN = 1;
     public static final int ORDER_FINISH = 2;
+    
+    public static final String TEMPLATEPATH = "/Users/zhao_jian/git/CHDPWeb/src/main/webapp/template";
 }

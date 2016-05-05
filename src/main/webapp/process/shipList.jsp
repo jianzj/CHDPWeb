@@ -1,19 +1,21 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ include file="../head.jsp"%>
+<form class="form-inline" action="<%=request.getContextPath()%>/process/shipList" method="GET">
 <h3 class="sub-header">出库流程列表
-	<div class="btn-group">
-	  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-	    选择指定医院 <span class="caret"></span>
-	  </button>
-	  <ul class="dropdown-menu">
-	    <c:forEach var='hospital' items="${hospitalList}">
-	        <li><a href="<%=request.getContextPath() %>/process/shipList?hospital=${hospital.name}"><c:out value="${hospital.name}" /></a></li>
-	    </c:forEach>
-	  </ul>
-	</div>
-	<a class="btn btn-success" style="float:right;margin-top:-5px" href="">打印出库清单</a>
-</h3>
+	<span>
+		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital" name="hospital">
+			<option value="ALL">全部医院</option>
+			
+			<c:forEach var='hosp' items="${hospitalList}">
+				<option value="${hosp.name}">${hosp.name}</option>
+			</c:forEach>
+		</select>
+		<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+		<a type="button" class="btn btn-success" style="" onClick="printList('${hospital}')">生成出库清单</a>
+	</span>
+	</h3>
+</form>
 <div>
 	<c:if test="${not empty errorMsg}">
 		<div class="alert alert-danger" role="alert">${errorMsg}</div>
@@ -22,7 +24,6 @@
 		<div class="alert alert-success" role="alert">${successMsg}</div>
 	</c:if>
 </div>
-
 <div class="table-responsive">
 	<table class="table table-striped">
 		<thead>
@@ -46,9 +47,9 @@
 					<td><c:out value="${prs.packet_num}" /></td>
 					<td><c:out value="${prs.price}" /></td>
 					<td><c:out value="${prs.create_time}" /></td>
-					<td width="90">
+					<td width="100">
 						<div class="btn-group" role="group" aria-label="...">
-							<a type="button" class="btn btn-default" href="<%=request.getContextPath()%>/prescription/shipModify?prsId=${prs.id}">处方修改</a>
+							<a type="button" class="btn btn-default" href="<%=request.getContextPath()%>/prescription/modify?prsId=${prs.id}&from=SHIP">处方修改</a>
 						</div>
 					</td>
 				</tr>
@@ -69,9 +70,9 @@
 	</div>
 </div>
 <script>
-    var deletePrs = function(id, process, hospital_name, outer_id){
-    	$("#assureMsg").html("确认删除处方 <strong>"+hospital_name+":"+outer_id+"</strong>？");
-        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/delete?prsId="+id+"&process="+process);
+    var printList = function(hospital_name){
+    	$("#assureMsg").html("确认生成出库清单?");
+        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printShipListXls?hospital="+hospital_name);
         $("#assureDlg").modal("show");
     };
 </script>

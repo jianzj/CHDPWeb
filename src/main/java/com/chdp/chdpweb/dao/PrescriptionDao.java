@@ -97,9 +97,12 @@ public interface PrescriptionDao {
 	          "where p.process = #{process} and h.name = #{hospitalName} and p.hospital_id = h.id")
 	List<Prescription> getPrsListWithProAndHospital(@Param("process") int process, @Param("hospitalName") String hospitalName);
 
+    @Select("select h.name from prescription as p, hospital as h " +
+              "where p.process = #{process} and p.hospital_id = h.id")
+    List<String> listInProgressHospitalwithProcess(@Param("process") int process);
+	
     @Select("select * from prescription where hospital_id = #{hospital_id}")
     List<Prescription> getPrescriptionByHospital(@Param("hospital_id") int hospital_id);
-
 
     @Update("update prescription set class_of_medicines = #{prs.class_of_medicines}, process = #{prs.process}, process_id = #{prs.process_id}, "
             + "need_decoct_first = #{prs.need_decoct_first}, decoct_first_list = #{prs.decoct_first_list, jdbcType=LONGVARCHAR},"
@@ -112,5 +115,7 @@ public interface PrescriptionDao {
 
     @Update("update prescription set finish_time = #{currentTime}, process = " + Constants.FINISH + " where process = " + Constants.SHIP + " and process_id = #{orderId}")
     int finishPrescription(int orderId, String currentTime);
-
+    
+    @Update("update prescription set finish_time = #{prs.finish_time}, process = #{prs.process}, process_id = #{prs.process_id} where id = #{prs.id}")
+    int markPrsFinished(@Param("prs") Prescription prs);
 }

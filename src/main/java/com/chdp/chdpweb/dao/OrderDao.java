@@ -11,6 +11,13 @@ public interface OrderDao {
 
 	@Insert("insert order(uuid, hospital_id, create_time) values(#{order.uuid}, #{order.hospital_id}, #{order.create_time})")
 	int createOrder(@Param("order") Order order);
+
+	@Insert("insert CHDP.order(uuid, hospital_id, create_time, create_user_id, status) " +
+	           "values(#{order.uuid}, #{order.hospital_id}, #{order.create_time}, #{order.create_user_id}, #{order.status})")
+	int createFullOrder(@Param("order") Order order);
+	
+	@Select("select id from CHDP.order where uuid = #{orderUuid}")
+	int getOrderIdByUuid(@Param("orderUuid") String orderUuid);
 	
 	@Update("update order set create_time = #{order.create_time}, create_user_id = #{order.create_user_id} " +
 	           "where uuid = #{order.uuid}")

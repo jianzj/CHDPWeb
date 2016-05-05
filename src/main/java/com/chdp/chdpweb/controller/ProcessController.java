@@ -59,6 +59,54 @@ public class ProcessController {
 	 	return "process/receiveList";
 	 }
 	
+	@RequiresRoles(value = {"ADMIN", "PACKAGE"}, logical = Logical.OR)
+	@RequestMapping(value = "/packageList", method = RequestMethod.GET)
+	public String listPrsInPackaging(HttpServletRequest request){
+				
+		String hospital = request.getParameter("hospital");
+		if (hospital == null || hospital.equals("")){
+			hospital = "ALL";
+		}
+		
+		List<Prescription> prsList = null;
+		if (hospital.equals("ALL")){
+			prsList = prsService.listPrsWithProcessNoUser(Constants.PACKAGE);
+		}else{
+			prsList = prsService.listPrsWithProHospitalNoUser(Constants.PACKAGE, hospital);
+		}
+		
+		List<Hospital> hospitalList = hospitalService.getHospitalList();
+		
+		request.setAttribute("hospitalList", hospitalList);
+		request.setAttribute("hospital", hospital);
+		request.setAttribute("packageList", prsList);
+	 	return "process/packageList";
+	 }
+
+	@RequiresRoles(value = {"ADMIN", "SHIP"}, logical = Logical.OR)
+	@RequestMapping(value = "/shipList", method = RequestMethod.GET)
+	public String listPrsInShipping(HttpServletRequest request){
+				
+		String hospital = request.getParameter("hospital");
+		if (hospital == null || hospital.equals("")){
+			hospital = "ALL";
+		}
+		
+		List<Prescription> prsList = null;
+		if (hospital.equals("ALL")){
+			prsList = prsService.listPrsWithProcessNoUser(Constants.SHIP);
+		}else{
+			prsList = prsService.listPrsWithProHospitalNoUser(Constants.SHIP, hospital);
+		}
+		
+		List<Hospital> hospitalList = hospitalService.getHospitalList();
+		
+		request.setAttribute("hospitalList", hospitalList);
+		request.setAttribute("hospital", hospital);
+		request.setAttribute("shipList", prsList);
+	 	return "process/shipList";
+	 }
+	
 	@RequestMapping(value = "/showAll", method = RequestMethod.GET)
 	public String showAllProcesses(HttpServletRequest request, @Param("prsId") Integer prsId){
 		
