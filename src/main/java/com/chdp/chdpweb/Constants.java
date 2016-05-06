@@ -153,7 +153,7 @@ public class Constants {
     public static final int ORDER_BEGIN = 1;
     public static final int ORDER_FINISH = 2;
     
-    public static final String TEMPLATEPATH = "/Users/zhao_jian/git/CHDPWeb/src/main/webapp/template";
+    public static final String TEMPLATEPATH = "D:/template";
     
     public static final String DEFAULT_START = "2010-07-18";
     public static final String DEFAULT_END = "2099-07-18";

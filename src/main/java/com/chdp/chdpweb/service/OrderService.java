@@ -131,7 +131,7 @@ public class OrderService {
     
     public int countPrsNumInOrder(int orderId){
     	try{
-    		return orderDao.countPrsNumInOrder(orderId);
+    		return orderDao.countPrsNumWithOrder(orderId);
     	} catch (Exception e){
     		return 0;
     	}
