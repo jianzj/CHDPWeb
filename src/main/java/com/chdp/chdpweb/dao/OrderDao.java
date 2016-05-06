@@ -25,8 +25,8 @@ public interface OrderDao {
 	           "where uuid = #{order.uuid}")
 	int updateCreateAction(@Param("order") Order order);
 	
-	@Update("update CHDP.order set outbound_time = #{order.outbound_time}, outbound_user_id = #{order.outbound_user_id} " +
-	          "where id = #{order.id}")
+	@Update("update CHDP.order set outbound_time = #{order.outbound_time}, outbound_user_id = #{order.outbound_user_id}, " +
+	          "status = #{order.status} where id = #{order.id}")
 	int updateOutboundAction(@Param("order") Order order);
 	
 	@Update("update CHDP.order set status = #{order.status} where uuid = #{order.uuid}")
