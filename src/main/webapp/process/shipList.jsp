@@ -6,8 +6,13 @@
 	<span>
 		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital" name="hospital">
 			<option value="ALL">全部医院</option>
-			
 			<c:forEach var='hosp' items="${hospitalList}">
+				<c:if test="${hospital == hosp.name}">
+					<option value="${hosp.name}" selected>${hosp.name}</option>
+				</c:if>
+				<c:if test="${hospital != hosp.name}">
+					<option value="${hosp.name}">${hosp.name}</option>
+				</c:if>
 				<option value="${hosp.name}">${hosp.name}</option>
 			</c:forEach>
 		</select>
