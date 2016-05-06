@@ -13,7 +13,6 @@
 				<c:if test="${hospital != hosp.name}">
 					<option value="${hosp.name}">${hosp.name}</option>
 				</c:if>
-				<option value="${hosp.name}">${hosp.name}</option>
 			</c:forEach>
 		</select>
 		<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
