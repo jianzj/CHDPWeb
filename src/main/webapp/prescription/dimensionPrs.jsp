@@ -3,29 +3,9 @@
 <%@ page import="com.chdp.chdpweb.Constants" %>
 <%@ include file="../head.jsp"%>
 
-<form class="form-inline" action="<%=request.getContextPath()%>/prescription/historyList" method="GET">
 <h3 class="sub-header">
-	历史处方列表
-	<span>
-		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital" name="hospital">
-			<option value="ALL">全部医院</option>
-			
-			<c:forEach var='hosp' items="${hospitalList}">
-				<option value="${hosp.name}">${hosp.name}</option>
-			</c:forEach>
-		</select>
-		<span class="input-group input-append date col-xs-2" id="hospital-datePicker-start">
-                <input type="text" class="form-control" name="startTime"/>
-                <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
-         </span>
-         <span class="input-group input-append date col-xs-2" id="hospital-datePicker-end">
-                <input type="text" class="form-control" name="endTime"/>
-         <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
-         </span>
-		<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-	</span>
+	处方汇总列表
 </h3>
-</form>
 <div>
 	<c:if test="${not empty errorMsg}">
 		<div class="alert alert-danger" role="alert">${errorMsg}</div>
@@ -48,7 +28,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<c:forEach var="prs" items="${historyPrsList}">
+			<c:forEach var="prs" items="${finishPrsList}">
 				<tr>
 					<td><c:out value="${prs.id}" /></td>
 					<td><c:out value="${prs.hospital_name}" /></td>
@@ -64,7 +44,7 @@
 							<% }else{ %>
 							<% 		request.setAttribute("page_num", request.getParameter("pageNum")); %>
 							<% } %>
-						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/process/showAllProcs?prsId=${prs.id}&from=HISTORY">状态</a>
+							 <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/process/showAllProcs?prsId=${prs.id}&from=${from}">状态</a>
 						</div>
 					</td>
 				</tr>
@@ -75,8 +55,6 @@
 <div class="text-right">
 	<% if (request.getAttribute("hospital") != null){ %>
 		<% request.setAttribute("hospital", (String)request.getAttribute("hospital")); %>
-	<% }else{ %>
-		<% request.setAttribute("hospital", "ALL"); %>
 	<% } %>
 	<% if (request.getAttribute("startTime") != null){ %>
 		<% request.setAttribute("startTime", (String)request.getAttribute("startTime")); %>
@@ -88,7 +66,17 @@
 	<% }else{ %>
 		<% request.setAttribute("endTime", Constants.DEFAULT_END); %>
 	<% } %>
-	<c:set var="pageUrl" value="prescription/historyList" />
+	<% if (request.getAttribute("userId") != null){ %>
+		<% request.setAttribute("userId", (Integer)request.getAttribute("userId")); %>
+	<% }else{ %>
+		<% request.setAttribute("userId", 0); %>
+	<% } %>
+	<% if (request.getAttribute("orderId") != null){ %>
+		<% request.setAttribute("orderId", (Integer)request.getAttribute("orderId")); %>
+	<% }else{ %>
+		<% request.setAttribute("orderId", 1); %>
+	<% } %>
+	<c:set var="pageUrl" value="prescription/dimensionPrsList" />
 	<%@ include file="../common/nav.jsp"%>
 </div>
 <%@ include file="../foot.jsp"%>

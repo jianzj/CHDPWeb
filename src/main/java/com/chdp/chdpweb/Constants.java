@@ -129,6 +129,12 @@ public class Constants {
     	return "";
     }
 
+    public static String getCurrentTime(){
+    	SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+    	Date date = new Date();
+    	return sdf1.format(date);
+    }
+    
     public static int getHeatTime(int decoct_type){
     	switch(decoct_type) {
 	    	case DECOCT_ONE:
@@ -148,4 +154,7 @@ public class Constants {
     public static final int ORDER_FINISH = 2;
     
     public static final String TEMPLATEPATH = "/Users/zhao_jian/git/CHDPWeb/src/main/webapp/template";
+    
+    public static final String DEFAULT_START = "2010-07-18";
+    public static final String DEFAULT_END = "2099-07-18";
 }

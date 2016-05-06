@@ -1,6 +1,7 @@
 package com.chdp.chdpweb.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -16,11 +17,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import com.chdp.chdpweb.service.HospitalService;
 import com.chdp.chdpweb.service.OrderService;
 import com.chdp.chdpweb.service.PrescriptionService;
 import com.chdp.chdpweb.service.ProcessService;
+import com.chdp.chdpweb.service.UserService;
 import com.github.pagehelper.PageInfo;
 import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.Hospital;
@@ -41,6 +44,8 @@ public class PrescriptionController {
 	private ProcessService proService;
 	@Autowired
 	private OrderService orderService;
+	@Autowired
+	private UserService userService;
 	
 	@RequiresRoles("RECEIVE")
 	@RequestMapping(value = "/add", method = RequestMethod.GET)
@@ -425,25 +430,21 @@ public class PrescriptionController {
 	
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/historyList", method = RequestMethod.GET)
-	public String getHistoryList(HttpServletRequest request, @RequestParam(name = "pageNum", defaultValue = "1") int pageNum){
+	public String getHistoryList(HttpServletRequest request, @RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
+				@Param("hospital") String hospital, @Param("startTime") String start, @Param("endTime") String end){
 		
 		request.setAttribute("nav", "历史处方列表");
 		
-		String hospital = request.getParameter("hospital");
-		String start = request.getParameter("start");
-		String end = request.getParameter("end");
-		if (hospital == null){
+		if (hospital == null || hospital == ""){
 			hospital = "ALL";
 		}
-		if (start == null){
-			start = "2010-07-18 00:00:00";
+		if (start == null || start == ""){
+			start = Constants.DEFAULT_START;
 		}
-		if (end == null){
-			end = "2099-07-18 00:00:00";
+		if (end == null || end == ""){
+			end = Constants.DEFAULT_END;
 		}
-		System.out.println(start);
-		System.out.println(end);
-		System.out.println(hospital);
+
 		List<Prescription> prsList = null;
 		if(hospital.equals("ALL")){
 			prsList = prsService.listPrsWithProcessAndTime(Constants.FINISH, pageNum, start, end);
@@ -452,8 +453,8 @@ public class PrescriptionController {
 		}
 		
 		request.setAttribute("hospital", hospital);
-		request.setAttribute("start", start);
-		request.setAttribute("end", end);
+		request.setAttribute("startTime", start);
+		request.setAttribute("endTime", end);
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
@@ -465,39 +466,188 @@ public class PrescriptionController {
         return "prescription/historyPrsList";
 	}
 	
+	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/hospitalDimensionList", method = RequestMethod.GET)
-	public String listHospitalDimension(HttpServletRequest request, @Param("hospital") String hospital, @Param("start") String start, @Param("end") String end){
+	public String listHospitalDimension(HttpServletRequest request, @Param("hospital") String hospital, @Param("startTime") String start, @Param("endTime") String end){
 		
 		// Initial params if empty;
-		if (hospital == null){
+		if (hospital == null || hospital == ""){
 			hospital = "ALL";
 		}
-		if (start == null){
-			start = "20160501000000";
+		if (start == null || start == ""){
+			start = Constants.DEFAULT_START;
 		}
-		if (end == null){
-			SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-			end = df.format(new Date());
+		if (end == null || end == ""){
+			end = Constants.DEFAULT_END;
 		}
-		
-		List<Hospital> updatedList = new ArrayList<Hospital>();
-		List<Hospital> hospitalList = hospitalService.getHospitalList();
-		Iterator<Hospital> itr = hospitalList.iterator();
-		int num = 0;
-		while (itr.hasNext()){
-			Hospital temp = itr.next();
-			num = prsService.countPrsNumForHospital(hospital, start, end);
-			temp.setFinishedPrsNum(num);
-			updatedList.add(temp);
-		}
-		
 		request.setAttribute("hospital", hospital);
-		request.setAttribute("start", start);
-		request.setAttribute("end", end);
+		request.setAttribute("startTime", start);
+		request.setAttribute("endTime", end);
 		
-		request.setAttribute("hospitalList", updatedList);
+		List<Hospital> hospitalList = hospitalService.getHospitalList();
+		List<Hospital> newHospList = new ArrayList<Hospital>();
+		Iterator<Hospital> itr = hospitalList.iterator();
+		if (hospital.equals("ALL")){
+			int num = 0;
+			while (itr.hasNext()){
+				Hospital temp = itr.next();
+				num = prsService.countPrsNumForHospital(temp.getName(), Constants.FINISH, start, end);
+				temp.setFinishedPrsNum(num);
+				newHospList.add(temp);
+			}
+		}else{
+			Hospital item = hospitalService.getHospitalByName(hospital);
+			if (item != null){
+				int num = prsService.countPrsNumForHospital(item.getName(), Constants.FINISH, start, end);
+				item.setFinishedPrsNum(num);
+				newHospList.add(item);
+			}
+		}
 		
+		request.setAttribute("hospitalList", hospitalList);
+		Collections.sort(newHospList);
+		request.setAttribute("displayHospitalList", newHospList);
 		return "prescription/hospitalDimension";
+	}
+	
+	@RequiresRoles("ADMIN")
+	@RequestMapping(value = "/orderDimensionList", method = RequestMethod.GET)
+	public String listOrderDimension(HttpServletRequest request, @Param("hospital") String hospital, @Param("startTime") String start, @Param("endTime") String end,
+			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum){
+		
+		request.setAttribute("nav", "出货单维度统计");
+		
+		// Initial params if empty;
+		if (hospital == null || hospital == ""){
+			hospital = "ALL";
+		}
+		if (start == null || start == ""){
+			start = Constants.DEFAULT_START;
+		}
+		if (end == null || end == ""){
+			end = Constants.DEFAULT_END;
+		}
+		request.setAttribute("hospital", hospital);
+		request.setAttribute("startTime", start);
+		request.setAttribute("endTime", end);
+		
+		List<Hospital> hospitalList = hospitalService.getHospitalList();
+		
+		List<Order> orderList = orderService.listOrderFinished(hospital, start, end, pageNum);
+		List<Order> finalOrderList = new ArrayList<Order>();
+		
+		Iterator<Order> itr = orderList.iterator();
+		Order item = null;
+		while (itr.hasNext()){
+			item = itr.next();
+			int prsNum = orderService.countPrsNumInOrder(item.getId());
+			item.setPrs_num(prsNum);
+			item.setCreate_user_name(userService.getUserById(item.getCreate_user_id()).getName());
+			item.setOutbound_user_name(userService.getUserById(item.getOutbound_user_id()).getName());
+			finalOrderList.add(item);
+		}
+		
+		Collections.sort(finalOrderList);
+		request.setAttribute("hospitalList", hospitalList);
+		PageInfo<Order> page = new PageInfo<Order>(finalOrderList);
+		request.setAttribute("page", page);	
+		
+		request.setAttribute("displayOrderList", finalOrderList);
+		return "prescription/orderDimension";
+	}
+	
+	@RequiresRoles("ADMIN")
+	@RequestMapping(value = "/userDimensionList", method = RequestMethod.GET)
+	public String listUserDimension(HttpServletRequest request, @Param("userAuth") Integer userAuth, @Param("startTime") String start, @Param("endTime") String end){
+		
+		// Initial params if empty;
+		if (userAuth == null || userAuth < 0){
+			userAuth = 0;
+		}
+		if (start == null || start == ""){
+			start = Constants.DEFAULT_START;
+		}
+		if (end == null || end == ""){
+			end = Constants.DEFAULT_END;
+		}
+		request.setAttribute("userAuth", userAuth);
+		request.setAttribute("startTime", start);
+		request.setAttribute("endTime", end);
+		
+		List<User> userList = userService.getUserListNoAdmin();
+		Iterator<User> itr = userList.iterator();
+		List<User> finalUserList = new ArrayList<User>();
+
+		User item = null;
+		while (itr.hasNext()){
+			item = itr.next();
+			if (userAuth != 0 && (item.getAuthority()&userAuth) == 0){
+				continue;
+			}
+			int process_type = proService.getProcessTypebyUserAuth(item.getAuthority());
+			int prsNum = prsService.countDealPrsByUser(item.getId(), process_type, start, end);
+			item.setDone_prs_num(prsNum);
+			int errorNum = prsService.countErrorProByUser(item.getId(), start, end);
+			item.setError_num(errorNum);
+			String position = userService.getPositionwithAuthority(item);
+			item.setPosition(position);
+			finalUserList.add(item);
+		}
+		Collections.sort(finalUserList);
+		request.setAttribute("finalUserList", finalUserList);
+		return "prescription/userDimension";
+	}
+	
+	@RequiresRoles("ADMIN")
+	@RequestMapping(value = "/dimensionPrsList", method = RequestMethod.GET)
+	public String dimensionPrsList(HttpServletRequest request, @Param("hospital") String hospital, @Param("startTime") String start, @Param("endTime") String end,
+			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, @Param("from") String from, @Param("userId") Integer userId){
+		
+		request.setAttribute("nav", "处方汇总列表");
+		
+		if (from == null || from == ""){
+			from = "HOSPITAL";
+		}
+		
+		if (hospital == null || hospital == "" || hospital.equals("ALL") || userId == null || userId <=0 ){
+			if (from.equals("HOSPITAL")){
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/hospitalDimensionList";
+			}else if(from.equals("USER")){
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
+			}
+			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/hospitalDimensionList";
+		}
+		
+		if (start == null || start == ""){
+			start = Constants.DEFAULT_START;
+		}
+		if (end == null || end == ""){
+			end = Constants.DEFAULT_END;
+		}
+		
+		request.setAttribute("startTime", start);
+		request.setAttribute("endTime", end);
+		request.setAttribute("pageNum", pageNum);
+		request.setAttribute("hospital", hospital);
+		request.setAttribute("userId", userId);
+		request.setAttribute("from", from);
+		
+		List<Prescription> prsList = null;
+		if (from.equals("HOSPITAL")){
+			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospital, pageNum, start, end);
+		}else if (from.equals("USER")) {
+			User user = userService.getUserById(userId);
+			int process_type = proService.getProcessTypebyUserAuth(user.getAuthority());
+			prsList = prsService.listPrswithUser(user.getId(), process_type, start, end);
+		}else{
+			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospital, pageNum, start, end);
+		}
+		
+		PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
+		request.setAttribute("page", page);	
+		request.setAttribute("finishPrsList", prsList);
+	
+		return "prescription/dimensionPrs";		
 	}
 	
 	@RequiresRoles("ADMIN")

@@ -97,4 +97,12 @@ public class HospitalService {
 			return -1;
 		}
 	}
+	
+	public Hospital getHospitalByName(String hospitalName){
+		try{
+			return hospitalDao.getHospitalwithName(hospitalName);
+		}catch (Exception e){
+			return null;
+		}
+	}
 }

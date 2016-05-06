@@ -24,6 +24,9 @@ public interface UserDao {
 
 	@Select("select * from user")
 	List<User> getUserList();
+	
+	@Select("select * from user where authority < 1024")
+	List<User> getUserListWithoutAdmin();
 
 	@Delete("delete from user where id = #{userId}")
 	int deleteUser(int userId);

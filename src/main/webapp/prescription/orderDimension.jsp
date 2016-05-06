@@ -3,10 +3,10 @@
 <%@ page import="com.chdp.chdpweb.Constants" %>
 <%@ include file="../head.jsp"%>
 
-<form class="form-inline" action="<%=request.getContextPath()%>/prescription/hospitalDimensionList" method="GET">
+<form class="form-inline" action="<%=request.getContextPath()%>/prescription/orderDimensionList" method="GET">
 
 <h3 class="sub-header">
-	处方统计
+	出货单维度统计
 	<span>
 		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital" name="hospital">
 			<option value="ALL">全部医院</option>
@@ -39,33 +39,29 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>ID</th>
+				<th>出货单编号</th>
 				<th>医院</th>
-				<th>已完成处方</th>
-				<th>始于</th>
-				<th>止于</th>
+				<th>创建人</th>
+				<th>运送人</th>
+				<th>包含处方数</th>
 			</tr>
 		</thead>
 		<tbody>
-			<c:forEach var="hosp2" items="${displayHospitalList}">
+			<c:forEach var="order" items="${displayOrderList}">
 				<tr>
-					<td><c:out value="${hosp2.id}" /></td>
-					<td><c:out value="${hosp2.name}" /></td>
-					<td><c:out value="${hosp2.finishedPrsNum}" /></td>
-					<td><c:out value="${startTime}" /></td>
-					<% if (request.getAttribute("endTime") == null || ((String)request.getAttribute("endTime")).equals(Constants.DEFAULT_END)){ %>
-					<td><%=Constants.getCurrentTime() %></td>
-					<% }else{ %>
-					<td><c:out value="${endTime}" /></td>
-					<% } %>
-					<c:if test="${hosp2.finishedPrsNum > 0}">
+					<td><c:out value="${order.uuid}" /></td>
+					<td><c:out value="${order.hospital_name}" /></td>
+					<td><c:out value="${order.create_user_name}" /></td>
+					<td><c:out value="${order.outbound_user_name}" /></td>
+					<td><c:out value="${order.prs_num}" /></td>
+					<c:if test="${order.prs_num > 0}">
 					<td width="100">
 						<div class="btn-group" role="group" aria-label="...">
-						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&userId=&hospital=${hosp2.name}&from=HOSPITAL">处方详情</a>
+						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&orderId=${order.id}&userId=&hospital=&from=ORDER">处方详情</a>
 						</div>
 					</td>
 					</c:if>
-					<c:if test="${hosp2.finishedPrsNum == 0}">
+					<c:if test="${order.prs_num == 0}">
 					<td width="100">
 						<div class="btn-group disabled" role="group" aria-label="...">
 						    <a type="button" class="btn btn-default" href="#">处方详情</a>
@@ -76,5 +72,22 @@
 			</c:forEach>
 		</tbody>
 	</table>
+</div>
+<div class="text-right">
+	<% if (request.getAttribute("hospital") != null){ %>
+		<% request.setAttribute("hospital", (String)request.getAttribute("hospital")); %>
+	<% } %>
+	<% if (request.getAttribute("startTime") != null){ %>
+		<% request.setAttribute("startTime", (String)request.getAttribute("startTime")); %>
+	<% }else{ %>
+		<% request.setAttribute("startTime", Constants.DEFAULT_START ); %>
+	<% } %>
+	<% if (request.getAttribute("endTime") != null){ %>
+		<% request.setAttribute("endTime", (String)request.getAttribute("endTime")); %>
+	<% }else{ %>
+		<% request.setAttribute("endTime", Constants.DEFAULT_END); %>
+	<% } %>
+	<c:set var="pageUrl" value="prescription/orderDimensionList" />
+	<%@ include file="../common/nav.jsp"%>
 </div>
 <%@ include file="../foot.jsp"%>

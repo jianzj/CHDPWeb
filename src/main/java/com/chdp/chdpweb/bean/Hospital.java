@@ -1,6 +1,6 @@
 package com.chdp.chdpweb.bean;
 
-public class Hospital {
+public class Hospital implements Comparable<Hospital> {
 	
 	private int id;
 	private String name;
@@ -38,4 +38,14 @@ public class Hospital {
 	public void setFinishedPrsNum(int num){
 		this.finishedPrsNum = num;
 	}
+	
+	public int compareTo(Hospital hosp1) {
+		if (this.getFinishedPrsNum() > hosp1.getFinishedPrsNum()){
+			return -1;
+		}else if (this.getFinishedPrsNum() < hosp1.getFinishedPrsNum()){
+			return 1;
+		}else{
+			return 0;
+		}
+    }
 }

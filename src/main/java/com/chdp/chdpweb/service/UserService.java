@@ -98,6 +98,14 @@ public class UserService {
 			return new ArrayList<User>();
 		}
 	}
+	
+	public List<User> getUserListNoAdmin() {
+		try {
+			return userDao.getUserListWithoutAdmin();
+		} catch (Exception e) {
+			return new ArrayList<User>();
+		}
+	}
 
 	public boolean deleteUser(int userId) {
 		try {
@@ -135,6 +143,36 @@ public class UserService {
 			return true;
 		} catch (Exception e) {
 			return false;
+		}
+	}
+	
+	public String getPositionwithAuthority(User user){
+		try{
+			if ((user.getAuthority()&512) != 0){
+				return "接方";
+			}else if ((user.getAuthority()&256) != 0){
+				return "审方";
+			}else if((user.getAuthority()&128) != 0){
+				return "调配";
+			}else if((user.getAuthority()&64) != 0){
+				return "调配检查";
+			}else if((user.getAuthority()&32) != 0){
+				return "浸泡";
+			}else if((user.getAuthority()&16) != 0){
+				return "煎煮";
+			}else if((user.getAuthority()&8) != 0){
+				return "灌装";
+			}else if((user.getAuthority()&4) != 0){
+				return "清场";
+			}else if((user.getAuthority()&2) != 0){
+				return "包装";
+			}else if((user.getAuthority()&1) != 0){
+				return "配送";
+			}else{
+				return "未知！";
+			}
+		}catch (Exception e){
+			return "未知";
 		}
 	}
 }

@@ -3,17 +3,23 @@
 <%@ page import="com.chdp.chdpweb.Constants" %>
 <%@ include file="../head.jsp"%>
 
-<form class="form-inline" action="<%=request.getContextPath()%>/prescription/hospitalDimensionList" method="GET">
+<form class="form-inline" action="<%=request.getContextPath()%>/prescription/userDimensionList" method="GET">
 
 <h3 class="sub-header">
 	处方统计
 	<span>
-		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital" name="hospital">
-			<option value="ALL">全部医院</option>
-			
-			<c:forEach var='hosp1' items="${hospitalList}">
-				<option value="${hosp1.name}">${hosp1.name}</option>
-			</c:forEach>
+		<select class="selectpicker" data-live-search="true" data-width="fit" id="userAuth" name="userAuth">
+			<option value="ALL">全部用户</option> 
+			<option value=512>接方</option>
+			<option value=256>审方</option>
+			<option value=128>调配</option>
+			<option value=64>调配审核</option>
+			<option value=32>浸泡</option>
+			<option value=16>煎煮</option>
+			<option value=8>灌装</option>
+			<option value=4>清场</option>
+			<option value=2>包装</option>
+			<option value=1>配送</option>
 		</select>
 		<span class="input-group input-append date col-xs-2" id="hospital-datePicker-start">
                 <input type="text" class="form-control" name="startTime"/>
@@ -39,33 +45,41 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>ID</th>
-				<th>医院</th>
-				<th>已完成处方</th>
+				<th>工号</th>
+				<th>姓名</th>
+				<th>职位</th>
+				<th>完成</th>
+				<th>出错</th>
 				<th>始于</th>
 				<th>止于</th>
 			</tr>
 		</thead>
 		<tbody>
-			<c:forEach var="hosp2" items="${displayHospitalList}">
+			<c:forEach var="user" items="${finalUserList}">
 				<tr>
-					<td><c:out value="${hosp2.id}" /></td>
-					<td><c:out value="${hosp2.name}" /></td>
-					<td><c:out value="${hosp2.finishedPrsNum}" /></td>
+					<td><c:out value="${user.usercode}" /></td>
+					<td><c:out value="${user.name}" /></td>
+					<td><c:out value="${user.position}" /></td>
+					<td><c:out value="${user.done_prs_num}" /></td>
+					<td><c:out value="${user.error_num}" /></td>
+					<% if(request.getAttribute("startTime") == null || (String)request.getAttribute("endTime") == ""){ %>
+					<td><%=Constants.DEFAULT_START %></td>
+					<% }else{ %>
 					<td><c:out value="${startTime}" /></td>
+					<% } %>
 					<% if (request.getAttribute("endTime") == null || ((String)request.getAttribute("endTime")).equals(Constants.DEFAULT_END)){ %>
 					<td><%=Constants.getCurrentTime() %></td>
 					<% }else{ %>
 					<td><c:out value="${endTime}" /></td>
 					<% } %>
-					<c:if test="${hosp2.finishedPrsNum > 0}">
+					<c:if test="${user.done_prs_num > 0}">
 					<td width="100">
 						<div class="btn-group" role="group" aria-label="...">
-						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&userId=&hospital=${hosp2.name}&from=HOSPITAL">处方详情</a>
+						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&userId=${user.id}&hospital=&from=USER">处方详情</a>
 						</div>
 					</td>
 					</c:if>
-					<c:if test="${hosp2.finishedPrsNum == 0}">
+					<c:if test="${user.done_prs_num == 0}">
 					<td width="100">
 						<div class="btn-group disabled" role="group" aria-label="...">
 						    <a type="button" class="btn btn-default" href="#">处方详情</a>

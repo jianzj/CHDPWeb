@@ -1,6 +1,6 @@
 package com.chdp.chdpweb.bean;
 
-public class Order {
+public class Order implements Comparable<Order> {
 
     private int id;
     private String uuid;
@@ -12,7 +12,11 @@ public class Order {
     private int status;
 
     private String hospital_name;
-
+    
+    private int prs_num;
+    private String create_user_name;
+    private String outbound_user_name;
+    
     public int getId() {
         return id;
     }
@@ -85,4 +89,37 @@ public class Order {
         this.hospital_name = hospital_name;
     }
 
+    public int getPrs_num(){
+    	return prs_num;
+    }
+    
+    public void setPrs_num(int num){
+    	this.prs_num = num;
+    }
+    
+    public String getCreate_user_name(){
+    	return create_user_name;
+    }
+    
+    public void setCreate_user_name(String usr_name){
+    	this.create_user_name = usr_name;
+    }
+    
+    public String getOutbound_user_name(){
+    	return outbound_user_name;
+    }
+    
+    public void setOutbound_user_name(String user_name){
+    	this.outbound_user_name = user_name;
+    }
+    
+    public int compareTo(Order another){
+    	if (this.getPrs_num() > another.getPrs_num()){
+    		return -1;
+    	}else if (this.getPrs_num() < another.getPrs_num()){
+    		return 1;
+    	}else{
+    		return 0;
+    	}
+    }
 }

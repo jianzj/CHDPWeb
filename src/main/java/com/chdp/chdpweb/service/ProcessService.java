@@ -350,4 +350,38 @@ public class ProcessService {
         }
     }
 
+    public int getProcIdwithPrsandStatus(int prsId, int process_type){
+    	try{
+    		return proDao.getProcIdwithPrsandStatus(prsId, process_type);
+    	} catch (Exception e){
+    		return -1;
+    	}
+    }
+    
+	public int getProcessTypebyUserAuth(int userAuth){
+		
+		if ((userAuth&512) != 0){
+			return Constants.RECEIVE;
+		}else if ((userAuth&256) != 0){
+			return Constants.CHECK;
+		}else if((userAuth&128) != 0){
+			return Constants.MIX;
+		}else if((userAuth&64) != 0){
+			return Constants.MIXCHECK;
+		}else if((userAuth&32) != 0){
+			return Constants.SOAK;
+		}else if((userAuth&16) != 0){
+			return Constants.DECOCT;
+		}else if((userAuth&8) != 0){
+			return Constants.POUR;
+		}else if((userAuth&4) != 0){
+			return Constants.CLEAN;
+		}else if((userAuth&2) != 0){
+			return Constants.PACKAGE;
+		}else if((userAuth&1) != 0){
+			return Constants.SHIP;
+		}
+		
+		return Constants.RECEIVE;
+	}
 }

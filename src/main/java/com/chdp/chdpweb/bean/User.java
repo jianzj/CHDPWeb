@@ -1,6 +1,6 @@
 package com.chdp.chdpweb.bean;
 
-public class User {
+public class User implements Comparable<User>{
 	private int id;
 	private String usercode;
 	private String name;
@@ -9,7 +9,11 @@ public class User {
 	@SuppressWarnings("unused")
 	private String authority_str;
 	private String last_outer_id;
-
+	
+	private String position;
+	private int done_prs_num;
+	private int error_num;
+	
 	public int getId() {
 		return id;
 	}
@@ -96,4 +100,42 @@ public class User {
 		return str;
 	}
 
+	public int getDone_prs_num(){
+		return done_prs_num;
+	}
+	
+	public void setDone_prs_num(int num){
+		this.done_prs_num = num;
+	}
+	
+	public int getError_num(){
+		return error_num;
+	}
+	
+	public void setError_num(int num){
+		this.error_num = num;
+	}
+	
+	public String getPosition(){
+		return position;
+	}
+	
+	public void setPosition(String position){
+		this.position = position;
+	}
+	
+	public int compareTo(User another){
+		if(this.getDone_prs_num() > another.getDone_prs_num()){
+			return -1;
+		}else if (this.getDone_prs_num() < another.getDone_prs_num()){
+			return 1;
+		}else{
+			if (this.getError_num() > another.getError_num()){
+				return -1;
+			}else if (this.getError_num() < another.getError_num()){
+				return 1;
+			}
+			return 0;
+		}
+	}
 }

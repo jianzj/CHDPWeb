@@ -62,4 +62,7 @@ public interface ProcessDao {
 	@Update("update process set finish = #{finish}, user_id = #{user_id},error_type = #{type}, error_msg = #{reason} where id = #{id}")
 	int cancelProcess(@Param("id") int id, @Param("finish") String finish, @Param("user_id") int user_id,
 			@Param("type") int type, @Param("reason") String reason);
+	
+	@Select("select max(id) from process where process_type = #{process} and prescription_id = #{prsId}")
+	int getProcIdwithPrsandStatus(@Param("prsId") int prsId, @Param("process") int process);
 }

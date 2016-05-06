@@ -174,7 +174,7 @@ public class PrescriptionService {
 	public List<Prescription> listPrsWithParamsAndTime(int process, String hospitalName, int pageNum, String start, String end){
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try{
-			return prsDao.getPrescriptionsByParamsAndTime(process, hospitalName, start, end);
+			return prsDao.getPrescriptionsByParamswithTime(process, hospitalName, start, end);
 		} catch (Exception e){
 			return new ArrayList<Prescription>();
 		}
@@ -265,9 +265,9 @@ public class PrescriptionService {
 		}
 	}
 	
-	public int countPrsNumForHospital(String hospital, String start, String end){
+	public int countPrsNumForHospital(String hospital, int process, String start, String end){
 		try{
-			return prsDao.countPrsNumForHospital(hospital, start, end);
+			return prsDao.countPrsNumForHospital(hospital, process, start, end);
 		} catch (Exception e){
 			return 0;
 		}
@@ -411,6 +411,32 @@ public class PrescriptionService {
 			return true;
 		}catch (Exception e){
 			return false;
+		}
+	}
+	
+	//用户维度
+	public int countDealPrsByUser(int userId, int processType, String start, String end){
+		try{
+			return prsDao.countPrsDealByUser(userId, processType, start, end);
+		}catch (Exception e){
+			return 0;
+		}
+	}
+	
+	//用户维度
+	public int countErrorProByUser(int userId, String start, String end){
+		try{
+			return prsDao.countProcsErrorByUser(userId, start, end);
+		}catch (Exception e){
+			return 0;
+		}
+	}
+	
+	public List<Prescription> listPrswithUser(int userId, int processType, String start, String end){
+		try{
+			return prsDao.listPrsByUser(userId, processType, start, end);
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
 		}
 	}
 }

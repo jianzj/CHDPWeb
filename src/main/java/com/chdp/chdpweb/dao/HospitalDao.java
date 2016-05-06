@@ -33,8 +33,11 @@ public interface HospitalDao {
 	@Delete("delete from hospital where name = #{name}")
 	int deleteHospitalwithName(@Param("name") String name);
 	
-	@Select("select * from hostpital where id = #{id}")
+	@Select("select * from hospital where id = #{id}")
 	Hospital getHospitalwithID(@Param("id") int id);
+	
+	@Select("select * from hospital where name = #{name}")
+	Hospital getHospitalwithName(@Param("name") String name);
 	
 	@Select("select h.id as id, h.name as name, h.description as description from hospital as h, prescription as p " +
 	        "where h.id = p.hospital_id")

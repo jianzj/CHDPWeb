@@ -1,11 +1,8 @@
 package com.chdp.chdpweb.service;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.TransactionDefinition;
@@ -20,6 +17,7 @@ import com.chdp.chdpweb.bean.Process;
 import com.chdp.chdpweb.bean.User;
 import com.chdp.chdpweb.dao.OrderDao;
 import com.chdp.chdpweb.dao.PrescriptionDao;
+import com.github.pagehelper.PageHelper;
 
 @Repository
 public class OrderService {
@@ -45,7 +43,7 @@ public class OrderService {
             return null;
         }
     }
-
+    
     public AppResult finishOrder(int orderId) {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
@@ -82,6 +80,55 @@ public class OrderService {
         transactionManager.commit(status);
         result.setSuccess(true);
         return result;
+    } 
+    
+    public boolean createFullOrder(Order newOrder){
+    	try{
+    		orderDao.createFullOrder(newOrder);
+    		return true;
+    	}catch (Exception e){
+    		return false;
+    	}
     }
-
+    
+    public int getOrderIdByUuid(String uuid){
+    	try{
+    		return orderDao.getOrderIdByUuid(uuid);
+    	} catch (Exception e){
+    		return -1;
+    	}
+    }
+    
+    public List<Order> listOrderFinished(String hospital, String start, String end){
+    	try{
+    		if (hospital.equals("ALL")){
+    			return orderDao.listOrderAllHospital(start, end, Constants.ORDER_FINISH);
+    		}else{
+    			return orderDao.listOrder(hospital, start, end, Constants.ORDER_FINISH);
+    		}
+    	}catch (Exception e){
+    		return new ArrayList<Order>();
+    	}
+    }
+    
+    public List<Order> listOrderFinished(String hospital, String start, String end, int pageNum){
+    	PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+    	try{
+    		if (hospital.equals("ALL")){
+    			return orderDao.listOrderAllHospital(start, end, Constants.ORDER_FINISH);
+    		}else{
+    			return orderDao.listOrder(hospital, start, end, Constants.ORDER_FINISH);
+    		}
+    	}catch (Exception e){
+    		return new ArrayList<Order>();
+    	}
+    }
+    
+    public int countPrsNumInOrder(int orderId){
+    	try{
+    		return orderDao.countPrsNumInOrder(orderId);
+    	} catch (Exception e){
+    		return 0;
+    	}
+    }
 }

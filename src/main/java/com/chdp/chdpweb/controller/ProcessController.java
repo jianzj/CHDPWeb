@@ -108,7 +108,7 @@ public class ProcessController {
 	@RequestMapping(value = "/showAllProcs", method = RequestMethod.GET)
 	public String showAllProcesses(HttpServletRequest request, @Param("prsId") Integer prsId, @Param("from") String from){
 
-		if (from == null){
+		if (from == null || from == ""){
 			from = "CURRENT";
 		}
 		
@@ -118,13 +118,43 @@ public class ProcessController {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/currentList";
 			}else if (from.equals("HISTORY")){
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/historyList";
+			}else if (from.equals("HOSPITAL")){
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/hospitalDimensionListt";
+			}else if (from.equals("USER")){
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
+			}else if (from.equals("ORDER")){
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
+			}
+		}
+		
+		int processId = 0;
+		if (from.equals("HISTORY") || from.equals("HOSPITAL") || from.equals("USER") || from.equals("ORDER")){
+			processId = proService.getProcIdwithPrsandStatus(prsId, Constants.SHIP);
+		}
+		
+		if (processId < 0){
+			request.setAttribute("errorMsg", "未知错误！");
+			if (from.equals("HISTORY")){
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/historyList";
+			}else if (from.equals("HOSPITAL")){
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/dimensionPrsList";
+			}else if (from.equals("USER")){
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
+			}else if (from.equals("ORDER")){
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
 			}
 		}
 		
 		request.setAttribute("from", from);
 		
-		Prescription prs = prsService.getPrescription(prsId);
-		List<Process> processList = proService.getProcessChainWithProcessId(prs.getProcess_id());
+		Prescription prs = prsService.getPrsNoUser(prsId);
+
+		List<Process> processList = null;
+		if (from.equals("HISTORY") || from.equals("HOSPITAL") || from.equals("USER") || from.equals("ORDER")){
+			processList = proService.getProcessChainWithProcessId(processId);
+		}else{
+			processList = proService.getProcessChainWithProcessId(prs.getProcess_id());
+		}
 		request.setAttribute("processList", processList);
 		request.setAttribute("currentPrs", prs);
 		
