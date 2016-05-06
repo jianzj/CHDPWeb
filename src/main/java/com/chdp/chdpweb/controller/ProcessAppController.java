@@ -126,22 +126,32 @@ public class ProcessAppController {
 
 		return procService.startProcess(procId, proc);
 	}
-	
-	@RequestMapping(value = "/checkAndFinish", method = RequestMethod.POST)
-    @ResponseBody
-    public AppResult checkAndFinish(HttpServletRequest request) {
-        int procId = Integer.parseInt(request.getParameter("procId"));
 
-        return procService.checkAndFinish(procId);
-    }
+	@RequestMapping(value = "/startWithMachine", method = RequestMethod.POST)
+	@ResponseBody
+	public AppResult startWithMachine(HttpServletRequest request) {
+		int procId = Integer.parseInt(request.getParameter("procId"));
+		int proc = Integer.parseInt(request.getParameter("proc"));
+		int machineId = Integer.parseInt(request.getParameter("machineId"));
+
+		return procService.startProcessWithMachine(procId, proc, machineId);
+	}
+
+	@RequestMapping(value = "/checkAndFinish", method = RequestMethod.POST)
+	@ResponseBody
+	public AppResult checkAndFinish(HttpServletRequest request) {
+		int procId = Integer.parseInt(request.getParameter("procId"));
+
+		return procService.checkAndFinish(procId);
+	}
 
 	@RequestMapping(value = "/decoct", method = RequestMethod.POST)
 	@ResponseBody
 	public AppResult decoct(HttpServletRequest request) {
 		int prsId = Integer.parseInt(request.getParameter("prsId"));
 		int procId = Integer.parseInt(request.getParameter("procId"));
-		int machineId = Integer.parseInt(request.getParameter("machineId"));
-		return procService.forwardProcess(prsId, procId, Constants.POUR, machineId);
+		
+		return procService.forwardProcess(prsId, procId, Constants.POUR, 0);
 	}
 
 	@RequestMapping(value = "/decoctCancel", method = RequestMethod.POST)

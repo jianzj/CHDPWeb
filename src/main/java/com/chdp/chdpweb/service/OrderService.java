@@ -2,8 +2,12 @@ package com.chdp.chdpweb.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -12,8 +16,6 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.AppResult;
 import com.chdp.chdpweb.bean.Order;
-import com.chdp.chdpweb.bean.Prescription;
-import com.chdp.chdpweb.bean.Process;
 import com.chdp.chdpweb.bean.User;
 import com.chdp.chdpweb.dao.OrderDao;
 import com.chdp.chdpweb.dao.PrescriptionDao;
@@ -24,6 +26,9 @@ public class OrderService {
 
     @Autowired
     private OrderDao orderDao;
+    
+    @Autowired
+    private DataSourceTransactionManager transactionManager;
     
     @Autowired
     private PrescriptionDao prsDao;
