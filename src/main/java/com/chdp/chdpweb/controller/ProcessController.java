@@ -112,7 +112,7 @@ public class ProcessController {
 	@RequestMapping(value = "/showAllProcs", method = RequestMethod.GET)
 	public String showAllProcesses(HttpServletRequest request, @Param("prsId") Integer prsId, @Param("from") String from){
 
-		if (from == null || from == ""){
+		if (from == null || from.equals("")){
 			from = "CURRENT";
 		}
 		

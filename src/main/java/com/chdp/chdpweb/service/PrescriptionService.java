@@ -169,10 +169,10 @@ public class PrescriptionService {
 		}
 	}
 	
-	public List<Prescription> listPrsWithParamsAndTime(int process, String hospitalName, int pageNum, String start, String end){
+	public List<Prescription> listPrsWithParamsAndTime(int process, int hospitalId, int pageNum, String start, String end){
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try{
-			return prsDao.getPrescriptionsByParamswithTime(process, hospitalName, start, end);
+			return prsDao.getPrescriptionsByParamswithTime(process, hospitalId, start, end);
 		} catch (Exception e){
 			return new ArrayList<Prescription>();
 		}
