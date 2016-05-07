@@ -11,16 +11,20 @@
 			<option value="ALL">全部医院</option>
 			
 			<c:forEach var='hosp' items="${hospitalList}">
-				<c:if test="${hospital == hosp.name}">
+				<c:when test="${hospital == hosp.name}">
 				<option value="${hosp.name}" selected>${hosp.name}</option>
-				</c:if>
-				<c:if test="${hospital != hosp.name}">
+				</c:when>
+				<c:otherwise>
 				<option value="${hosp.name}">${hosp.name}</option>
-				</c:if>
+				</c:otherwise>
 			</c:forEach>
 		</select>
 		<span class="input-group input-append date col-xs-2" id="hospital-datePicker-start">
-                <input type="text" class="form-control" name="startTime" value=""/>
+				<% if (request.getAttribute("startTime") == null || ((String)request.getAttribute("startTime")).equals(Constants.DEFAULT_START)){ %>
+				<input type="text" class="form-control" name="startTime" value=""/>
+				<% } else{ %>
+				<input type="text" class="form-control" name="startTime" value="${startTime}"/>
+				<% } %>
                 <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <span class="input-group input-append date col-xs-2" id="hospital-datePicker-end">

@@ -29,6 +29,8 @@ public class Prescription {
 	private String user_name;
 	private String finish_time;
 
+	private String phase_name;
+	
 	public int getId() {
 		return id;
 	}
@@ -245,4 +247,11 @@ public class Prescription {
 		this.decoct_first_list = decoct_first_list;
 	}
 
+	public String getPhase_name(){
+		return phase_name;
+	}
+	
+	public void setPhase_name(String phase_name){
+		this.phase_name = phase_name;
+	}
 }

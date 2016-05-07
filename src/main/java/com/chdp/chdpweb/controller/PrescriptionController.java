@@ -408,13 +408,23 @@ public class PrescriptionController {
 			prsList = prsService.listPrsWithParams(process, hospital, pageNum);
 		}
 		
+		List<Prescription> finalList = new ArrayList<Prescription>();
+		
+		Iterator<Prescription> itr = prsList.iterator();
+		Prescription prs = null;
+		while (itr.hasNext()){
+			prs = itr.next();
+			prs.setPhase_name(proService.getPhaseNamewithProcess(prs));
+			finalList.add(prs);
+		}
+		
 		request.setAttribute("hospital", hospital);
 		request.setAttribute("process", process);
 		
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
 		
-		request.setAttribute("currentPrsList", prsList);
+		request.setAttribute("currentPrsList", finalList);
 		PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
 		request.setAttribute("page", page);	
 	

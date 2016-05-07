@@ -401,4 +401,36 @@ public class ProcessService {
 		
 		return Constants.RECEIVE;
 	}
+	
+	//获取当前订单状态的信息
+	public String getPhaseNamewithProcess(Prescription prs){
+		
+		try{
+			Process proc = null;
+			switch (prs.getProcess()){
+			case Constants.RECEIVE:
+				return "正在接方";
+			case Constants.SHIP:
+				if (prs.getProcess_id() == -1){
+					return "包装完成";
+				}else{
+					return "等待出库";
+				}
+			case Constants.FINISH:
+				return "处方完成";
+			case Constants.DECOCT:
+				proc = proDao.getProcessesById(prs.getProcess_id());
+				if (proc.getBegin() == null){
+					return "正在浸泡";
+				}else {
+					return "正在煎煮";
+				}
+			default:
+				return Constants.getProcessName(prs.getProcess() - 1) + "完成";
+			}
+		} catch (Exception e){
+			return "未知状态";
+		}
+		
+	}
 }

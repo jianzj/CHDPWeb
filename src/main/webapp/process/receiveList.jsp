@@ -8,12 +8,12 @@
 			<option value="ALL">全部医院</option>
 			
 			<c:forEach var='hosp' items="${hospitalList}">
-				<c:if test="${hospital == hosp.name}">
+				<c:when test="${hospital == hosp.name}">
 				<option value="${hosp.name}" selected>${hosp.name}</option>
-				</c:if>
-				<c:if test="${hospital != hosp.name}">
+				</c:when>
+				<c:otherwise>
 				<option value="${hosp.name}">${hosp.name}</option>
-				</c:if>
+				</c:otherwise>
 			</c:forEach>
 		</select>
 		<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
