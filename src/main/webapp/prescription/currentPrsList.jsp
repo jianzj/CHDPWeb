@@ -8,23 +8,77 @@
 	<span>
 		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital" name="hospital">
 			<option value="ALL">全部医院</option>
-			
 			<c:forEach var='hosp' items="${hospitalList}">
+				<c:if test="${hospital == hosp.name}">
+				<option value="${hosp.name}" selected>${hosp.name}</option>
+				</c:if>
+				<c:if test="${hospital != hosp.name}">
 				<option value="${hosp.name}">${hosp.name}</option>
+				</c:if>
 			</c:forEach>
 		</select>
 		<select class="selectpicker" data-live-search="true" data-with="fit" id="process" name="process">
-			<option value="0">全部流程</option>
-			<option value="1">接方</option>
-			<option value="2">审方</option>
-			<option value="3">调配</option>
-			<option value="4">调配审核</option>
-			<option value="5">浸泡</option>
-			<option value="6">煎煮</option>
-			<option value="7">灌装</option>
-			<option value="8">清场</option>
-			<option value="9">包装</option>
-			<option value="10">出库</option>
+			<option value=0>全部流程</option>
+			<c:if test="${process == 1}">
+			<option value=1 selected>接方</option>
+			</c:if>
+			<c:if test="${process != 1}">
+			<option value=1>接方</option>
+			</c:if>
+			<c:if test="${process == 2}">
+			<option value=2 selected>审方</option>
+			</c:if>
+			<c:if test="${process != 2}">
+			<option value=2>审方</option>
+			</c:if>
+			<c:if test="${process == 3}">
+			<option value=3 selected>调配</option>
+			</c:if>
+			<c:if test="${process != 3}">
+			<option value=3>调配</option>
+			</c:if>
+			<c:if test="${process == 4}">
+			<option value=4 selected>调配审核</option>
+			</c:if>
+			<c:if test="${process != 4}">
+			<option value=4>调配审核</option>
+			</c:if>
+			<c:if test="${process == 5}">
+			<option value=5 selected>浸泡</option>
+			</c:if>
+			<c:if test="${process != 5}">
+			<option value=5>浸泡</option>
+			</c:if>
+			<c:if test="${process == 6}">
+			<option value=6 selected>煎煮</option>
+			</c:if>
+			<c:if test="${process != 6}">
+			<option value=6>煎煮</option>
+			</c:if>
+			<c:if test="${process == 7}">
+			<option value=7 selected>灌装</option>
+			</c:if>
+			<c:if test="${process != 7}">
+			<option value=7>灌装</option>
+			</c:if>
+			<c:if test="${process == 8}">
+			<option value=8 selected>清场</option>
+			</c:if>
+			<c:if test="${process != 8}">
+			<option value=8>清场</option>
+			</c:if>
+			<c:if test="${process == 9}">
+			<option value=9 selected>包装</option>
+			</c:if>
+			<c:if test="${process != 9}">
+			<option value=9>包装</option>
+			</c:if>
+			<c:if test="${process == 10}">
+			<option value=10 selected>出库</option>
+			</c:if>
+			<c:if test="${process != 10}">
+			<option value=10>出库</option>
+			</c:if>			
 		</select>
 		<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
 	</span>

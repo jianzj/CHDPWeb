@@ -207,7 +207,7 @@ public class PrescriptionController {
 			return "prescription/currentPrsList";
 		}
 		
-		Prescription prs = prsService.getPrescription(prsId);
+		Prescription prs = prsService.getPrsNoUser(prsId);
 		request.setAttribute("prsId", prsId);
 		request.setAttribute("prsModify", prs);
 		request.setAttribute("from", from);
@@ -384,39 +384,32 @@ public class PrescriptionController {
 	
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/currentList", method = RequestMethod.GET)
-	public String getCurrentList(HttpServletRequest request, @RequestParam(name = "pageNum", defaultValue = "1") int pageNum){
+	public String getCurrentList(HttpServletRequest request, @RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
+				@Param("hospital") String hospital, @Param("process") Integer process){
 		
 		request.setAttribute("nav", "当前处方列表");
 		
-		String hospital = request.getParameter("hospital");
-		String process = request.getParameter("process");
-		if (hospital == null){
+		if (hospital == null || hospital == ""){
 			hospital = "ALL";
 		}
 		if (process == null){
-			process = "0";
-		}
-		int process_type = 0;
-		try{
-			process_type = Integer.parseInt(process);
-		} catch (Exception e){
-			process_type = 0;
+			process = 0;
 		}
 		
 		List<Prescription> prsList = null;
 		
-		if (hospital.equals("ALL") && process_type == 0){
+		if (hospital.equals("ALL") && process == 0){
 			prsList = prsService.listPrsWithProcessUnfinished(pageNum);
 		}else if (hospital.equals("ALL")){
-			prsList = prsService.listPrsWithProcess(process_type, pageNum);
-		}else if (process_type == 0){
+			prsList = prsService.listPrsWithProcess(process, pageNum);
+		}else if (process == 0){
 			prsList = prsService.listPrsWithHospital(hospital, pageNum);
 		}else{
-			prsList = prsService.listPrsWithParams(process_type, hospital, pageNum);
+			prsList = prsService.listPrsWithParams(process, hospital, pageNum);
 		}
 		
 		request.setAttribute("hospital", hospital);
-		request.setAttribute("process", process_type);
+		request.setAttribute("process", process);
 		
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
@@ -836,8 +829,11 @@ public class PrescriptionController {
 				
 				SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
 				String currentTime = df.format(new Date());
-				User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
 				
+				
+				/** Old logic, will be removed.
+				 * 
+				User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
 				Process newProcess = new Process();
 				Process currentProcess = proService.getProcessById(printItem.getId());
 				newProcess.setProcess_type(Constants.SHIP);
@@ -864,8 +860,22 @@ public class PrescriptionController {
 				}else{
 					request.setAttribute("errorMsg", "打印到处方" + String.valueOf(printItem.getId()) + "出错，请重新打印");
 					break;
+				} **/
+				printItem.setProcess(Constants.SHIP);
+				printItem.setProcess_id(-1);
+				if(prsService.updatePrescriptionProcess(printItem)){
+					Process currentProcess = proService.getProcessById(printItem.getId());
+					currentProcess.setFinish(currentTime);
+					if (proService.updateProcessTime(currentProcess)){
+						count += 1;
+					}else{
+						request.setAttribute("errorMsg", "打印到处方" + String.valueOf(printItem.getId()) + "出错，请重新打印");
+						break;
+					}
+				}else{
+					request.setAttribute("errorMsg", "打印到处方" + String.valueOf(printItem.getId()) + "出错，请重新打印");
+					break;
 				}
-
 			}else{
 				request.setAttribute("errorMsg", "打印到处方" + String.valueOf(printItem.getId()) + "出错，请重新打印");
 				break;
@@ -942,14 +952,8 @@ public class PrescriptionController {
 					Prescription item = null;
 					while (prsItems.hasNext()){
 						item = prsItems.next();
-						Process currentPro = proService.getProcessById(item.getProcess_id());
-						currentPro.setFinish(currentTime);
-						proService.updateProcessTime(currentPro);
-						
-						item.setProcess(Constants.FINISH);
 						item.setProcess_id(newOrder.getId());
-						item.setFinish_time(currentTime);
-						prsService.markPrsFinished(item);
+						prsService.updatePrescriptionProcess(item);
 					}
 				}else{
 					request.setAttribute("errorMsg", "打印 " + hospitalName + " 的出货单出错，请重新打印！");

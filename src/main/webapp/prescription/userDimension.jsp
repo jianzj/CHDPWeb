@@ -8,8 +8,8 @@
 <h3 class="sub-header">
 	处方统计
 	<span>
-		<select class="selectpicker" data-live-search="true" data-width="fit" id="userAuth" name="userAuth">
-			<option value="ALL">全部用户</option> 
+		<select class="selectpicker" data-live-search="true" data-width="fit" id="userId" name="userId">
+			<option value=0>全部用户</option> 
 			<option value=512>接方</option>
 			<option value=256>审方</option>
 			<option value=128>调配</option>
@@ -22,11 +22,19 @@
 			<option value=1>配送</option>
 		</select>
 		<span class="input-group input-append date col-xs-2" id="hospital-datePicker-start">
-                <input type="text" class="form-control" name="startTime"/>
+         		<% if (request.getAttribute("startTime") != null && !((String)request.getAttribute("startTime")).equals(Constants.DEFAULT_START)) {%>
+         		<input type="text" class="form-control" name="startTime" value="${startTime}"/>
+         		<% } else { %>
+         		<input type="text" class="form-control" name="startTime" />
+         		<% } %>
                 <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <span class="input-group input-append date col-xs-2" id="hospital-datePicker-end">
-                <input type="text" class="form-control" name="endTime"/>
+         		<% if (request.getAttribute("endTime") != null && !((String)request.getAttribute("endTime")).equals(Constants.DEFAULT_END)) {%>
+         		<input type="text" class="form-control" name="endTime" value="${endTime}"/>
+         		<% } else { %>
+         		<input type="text" class="form-control" name="endTime"/>
+         		<% } %>
          <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>

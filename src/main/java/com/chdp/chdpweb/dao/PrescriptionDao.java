@@ -20,38 +20,34 @@ public interface PrescriptionDao {
             + "#{prs.need_melt}, #{prs.need_decoct_alone}, #{prs.process}, #{prs.process_id})")
     int createPrescription(@Param("prs") Prescription prs);
 
-	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
-	          "user as u, process as pro where p.id = #{id} and p.hospital_id = h.id and p.process_id = pro.id and pro.user_id = u.id")
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h " +
+	          "where p.id = #{id} and p.hospital_id = h.id")
 	Prescription getPrescriptionByID(@Param("id") int id);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.uuid = #{uuid} and p.hospital_id = h.id")
 	Prescription getPrescriptionByUUID(@Param("uuid") String uuid);
 
-	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
-	          "user as u, process as pro where p.process = #{process} and p.hospital_id = h.id and p.process_id = pro.id and pro.user_id = u.id")
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.process = #{process} and p.hospital_id = h.id")
 	List<Prescription> getPrescriptionsByProcess(@Param("process") int process);
 
 	// Used to find out finished prescriptions by hospital and time. 
-	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.process = #{process} and p.hospital_id = h.id and p.create_time > #{start} and p.finish_time < #{end}")
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.process = #{process} and p.hospital_id = h.id and p.create_time >= #{start} and p.finish_time <= #{end}")
 	List<Prescription> getPrescriptionsByProcessAndTime(@Param("process") int process, @Param("start") String start, @Param("end") String end);
 
 	// Used to find out finished prescriptions by hospital and time.
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h " +
-	          "where p.process = #{process} and h.name = #{hospitalName} and p.hospital_id = h.id and p.create_time > #{start} and p.finish_time < #{end}")
+	          "where p.process = #{process} and h.name = #{hospitalName} and p.hospital_id = h.id and p.create_time >= #{start} and p.finish_time <= #{end}")
 	List<Prescription> getPrescriptionsByParamswithTime(@Param("process") int process, @Param("hospitalName") String hospitalName, @Param("start") String start, @Param("end") String end);
 	
-	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
-	          "user as u, process as pro where p.process = #{process} and h.name = #{hospitalName} and p.hospital_id = h.id and p.process_id = pro.id and pro.user_id = u.id")
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.process = #{process} and h.name = #{hospitalName} and p.hospital_id = h.id")
 	List<Prescription> getPrescriptionsByParams(@Param("process") int process, @Param("hospitalName") String hospitalName);
 
-	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
-	          "user as u, process as pro where h.name = #{hospitalName} and h.id = p.hospital_id " +
-			"and p.id = pro.prescription_id and u.id = pro.user_id and pro.id = p.process_id and p.process < 11")
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h " +
+	          "where h.name = #{hospitalName} and h.id = p.hospital_id and p.process < 11")
 	List<Prescription> getPrescriptionByHospitalName(@Param("hospitalName") String hospitalName);
 	
-	@Select("select p.*, h.name as hospital_name, u.name as user_name from prescription as p, hospital as h, " +
-	          "user as u, process as pro where p.hospital_id = h.id " +
-			"and p.id = pro.prescription_id and u.id = pro.user_id and pro.id = p.process_id and p.process < 11")
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h " +
+	          "where p.process < 11 and p.hospital_id = h.id ")
 	List<Prescription> getPrescriptionsUnfinished();
 	
 	//获取在一段时间内指定一家医院完成的处方
@@ -130,16 +126,16 @@ public interface PrescriptionDao {
     
     //用户维度统计:计算处理的Prs
     @Select("select count(*) from prescription as p, process as pro, user as u where p.process = 11 and u.id = #{userId} and pro.process_type = #{process_type} " +
-              "and pro.prescription_id = p.id and pro.user_id = u.id and p.create_time > #{start} and p.finish_time < #{end}")
+              "and pro.prescription_id = p.id and pro.user_id = u.id and p.create_time >= #{start} and p.finish_time <= #{end}")
     int countPrsDealByUser(@Param("userId") int userId, @Param("process_type") int process_type, @Param("start") String start, @Param("end") String end);
 
     //用户维度统计:PrsList
     @Select("select p.*, h.name as hospital_name from prescription as p, process as pro, user as u, hospital as h where p.process = 11 and u.id = #{userId} and pro.process_type = #{process_type} " +
-              "and p.hospital_id = h.id and pro.prescription_id = p.id and pro.user_id = u.id and p.create_time > #{start} and p.finish_time < #{end}")
+              "and p.hospital_id = h.id and pro.prescription_id = p.id and pro.user_id = u.id and p.create_time >= #{start} and p.finish_time <= #{end}")
     List<Prescription> listPrsByUser(@Param("userId") int userId, @Param("process_type") int process_type, @Param("start") String start, @Param("end") String end);
     
     //用户维度统计:计算出错的Process
     @Select("select count(*) from prescription as p, process as pro, user as u where p.process = 11 and u.id = #{userId} and pro.error_type > 0 " +
-              "and pro.prescription_id = p.id and pro.user_id = u.id and p.create_time > #{start} and p.finish_time < #{end}")
+              "and pro.prescription_id = p.id and pro.user_id = u.id and p.create_time >= #{start} and p.finish_time <= #{end}")
     int countProcsErrorByUser(@Param("userId") int userId, @Param("start") String start, @Param("end") String end);
 }

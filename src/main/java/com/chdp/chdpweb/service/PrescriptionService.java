@@ -16,9 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.chdp.chdpweb.Constants;
+import com.chdp.chdpweb.bean.Order;
+import com.chdp.chdpweb.bean.Process;
 import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.bean.User;
+import com.chdp.chdpweb.dao.OrderDao;
 import com.chdp.chdpweb.dao.PrescriptionDao;
+import com.chdp.chdpweb.dao.ProcessDao;
+import com.chdp.chdpweb.dao.UserDao;
 import com.github.pagehelper.PageHelper;
 
 @Repository
@@ -26,10 +31,33 @@ public class PrescriptionService {
 
 	@Autowired
 	private PrescriptionDao prsDao;
+	@Autowired
+	private OrderDao orderDao;
+	@Autowired
+	private UserDao userDao;
+	@Autowired
+	private ProcessDao processDao;
 	
 	public Prescription getPrescription(int id) {
 		try {
-			return prsDao.getPrescriptionByID(id);
+			Prescription prs = prsDao.getPrswithIdNoUser(id);
+			if (prs.getProcess() == Constants.FINISH){
+				Order order = orderDao.getOrderById(prs.getProcess_id());
+				prs.setUser_name(userDao.getUserById(order.getOutbound_user_id()).getName());
+			}else if (prs.getProcess() == Constants.SHIP){
+				if (prs.getProcess_id() == -1){
+					//Process pro = processDao.getProcesswithPrsIdandProcess(prs.getId(), Constants.PACKAGE);
+					//prs.setUser_name(userDao.getUserById(pro.getUser_id()).getName());
+					prs.setUser_name("尚未打印出库单!");
+				}else {
+					Order order = orderDao.getOrderById(prs.getProcess_id());
+					prs.setUser_name(userDao.getUserById(order.getCreate_user_id()).getName());
+				}
+			}else{
+				Process proc = processDao.getProcessesById(prs.getProcess_id());
+				prs.setUser_name(userDao.getUserById(proc.getUser_id()).getName());
+			}
+			return prs;
 		} catch (Exception e) {
 			return null;
 		}
@@ -70,7 +98,8 @@ public class PrescriptionService {
 
 	public List<Prescription> listPrsWithProcessUnfinished() {
 		try {
-			return prsDao.getPrescriptionsUnfinished();
+			List<Prescription> prsList = prsDao.getPrescriptionsUnfinished();
+			return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e){
 			return new ArrayList<Prescription>();
 		}
@@ -78,8 +107,9 @@ public class PrescriptionService {
 	
 	public List<Prescription> listPrsWithProcessUnfinished(int pageNum){
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
-		try{
-			return prsDao.getPrescriptionsUnfinished();
+		try {
+			List<Prescription> prsList = prsDao.getPrescriptionsUnfinished();
+			return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e){
 			return new ArrayList<Prescription>();
 		}
@@ -113,7 +143,8 @@ public class PrescriptionService {
 
 	public List<Prescription> listPrsWithProcess(int process) {
 		try {
-			return prsDao.getPrescriptionsByProcess(process);
+			List<Prescription> prsList = prsDao.getPrescriptionsByProcess(process);
+			return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -130,9 +161,10 @@ public class PrescriptionService {
 
 	public List<Prescription> listPrsWithProcess(int process, int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
-		try{
-			return prsDao.getPrescriptionsByProcess(process);
-		} catch (Exception e){
+		try {
+			List<Prescription> prsList = prsDao.getPrescriptionsByProcess(process);
+			return this.updatePrsListwithUsername(prsList);
+		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
@@ -148,7 +180,8 @@ public class PrescriptionService {
 
 	public List<Prescription> listPrsWithHospital(String hospitalName) {
 		try {
-			return prsDao.getPrescriptionByHospitalName(hospitalName);
+			List<Prescription> prsList = prsDao.getPrescriptionByHospitalName(hospitalName);
+			return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -157,7 +190,8 @@ public class PrescriptionService {
 	public List<Prescription> listPrsWithHospital(String hospitalName, int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
-			return prsDao.getPrescriptionByHospitalName(hospitalName);
+			List<Prescription> prsList = prsDao.getPrescriptionByHospitalName(hospitalName);
+			return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -165,7 +199,8 @@ public class PrescriptionService {
 
 	public List<Prescription> listPrsWithParams(int process, String hospitalName) {
 		try {
-			return prsDao.getPrescriptionsByParams(process, hospitalName);
+			List<Prescription> prsList = prsDao.getPrescriptionsByParams(process, hospitalName);
+			return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -174,7 +209,8 @@ public class PrescriptionService {
 	public List<Prescription> listPrsWithParams(int process, String hospitalName, int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
-			return prsDao.getPrescriptionsByParams(process, hospitalName);
+			List<Prescription> prsList = prsDao.getPrescriptionsByParams(process, hospitalName);
+			return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -436,6 +472,42 @@ public class PrescriptionService {
 			return prsDao.listPrsByUser(userId, processType, start, end);
 		} catch (Exception e){
 			return new ArrayList<Prescription>();
+		}
+	}
+	
+	public List<Prescription> updatePrsListwithUsername(List<Prescription> prsList){
+		try{
+			List<Prescription> finalPrsList = new ArrayList<Prescription>();
+			Iterator<Prescription> itr = prsList.iterator();
+			Prescription prs = null;
+			while (itr.hasNext()){
+				prs = itr.next();
+				if (prs.getProcess() == Constants.SHIP){
+					if (prs.getProcess_id() == -1){
+						prs.setUser_name("尚未打印出库单!");
+					}else {
+						Order order = orderDao.getOrderById(prs.getProcess_id());
+						prs.setUser_name(userDao.getUserById(order.getCreate_user_id()).getName());
+					}
+				}else{
+					Process proc = processDao.getProcessesById(prs.getProcess_id());
+					prs.setUser_name(userDao.getUserById(proc.getUser_id()).getName());
+				}
+				finalPrsList.add(prs);
+			}
+			return finalPrsList;
+		}catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	//此方法主要用来取得最近的process的id
+	public int getLastestProcIdwithPrsandProcess(int prsId, int process_type){
+		try {
+			Process pro = processDao.getProcesswithPrsIdandProcess(prsId, Constants.PACKAGE);
+			return pro.getId();
+		} catch (Exception e) {
+			return -1;
 		}
 	}
 }

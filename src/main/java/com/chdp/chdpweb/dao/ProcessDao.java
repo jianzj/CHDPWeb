@@ -68,4 +68,9 @@ public interface ProcessDao {
 	
 	@Select("select max(id) from process where process_type = #{process} and prescription_id = #{prsId}")
 	int getProcIdwithPrsandStatus(@Param("prsId") int prsId, @Param("process") int process);
+	
+	// Add new selection for Order and Shipping process
+	@Select("select * from process where id = " +
+	            "(select max(id) from process where prescription_id = #{prsId} and process_type = #{process}")
+	Process getProcesswithPrsIdandProcess(@Param("prsId") int prsId, @Param("process") int process);
 }
