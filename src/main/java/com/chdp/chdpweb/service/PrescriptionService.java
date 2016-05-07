@@ -21,6 +21,7 @@ import com.chdp.chdpweb.bean.Order;
 import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.bean.Process;
 import com.chdp.chdpweb.bean.User;
+import com.chdp.chdpweb.common.Utils;
 import com.chdp.chdpweb.dao.HospitalDao;
 import com.chdp.chdpweb.dao.OrderDao;
 import com.chdp.chdpweb.dao.PrescriptionDao;
@@ -105,7 +106,8 @@ public class PrescriptionService {
 	public List<Prescription> listPrsWithProcessUnfinished() {
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsUnfinished();
-			return this.updatePrsListwithUsername(prsList);
+			return prsList;
+			//return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -115,7 +117,8 @@ public class PrescriptionService {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsUnfinished();
-			return this.updatePrsListwithUsername(prsList);
+			return prsList;
+			//return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -159,7 +162,8 @@ public class PrescriptionService {
 	public List<Prescription> listPrsWithProcess(int process) {
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsByProcess(process);
-			return this.updatePrsListwithUsername(prsList);
+			return prsList;
+			//return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -187,7 +191,8 @@ public class PrescriptionService {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsByProcess(process);
-			return this.updatePrsListwithUsername(prsList);
+			return prsList;
+			//return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -206,7 +211,8 @@ public class PrescriptionService {
 	public List<Prescription> listPrsWithHospital(int hospitalId) {
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionByHospitalName(hospitalId);
-			return this.updatePrsListwithUsername(prsList);
+			return prsList;
+			//return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -216,7 +222,8 @@ public class PrescriptionService {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionByHospitalName(hospitalId);
-			return this.updatePrsListwithUsername(prsList);
+			return prsList;
+			//return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -225,7 +232,8 @@ public class PrescriptionService {
 	public List<Prescription> listPrsWithParams(int process, int hospitalId) {
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsByParams(process, hospitalId);
-			return this.updatePrsListwithUsername(prsList);
+			return prsList;
+			//return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -235,7 +243,8 @@ public class PrescriptionService {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsByParams(process, hospitalId);
-			return this.updatePrsListwithUsername(prsList);
+			return prsList;
+			//return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -463,15 +472,6 @@ public class PrescriptionService {
 	}
 
 	// 用户维度
-	public int countDealPrsByUser(int userId, int processType, String start, String end) {
-		try {
-			return prsDao.countPrsDealByUser(userId, processType, start, end);
-		} catch (Exception e) {
-			return 0;
-		}
-	}
-
-	// 用户维度
 	public int countErrorProByUser(int userId, String start, String end) {
 		try {
 			return prsDao.countProcsErrorByUser(userId, start, end);
@@ -524,32 +524,106 @@ public class PrescriptionService {
 		}
 	}
 	
-	public Prescription formatPrsTime(Prescription prs){
+	//获得用户维度的处方列表
+	public List<User> getUserListForPrsSummary(int userAuth, String start, String end){
 		try{
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String startTime = "";
-			String endTime = "";
-			if (prs.getCreate_time() != null){
-				startTime = sdf.format(sdf.parse(prs.getCreate_time()));
-				prs.setCreate_time(startTime);
+			List<User> userList = null;
+			if (userAuth == 0){
+				userList = userDao.getUserList();
+				//userList = userDao.getUserListWithoutAdmin();
+			}else{
+				userList = userDao.getUserListWithAuth(userAuth);
 			}
-			if (prs.getFinish_time() != null){
-				endTime = sdf.format(sdf.parse(prs.getFinish_time()));
-				prs.setFinish_time(endTime);
+			List<User> finalUserList = new ArrayList<User>();
+			Iterator<User> itr = userList.iterator();
+			User user = null;
+			while (itr.hasNext()){
+				user = itr.next();
+				int prsNum = 0;
+				int errorNum = 0;
+				if (userAuth == 0){
+					List<Integer> tempPrsIdList = prsDao.listDealPrsIdByUser_NoShip(user.getId(), start, end);
+					if ((user.getAuthority() & 1) != 0){
+						List<Integer> tempPrsIdList02 = prsDao.listDealPrsIdByUserr_Ship(user.getId(), start, end);
+						tempPrsIdList = Utils.mergeTwoPrsIdList(tempPrsIdList, tempPrsIdList02);
+					}
+					prsNum = tempPrsIdList.size();
+				}else{
+					int process_type = Utils.getProcessTypebyUserAuth(userAuth);
+					if (process_type == Constants.SHIP){
+						prsNum = prsDao.countPrsDealByUser_Ship(user.getId(), start, end);
+					}else{
+						prsNum = prsDao.countPrsDealByUserAndProcess_NoShip(user.getId(), process_type, start, end);
+					}
+				}
+				if (userAuth == 0){
+					Integer temp = prsDao.countProcsErrorByUser(user.getId(), start, end);
+					if (temp == null){
+						errorNum = 0;
+					}else{
+						errorNum = temp;
+					}
+				}else{
+					//int process_type = Utils.getProcessTypebyUserAuth(userAuth);
+					//Integer temp = prsDao.countProcsErrorByUse_Process(process_type,user.getId(), start, end);
+					Integer temp = prsDao.countProcsErrorByUser(user.getId(), start, end);
+					if (temp == null){
+						errorNum = 0;
+					}else{
+						errorNum = temp;
+					}
+				}
+				user.setDone_prs_num(prsNum);
+				user.setError_num(errorNum);
+				user.setPosition(user.getAuthority_str());
+				finalUserList.add(user);
 			}
-			return prs;
-		} catch (Exception e){
-			return prs;
+			
+			return finalUserList;
+		}catch (Exception e){
+			return new ArrayList<User>();
 		}
 	}
-	
-	public List<Prescription> formatPrsListForTime(List<Prescription> prsList){
+
+	public List<Prescription> listPrsByUser(int userAuth, int userId, String start, String end){
 		try{
-			List<Prescription> finalList = new ArrayList<Prescription>();
+			User user = userDao.getUserById(userId);
+			List<Prescription> prsList = new ArrayList<Prescription>();
+			if (userAuth == 0){
+				List<Integer> prsIdList = prsDao.listDealPrsIdByUser_NoShip(userId, start, end);
+				if ((user.getAuthority() & 1) != 0){
+					List<Integer> tempPrsIdList = prsDao.listDealPrsIdByUserr_Ship(userId, start, end);
+					prsIdList = Utils.mergeTwoPrsIdList(prsIdList, tempPrsIdList);
+				}
+				Iterator<Integer> itr = prsIdList.iterator();
+				Prescription prs = null;
+				while (itr.hasNext()){
+					int tempId = itr.next();
+					prs = prsDao.getPrescriptionByID(tempId);
+					prs.setHospital_name(hospitalDao.getHospitalwithID(prs.getHospital_id()).getName());
+					prsList.add(prs);
+				}
+			}else{
+				List<Integer> prsIdList = prsDao.listDealPrsIdByUser_NoShip(userId, start, end);
+				if (userAuth == 1){
+					prsIdList = prsDao.listDealPrsIdByUserr_Ship(userId, start, end);
+				}else{
+					int process_type = Utils.getProcessTypebyUserAuth(userAuth);
+					prsIdList = prsDao.listDealPrsIdByUserAndProcess_NoShip(userId, process_type, start, end);
+				}
+				Iterator<Integer> itr = prsIdList.iterator();
+				Prescription prs = null;
+				while (itr.hasNext()){
+					int tempId = itr.next();
+					prs = prsDao.getPrescriptionByID(tempId);
+					prs.setHospital_name(hospitalDao.getHospitalwithID(prs.getHospital_id()).getName());
+					prsList.add(prs);
+				}
+			}
 			
 			return prsList;
 		} catch (Exception e){
-			return prsList;
+			return new ArrayList<Prescription>();
 		}
 	}
 }

@@ -70,7 +70,7 @@
 		<% request.setAttribute("orderId", (Integer)request.getAttribute("orderId")); %>
 	<% } %>
 	<% if (request.getAttribute("from") != null){ %>
-		<% request.setAttribute("from", (String)request.getAttribute("String")); %>
+		<% request.setAttribute("from", (String)request.getAttribute("from")); %>
 	<% } %>
 	<c:set var="pageUrl" value="prescription/dimensionPrsList" />
 	<%@ include file="../common/nav.jsp"%>

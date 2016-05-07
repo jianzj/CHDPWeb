@@ -4,7 +4,7 @@
 <nav>
 	<ul class="pagination">
 		<li <c:if test="${!page.hasPreviousPage}"> class="disabled"</c:if>><a
-			href="<c:if test="${page.hasPreviousPage}"><%=request.getContextPath()%>/${pageUrl}?startTime=${startTime}&endTime=${endTime}&orderId=${orderId}&userId=${userId}&hospitalId=${hospitalId}&process=${process}&pageNum=${page.pageNum-1}</c:if>"
+			href="<c:if test="${page.hasPreviousPage}"><%=request.getContextPath()%>/${pageUrl}?from=${from}&startTime=${startTime}&endTime=${endTime}&orderId=${orderId}&userId=${userId}&userAuth=${userAuth}&hospitalId=${hospitalId}&process=${process}&pageNum=${page.pageNum-1}</c:if>"
 			aria-label="上一页"> <span aria-hidden="true">&laquo;</span>
 		</a></li>
 		<%
@@ -18,10 +18,10 @@
 		%>
 		<c:forEach var="p" begin="${start}" end="${end}">
 			<li <c:if test="${page.pageNum==p}"> class="active"</c:if>><a
-				href="<%=request.getContextPath()%>/${pageUrl}?startTime=${startTime}&endTime=${endTime}&orderId=${orderId}&userId=${userId}&hospitalId=${hospitalId}&process=${process}&pageNum=${p}">${p}</a></li>
+				href="<%=request.getContextPath()%>/${pageUrl}?from=${from}&startTime=${startTime}&endTime=${endTime}&orderId=${orderId}&userId=${userId}&userAuth=${userAuth}&hospitalId=${hospitalId}&process=${process}&pageNum=${p}">${p}</a></li>
 		</c:forEach>
 		<li <c:if test="${!page.hasNextPage}"> class="disabled"</c:if>><a
-			href="<c:if test="${page.hasNextPage}"><%=request.getContextPath()%>/${pageUrl}?startTime=${startTime}&endTime=${endTime}&order=${orderId}&userId=${userId}&hospitalId=${hospitalId}&process=${process}&pageNum=${page.pageNum+1}</c:if>"
+			href="<c:if test="${page.hasNextPage}"><%=request.getContextPath()%>/${pageUrl}?from=${from}&startTime=${startTime}&endTime=${endTime}&order=${orderId}&userId=${userId}&userAuth=${userAuth}&hospitalId=${hospitalId}&process=${process}&pageNum=${page.pageNum+1}</c:if>"
 			aria-label="下一页"> <span aria-hidden="true">&raquo;</span>
 		</a></li>
 	</ul>

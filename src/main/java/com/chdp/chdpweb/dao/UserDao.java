@@ -28,6 +28,9 @@ public interface UserDao {
 	@Select("select * from user where authority < 1024")
 	List<User> getUserListWithoutAdmin();
 
+	@Select("select * from user where authority & #{userAuth} != 0")
+	List<User> getUserListWithAuth(@Param("userAuth") int userAuth);
+	
 	@Delete("delete from user where id = #{userId}")
 	int deleteUser(int userId);
 
