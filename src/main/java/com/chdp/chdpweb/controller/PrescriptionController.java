@@ -66,6 +66,10 @@ public class PrescriptionController {
 	@RequiresRoles("RECEIVE")
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public String addPost(HttpServletRequest request, Prescription prs) {
+		if (prs.getPacket_num() == -1) {
+			prs.setPacket_num(request.getParameter("packet_num_other") == null ? 0
+					: Integer.parseInt(request.getParameter("packet_num_other")));
+		}
 
 		String price = request.getParameter("prs_price");
 		double priceNum = 0;
@@ -153,7 +157,7 @@ public class PrescriptionController {
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
-		//request.setAttribute("hospital", "ALL");
+		// request.setAttribute("hospital", "ALL");
 		List<Prescription> prsList = null;
 
 		if (prsId == null) {
@@ -172,7 +176,7 @@ public class PrescriptionController {
 				return "process/shipList";
 			} else if (from.equals("CURRENT")) {
 				prsList = prsService.listPrsWithProcessUnfinished(1);
-				//request.setAttribute("hospital", "ALL");
+				// request.setAttribute("hospital", "ALL");
 				request.setAttribute("process", 0);
 				request.setAttribute("currentPrsList", prsList);
 				PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
@@ -203,7 +207,7 @@ public class PrescriptionController {
 		} else if (from.equals("CURRENT") && ((currentUser.getAuthority() & 1024) == 0)) {
 			request.setAttribute("errorMsg", "您暂无此操作权限！");
 			prsList = prsService.listPrsWithProcessUnfinished(1);
-			//request.setAttribute("hospital", "ALL");
+			// request.setAttribute("hospital", "ALL");
 			request.setAttribute("process", 0);
 			request.setAttribute("currentPrsList", prsList);
 			PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
@@ -229,7 +233,7 @@ public class PrescriptionController {
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
-		//request.setAttribute("hospital", "ALL");
+		// request.setAttribute("hospital", "ALL");
 		List<Prescription> prsList = null;
 
 		if (prsId == null) {
@@ -461,15 +465,16 @@ public class PrescriptionController {
 		request.setAttribute("hospitalId", hospitalId);
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
-		
+
 		start = Utils.formatStartTime(start);
 		end = Utils.formatEndTime(end);
-		
+
 		List<Prescription> prsList = null;
 		if (hospitalId.equals("ALL")) {
 			prsList = prsService.listPrsWithProcessAndTime(Constants.FINISH, pageNum, start, end);
 		} else {
-			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, Integer.parseInt(hospitalId), pageNum, start, end);
+			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, Integer.parseInt(hospitalId), pageNum,
+					start, end);
 		}
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
@@ -503,7 +508,7 @@ public class PrescriptionController {
 
 		start = Utils.formatStartTime(start);
 		end = Utils.formatEndTime(end);
-		
+
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		List<Hospital> newHospList = new ArrayList<Hospital>();
 		Iterator<Hospital> itr = hospitalList.iterator();
@@ -551,10 +556,10 @@ public class PrescriptionController {
 		request.setAttribute("hospital", hospital);
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
-		
+
 		start = Utils.formatStartTime(start);
 		end = Utils.formatEndTime(end);
-		
+
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 
 		List<Order> orderList = orderService.listOrderFinished(hospital, start, end, pageNum);
@@ -601,7 +606,7 @@ public class PrescriptionController {
 
 		start = Utils.formatStartTime(start);
 		end = Utils.formatEndTime(end);
-		
+
 		List<User> userList = userService.getUserListNoAdmin();
 		Iterator<User> itr = userList.iterator();
 		List<User> finalUserList = new ArrayList<User>();
@@ -661,7 +666,7 @@ public class PrescriptionController {
 
 		start = Utils.formatStartTime(start);
 		end = Utils.formatEndTime(end);
-		
+
 		List<Prescription> prsList = null;
 		if (from.equals("HOSPITAL")) {
 			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, Integer.parseInt(hospitalId), pageNum,
