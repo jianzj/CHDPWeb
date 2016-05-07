@@ -37,23 +37,25 @@ public class PrescriptionService {
 	private UserDao userDao;
 	@Autowired
 	private ProcessDao processDao;
-	
+
 	public Prescription getPrescription(int id) {
 		try {
 			Prescription prs = prsDao.getPrswithIdNoUser(id);
-			if (prs.getProcess() == Constants.FINISH){
+			if (prs.getProcess() == Constants.FINISH) {
 				Order order = orderDao.getOrderById(prs.getProcess_id());
 				prs.setUser_name(userDao.getUserById(order.getOutbound_user_id()).getName());
-			}else if (prs.getProcess() == Constants.SHIP){
-				if (prs.getProcess_id() == -1){
-					//Process pro = processDao.getProcesswithPrsIdandProcess(prs.getId(), Constants.PACKAGE);
-					//prs.setUser_name(userDao.getUserById(pro.getUser_id()).getName());
+			} else if (prs.getProcess() == Constants.SHIP) {
+				if (prs.getProcess_id() == -1) {
+					// Process pro =
+					// processDao.getProcesswithPrsIdandProcess(prs.getId(),
+					// Constants.PACKAGE);
+					// prs.setUser_name(userDao.getUserById(pro.getUser_id()).getName());
 					prs.setUser_name("尚未打印出库单!");
-				}else {
+				} else {
 					Order order = orderDao.getOrderById(prs.getProcess_id());
 					prs.setUser_name(userDao.getUserById(order.getCreate_user_id()).getName());
 				}
-			}else{
+			} else {
 				Process proc = processDao.getProcessesById(prs.getProcess_id());
 				prs.setUser_name(userDao.getUserById(proc.getUser_id()).getName());
 			}
@@ -100,43 +102,43 @@ public class PrescriptionService {
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsUnfinished();
 			return this.updatePrsListwithUsername(prsList);
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
-	public List<Prescription> listPrsWithProcessUnfinished(int pageNum){
+
+	public List<Prescription> listPrsWithProcessUnfinished(int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsUnfinished();
 			return this.updatePrsListwithUsername(prsList);
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
+
 	// No user_name included
-	public List<Prescription> listPrsWithProcessNoUser(int process){
-		try{
+	public List<Prescription> listPrsWithProcessNoUser(int process) {
+		try {
 			return prsDao.getPrsListWithProcess(process);
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
-	public List<String> listInProgressHospitalwithProcess(int process){
-		try{
+
+	public List<String> listInProgressHospitalwithProcess(int process) {
+		try {
 			return prsDao.listInProgressHospitalwithProcess(process);
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<String>();
 		}
 	}
-			
-	public List<Prescription> listPrsWithProcessAndTime(int process, int pageNum, String start, String end){
+
+	public List<Prescription> listPrsWithProcessAndTime(int process, int pageNum, String start, String end) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
-		try{
+		try {
 			return prsDao.getPrescriptionsByProcessAndTime(process, start, end);
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
@@ -168,12 +170,13 @@ public class PrescriptionService {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
-	public List<Prescription> listPrsWithParamsAndTime(int process, int hospitalId, int pageNum, String start, String end){
+
+	public List<Prescription> listPrsWithParamsAndTime(int process, int hospitalId, int pageNum, String start,
+			String end) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
-		try{
+		try {
 			return prsDao.getPrescriptionsByParamswithTime(process, hospitalId, start, end);
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
@@ -300,10 +303,10 @@ public class PrescriptionService {
 		}
 	}
 
-	public int countPrsNumForHospital(String hospital, int process, String start, String end){
-		try{
+	public int countPrsNumForHospital(String hospital, int process, String start, String end) {
+		try {
 			return prsDao.countPrsNumForHospital(hospital, process, start, end);
-		} catch (Exception e){
+		} catch (Exception e) {
 			return 0;
 		}
 	}
@@ -313,124 +316,111 @@ public class PrescriptionService {
 		return true;
 	}
 
-	public boolean printPackageLabel(String uuid){
-		
+	public boolean printPackageLabel(String uuid) {
+
 		return true;
 	}
-	
-	public boolean printSinglePackage(String uuid){
+
+	public boolean printSinglePackage(String uuid) {
 		return true;
 	}
-	
-	public boolean printSinglePrs(String uuid){
+
+	public boolean printSinglePrs(String uuid) {
 		return true;
 	}
-	
-	public boolean generatePrsListXls(String hospitalName, User user, List<Prescription> prs){
-		try{
+
+	public boolean generatePrsListXls(String hospitalName, User user, List<Prescription> prs) {
+		try {
 			String templatePath = Constants.TEMPLATEPATH + "/template.xls";
-			
+
 			File tempFile = new File(templatePath);
-			if (!tempFile.exists()){
+			if (!tempFile.exists()) {
 				return false;
 			}
-			
+
 			FileInputStream fis = new FileInputStream(templatePath);
 			HSSFWorkbook templateWb = new HSSFWorkbook(fis);
 			HSSFSheet templateSt = templateWb.getSheetAt(0);
-			
-			HSSFRow titleRow = templateSt.getRow(0);
-			HSSFRow itemRow = templateSt.getRow(1);
-			HSSFRow lastRowTemplate = templateSt.getRow(templateSt.getLastRowNum());
-			
-			//String newTitle = titleRow.getCell(0).getStringCellValue() + hospitalName;
-			titleRow.getCell(0).setCellValue(hospitalName);
-			
+
+			HSSFRow titleRow = templateSt.getRow(1);
+			HSSFRow itemRow = templateSt.getRow(2);
+
+			titleRow.getCell(1).setCellValue(hospitalName);
+
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			String currentTime = df.format(new Date());
+			titleRow.getCell(5).setCellValue(currentTime);
+
 			int prsNum = prs.size();
-			templateSt.shiftRows(2, templateSt.getLastRowNum(), prsNum);
-			int index = 2;
+			templateSt.shiftRows(3, templateSt.getLastRowNum(), prsNum);
+			int index = 3;
 			double totalPrice = 0;
-			
+			int totalNum = 0;
+
 			Iterator<Prescription> itr = prs.iterator();
 			Prescription printItem = null;
-			while (itr.hasNext()){
+			while (itr.hasNext()) {
 				printItem = itr.next();
 				HSSFRow insertRow = templateSt.createRow(index);
-				insertRow.createCell(0).setCellValue(index - 1);
+
+				insertRow.createCell(0).setCellValue(printItem.getUuid());
 				insertRow.getCell(0).setCellStyle(itemRow.getCell(0).getCellStyle());
-				
+
 				insertRow.createCell(1).setCellValue(printItem.getOuter_id());
 				insertRow.getCell(1).setCellStyle(itemRow.getCell(1).getCellStyle());
-				
+
 				insertRow.createCell(2).setCellValue(printItem.getPatient_name());
 				insertRow.getCell(2).setCellStyle(itemRow.getCell(2).getCellStyle());
-				
+
 				insertRow.createCell(3).setCellValue(printItem.getPacket_num());
 				insertRow.getCell(3).setCellStyle(itemRow.getCell(3).getCellStyle());
-				
+
 				insertRow.createCell(4).setCellValue(printItem.getPrice());
 				insertRow.getCell(4).setCellStyle(itemRow.getCell(4).getCellStyle());
-				
+
 				insertRow.createCell(5).setCellValue("");
 				insertRow.getCell(5).setCellStyle(itemRow.getCell(5).getCellStyle());
-				
+
 				totalPrice += printItem.getPrice();
+				totalNum += printItem.getPacket_num();
 				index += 1;
 			}
-						
-			for (int i = templateSt.getLastRowNum() - 5; i <= templateSt.getLastRowNum(); i++){
-				templateSt.getRow(i).setHeight(lastRowTemplate.getHeight());
-				//templateSt.getRow(i).getCell(0).setCellStyle(lastRowTemplate.getCell(0).getCellStyle());
-			}
-		
-			HSSFRow lastRow = templateSt.getRow(templateSt.getLastRowNum() - 5);
-			String summaryAccount = lastRow.getCell(0).getStringCellValue() + String.valueOf(prs.size());
-			lastRow.getCell(0).setCellValue(summaryAccount);
-			
-			lastRow = templateSt.getRow(templateSt.getLastRowNum() - 4);
-			String summaryPrice = lastRow.getCell(0).getStringCellValue() + String.valueOf(totalPrice);
-			lastRow.getCell(0).setCellValue(summaryPrice);
-			
-			lastRow = templateSt.getRow(templateSt.getLastRowNum() - 3);
-			String shipUser = lastRow.getCell(0).getStringCellValue() + user.getName();
-			lastRow.getCell(0).setCellValue(shipUser);
-			
-			lastRow = templateSt.getRow(templateSt.getLastRowNum());
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-			String currentTime = df.format(new Date());
-			currentTime = lastRow.getCell(0).getStringCellValue() + currentTime;
-			lastRow.getCell(0).setCellValue(currentTime);
 
-			//生成UUID，形如20160502213800386, 当前日期+三位随机数
-			int randomNum = (int)(Math.random()*900)+100;
-			df = new SimpleDateFormat("yyyyMMddHHmmss");
+			HSSFRow lastRow = templateSt.getRow(templateSt.getLastRowNum() - 1);
+			lastRow.getCell(1).setCellValue(prs.size());
+			lastRow.getCell(3).setCellValue(totalNum + "帖");
+			lastRow.getCell(4).setCellValue(totalPrice);
+
+			// 生成UUID，形如20160502213800386, 当前日期+三位随机数
+			int randomNum = (int) (Math.random() * 900) + 100;
+			df = new SimpleDateFormat("yyyyMMdd-HHmmss");
 			currentTime = df.format(new Date());
 			String uuid = currentTime + String.valueOf(randomNum);
-			
-		    String newPath = uuid + ".xls";
-		    File newShipList = new File(newPath);
-		    try{
-		    	newShipList.createNewFile();
-		    } catch (Exception e){
-			    templateWb.close();
-			    fis.close();
-		    	return false;
-		    }
-		    
-		    FileOutputStream fileOut = new FileOutputStream(newShipList);
-		    templateWb.write(fileOut);
-		    fileOut.flush();
-		    fileOut.close();
-		    fis.close();
-		    templateWb.close();
+
+			String newPath = hospitalName + "-" + uuid + ".xls";
+			File newShipList = new File(newPath);
+			try {
+				newShipList.createNewFile();
+			} catch (Exception e) {
+				templateWb.close();
+				fis.close();
+				return false;
+			}
+
+			FileOutputStream fileOut = new FileOutputStream(newShipList);
+			templateWb.write(fileOut);
+			fileOut.flush();
+			fileOut.close();
+			fis.close();
+			templateWb.close();
 
 			return true;
-		} catch (Exception e){
-			
+		} catch (Exception e) {
+
 			return false;
 		}
 	}
-	
+
 	public boolean updatePrsProcess(Prescription prs) {
 		try {
 			prsDao.updatePrescriptionProcess(prs);
@@ -439,70 +429,70 @@ public class PrescriptionService {
 			return false;
 		}
 	}
-	
-	public boolean markPrsFinished(Prescription prs){
-		try{
+
+	public boolean markPrsFinished(Prescription prs) {
+		try {
 			prsDao.markPrsFinished(prs);
 			return true;
-		}catch (Exception e){
+		} catch (Exception e) {
 			return false;
 		}
 	}
-	
-	//用户维度
-	public int countDealPrsByUser(int userId, int processType, String start, String end){
-		try{
+
+	// 用户维度
+	public int countDealPrsByUser(int userId, int processType, String start, String end) {
+		try {
 			return prsDao.countPrsDealByUser(userId, processType, start, end);
-		}catch (Exception e){
+		} catch (Exception e) {
 			return 0;
 		}
 	}
-	
-	//用户维度
-	public int countErrorProByUser(int userId, String start, String end){
-		try{
+
+	// 用户维度
+	public int countErrorProByUser(int userId, String start, String end) {
+		try {
 			return prsDao.countProcsErrorByUser(userId, start, end);
-		}catch (Exception e){
+		} catch (Exception e) {
 			return 0;
 		}
 	}
-	
-	public List<Prescription> listPrswithUser(int userId, int processType, String start, String end){
-		try{
+
+	public List<Prescription> listPrswithUser(int userId, int processType, String start, String end) {
+		try {
 			return prsDao.listPrsByUser(userId, processType, start, end);
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
-	public List<Prescription> updatePrsListwithUsername(List<Prescription> prsList){
-		try{
+
+	public List<Prescription> updatePrsListwithUsername(List<Prescription> prsList) {
+		try {
 			List<Prescription> finalPrsList = new ArrayList<Prescription>();
 			Iterator<Prescription> itr = prsList.iterator();
 			Prescription prs = null;
-			while (itr.hasNext()){
+			while (itr.hasNext()) {
 				prs = itr.next();
-				if (prs.getProcess() == Constants.SHIP){
-					if (prs.getProcess_id() == -1){
+				if (prs.getProcess() == Constants.SHIP) {
+					if (prs.getProcess_id() == -1) {
 						prs.setUser_name("尚未打印出库单!");
-					}else {
+					} else {
 						Order order = orderDao.getOrderById(prs.getProcess_id());
 						prs.setUser_name(userDao.getUserById(order.getCreate_user_id()).getName());
 					}
-				}else{
+				} else {
 					Process proc = processDao.getProcessesById(prs.getProcess_id());
 					prs.setUser_name(userDao.getUserById(proc.getUser_id()).getName());
 				}
 				finalPrsList.add(prs);
 			}
 			return finalPrsList;
-		}catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
-	//此方法主要用来取得最近的process的id
-	public int getLastestProcIdwithPrsandProcess(int prsId, int process_type){
+
+	// 此方法主要用来取得最近的process的id
+	public int getLastestProcIdwithPrsandProcess(int prsId, int process_type) {
 		try {
 			Process pro = processDao.getProcesswithPrsIdandProcess(prsId, Constants.PACKAGE);
 			return pro.getId();
