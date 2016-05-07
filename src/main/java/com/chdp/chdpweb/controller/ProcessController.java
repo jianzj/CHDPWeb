@@ -15,8 +15,10 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.Hospital;
+import com.chdp.chdpweb.bean.Order;
 import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.service.HospitalService;
+import com.chdp.chdpweb.service.OrderService;
 import com.chdp.chdpweb.service.PrescriptionService;
 import com.chdp.chdpweb.service.ProcessService;
 import com.chdp.chdpweb.bean.Process;
@@ -31,6 +33,8 @@ public class ProcessController {
 	private PrescriptionService prsService;
 	@Autowired
 	private HospitalService hospitalService;
+	@Autowired
+	private OrderService orderService;
 	
 	@RequiresRoles(value = {"ADMIN", "RECEIVE"}, logical = Logical.OR)
 	@RequestMapping(value = "/receiveList", method = RequestMethod.GET)
@@ -126,7 +130,28 @@ public class ProcessController {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
 			}
 		}
+		request.setAttribute("from", from);
 		
+		Prescription prs = prsService.getPrsNoUser(prsId);
+		int processId = 0;
+		int orderId = -1;
+		if (prs.getProcess() < Constants.SHIP){
+			processId = prs.getProcess_id();
+		}else {
+			processId = prsService.getLastestProcIdwithPrsandProcess(prs.getId(), Constants.SHIP);
+			orderId = prs.getProcess_id();
+		}
+		
+		List<Process> processList = proService.getProcessChainWithProcessId(processId);
+		request.setAttribute("processList", processList);
+		request.setAttribute("currentPrs", prs);
+		
+		if (orderId > 0){
+			Order order = orderService.getOrder(orderId);
+			request.setAttribute("shipOrder", order);
+		}
+		
+		/**
 		int processId = 0;
 		if (from.equals("HISTORY") || from.equals("HOSPITAL") || from.equals("USER") || from.equals("ORDER")){
 			processId = proService.getProcIdwithPrsandStatus(prsId, Constants.SHIP);
@@ -143,12 +168,7 @@ public class ProcessController {
 			}else if (from.equals("ORDER")){
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
 			}
-		}
-		
-		request.setAttribute("from", from);
-		
-		Prescription prs = prsService.getPrsNoUser(prsId);
-
+		} 
 		List<Process> processList = null;
 		if (from.equals("HISTORY") || from.equals("HOSPITAL") || from.equals("USER") || from.equals("ORDER")){
 			processList = proService.getProcessChainWithProcessId(processId);
@@ -157,6 +177,8 @@ public class ProcessController {
 		}
 		request.setAttribute("processList", processList);
 		request.setAttribute("currentPrs", prs);
+		*
+		**/
 		
 		return "process/processDetail";
 	}
