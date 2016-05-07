@@ -93,6 +93,10 @@ public interface PrescriptionDao {
 	@Delete("delete from prescription where id = #{prsId}")
 	int deletePrescription(@Param("prsId") int prsId);
 
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
+			+ "where p.process = #{process} and p.process_id = -1 and p.hospital_id = h.id")
+	List<Prescription> getPrsListWithProcess_Ship(@Param("process") int process);
+	
 	// New added
 	// Used for receiveList/ to get PrsList with Process type. No user_name
 	// included.
@@ -104,6 +108,13 @@ public interface PrescriptionDao {
 			+ "where p.id = #{id} and p.hospital_id = h.id")
 	Prescription getPrswithIdNoUser(@Param("id") int id);
 
+	// Used for receiveList/ to get PrsList with Process type. No user_name
+	// included.
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
+			+ "where p.process = #{process} and p.process_id = -1 and h.id = #{hospitalId} and p.hospital_id = h.id")
+	List<Prescription> getPrsListWithProAndHospital_Ship(@Param("process") int process,
+			@Param("hospitalId") int hospitalId);
+	
 	// Used for receiveList/ to get PrsList with Process type. No user_name
 	// included.
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "

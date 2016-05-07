@@ -122,6 +122,15 @@ public class PrescriptionService {
 	}
 
 	// No user_name included
+	public List<Prescription> listPrsWithProcessNoUser_Ship(int process) {
+		try {
+			return prsDao.getPrsListWithProcess_Ship(process);
+		} catch (Exception e) {
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	// No user_name included
 	public List<Prescription> listPrsWithProcessNoUser(int process) {
 		try {
 			return prsDao.getPrsListWithProcess(process);
@@ -156,6 +165,15 @@ public class PrescriptionService {
 		}
 	}
 
+	// No user_name included 为了出库列表
+	public List<Prescription> listPrsWithProHospitalNoUser_Ship(int process, int hospitalId) {
+		try {
+			return prsDao.getPrsListWithProAndHospital_Ship(process, hospitalId);
+		} catch (Exception e) {
+			return new ArrayList<Prescription>();
+		}
+	}
+	
 	// No user_name included
 	public List<Prescription> listPrsWithProHospitalNoUser(int process, int hospitalId) {
 		try {

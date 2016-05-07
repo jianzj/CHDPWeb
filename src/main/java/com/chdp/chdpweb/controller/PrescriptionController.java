@@ -915,7 +915,7 @@ public class PrescriptionController {
 		while (itr.hasNext()) {
 			tempHospitalId = itr.next();
 			Hospital tempHospital = hospitalService.getHospitalById(tempHospitalId);
-			prs = prsService.listPrsWithProHospitalNoUser(Constants.SHIP, tempHospitalId);
+			prs = prsService.listPrsWithProHospitalNoUser_Ship(Constants.SHIP, tempHospitalId);
 			if (prsService.generatePrsListXls(tempHospitalId, currentUser, prs)) {
 				SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
 				String currentTime = df.format(new Date());
