@@ -612,13 +612,10 @@ public class PrescriptionController {
 			from = "HOSPITAL";
 		}
 		
-		if (hospital == null || hospital == "" || hospital.equals("ALL") || userId == null || userId <=0 ){
-			if (from.equals("HOSPITAL")){
-				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/hospitalDimensionList";
-			}else if(from.equals("USER")){
-				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
-			}
+		if (from.equals("HOSPITAL") && (hospital == null || hospital == "" || hospital.equals("ALL"))){
 			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/hospitalDimensionList";
+		}else if(from.equals("USER") && (userId == null || userId <=0)){
+			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
 		}
 		
 		if (start == null || start == ""){
