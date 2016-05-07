@@ -11,7 +11,7 @@
 				<c:if test="${hospitalId == hosp.id}">
 				<option value="${hosp.id}" selected>${hosp.name}</option>
 				</c:if>
-				<c:if test="${hospitalId != hosp.name}">
+				<c:if test="${hospitalId != hosp.id}">
 				<option value="${hosp.id}">${hosp.name}</option>
 				</c:if>
 			</c:forEach>

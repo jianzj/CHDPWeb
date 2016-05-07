@@ -16,10 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.chdp.chdpweb.Constants;
+import com.chdp.chdpweb.bean.Hospital;
 import com.chdp.chdpweb.bean.Order;
 import com.chdp.chdpweb.bean.Process;
 import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.bean.User;
+import com.chdp.chdpweb.dao.HospitalDao;
 import com.chdp.chdpweb.dao.OrderDao;
 import com.chdp.chdpweb.dao.PrescriptionDao;
 import com.chdp.chdpweb.dao.ProcessDao;
@@ -37,6 +39,8 @@ public class PrescriptionService {
 	private UserDao userDao;
 	@Autowired
 	private ProcessDao processDao;
+	@Autowired
+	private HospitalDao hospitalDao;
 	
 	public Prescription getPrescription(int id) {
 		try {
@@ -124,11 +128,11 @@ public class PrescriptionService {
 		}
 	}
 	
-	public List<String> listInProgressHospitalwithProcess(int process){
+	public List<Integer> listInProgressHospitalwithProcess(int process){
 		try{
 			return prsDao.listInProgressHospitalwithProcess(process);
 		} catch (Exception e){
-			return new ArrayList<String>();
+			return new ArrayList<Integer>();
 		}
 	}
 			
@@ -151,9 +155,9 @@ public class PrescriptionService {
 	}
 
 	// No user_name included
-	public List<Prescription> listPrsWithProHospitalNoUser(int process, String hospital) {
+	public List<Prescription> listPrsWithProHospitalNoUser(int process, int hospitalId) {
 		try {
-			return prsDao.getPrsListWithProAndHospital(process, hospital);
+			return prsDao.getPrsListWithProAndHospital(process, hospitalId);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -178,38 +182,38 @@ public class PrescriptionService {
 		}
 	}
 
-	public List<Prescription> listPrsWithHospital(String hospitalName) {
+	public List<Prescription> listPrsWithHospital(int hospitalId) {
 		try {
-			List<Prescription> prsList = prsDao.getPrescriptionByHospitalName(hospitalName);
+			List<Prescription> prsList = prsDao.getPrescriptionByHospitalName(hospitalId);
 			return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
 
-	public List<Prescription> listPrsWithHospital(String hospitalName, int pageNum) {
+	public List<Prescription> listPrsWithHospital(int hospitalId, int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
-			List<Prescription> prsList = prsDao.getPrescriptionByHospitalName(hospitalName);
+			List<Prescription> prsList = prsDao.getPrescriptionByHospitalName(hospitalId);
 			return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
 
-	public List<Prescription> listPrsWithParams(int process, String hospitalName) {
+	public List<Prescription> listPrsWithParams(int process, int hospitalId) {
 		try {
-			List<Prescription> prsList = prsDao.getPrescriptionsByParams(process, hospitalName);
+			List<Prescription> prsList = prsDao.getPrescriptionsByParams(process, hospitalId);
 			return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
 
-	public List<Prescription> listPrsWithParams(int process, String hospitalName, int pageNum) {
+	public List<Prescription> listPrsWithParams(int process, int hospitalId, int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
-			List<Prescription> prsList = prsDao.getPrescriptionsByParams(process, hospitalName);
+			List<Prescription> prsList = prsDao.getPrescriptionsByParams(process, hospitalId);
 			return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
@@ -300,9 +304,9 @@ public class PrescriptionService {
 		}
 	}
 
-	public int countPrsNumForHospital(String hospital, int process, String start, String end){
+	public int countPrsNumForHospital(int hospitalId, int process, String start, String end){
 		try{
-			return prsDao.countPrsNumForHospital(hospital, process, start, end);
+			return prsDao.countPrsNumForHospital(hospitalId, process, start, end);
 		} catch (Exception e){
 			return 0;
 		}
@@ -326,7 +330,7 @@ public class PrescriptionService {
 		return true;
 	}
 	
-	public boolean generatePrsListXls(String hospitalName, User user, List<Prescription> prs){
+	public boolean generatePrsListXls(int hospitalId, User user, List<Prescription> prs){
 		try{
 			String templatePath = Constants.TEMPLATEPATH + "/template.xls";
 			
@@ -343,8 +347,9 @@ public class PrescriptionService {
 			HSSFRow itemRow = templateSt.getRow(1);
 			HSSFRow lastRowTemplate = templateSt.getRow(templateSt.getLastRowNum());
 			
+			Hospital usdedHospital = hospitalDao.getHospitalwithID(hospitalId);
 			//String newTitle = titleRow.getCell(0).getStringCellValue() + hospitalName;
-			titleRow.getCell(0).setCellValue(hospitalName);
+			titleRow.getCell(0).setCellValue(usdedHospital.getName());
 			
 			int prsNum = prs.size();
 			templateSt.shiftRows(2, templateSt.getLastRowNum(), prsNum);

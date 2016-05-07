@@ -41,22 +41,22 @@ public interface PrescriptionDao {
 	List<Prescription> getPrescriptionsByParamswithTime(@Param("process") int process,
 			@Param("hospitalId") int hospitalId, @Param("start") String start, @Param("end") String end);
 
-	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.process = #{process} and h.name = #{hospitalName} and p.hospital_id = h.id")
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id")
 	List<Prescription> getPrescriptionsByParams(@Param("process") int process,
-			@Param("hospitalName") String hospitalName);
+			@Param("hospitalId ") int hospitalId);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where h.name = #{hospitalName} and h.id = p.hospital_id and p.process < 11")
-	List<Prescription> getPrescriptionByHospitalName(@Param("hospitalName") String hospitalName);
+			+ "where h.id = #{hospitalId} and h.id = p.hospital_id and p.process < 11")
+	List<Prescription> getPrescriptionByHospitalName(@Param("hospitalId") int hospitalId);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
 			+ "where p.process < 11 and p.hospital_id = h.id ")
 	List<Prescription> getPrescriptionsUnfinished();
 
 	// 获取在一段时间内指定一家医院完成的处方
-	@Select("select count(*) from prescription as p, hospital as h where h.name = #{hospital} and p.hospital_id = h.id and p.process = #{process} "
+	@Select("select count(*) from prescription as p, hospital as h where h.id = #{hospitalId} and p.hospital_id = h.id and p.process = #{process} "
 			+ "and p.create_time > #{start} and p.finish_time < #{end}")
-	int countPrsNumForHospital(@Param("hospital") String hospital, @Param("process") int process,
+	int countPrsNumForHospital(@Param("hospitalId") int hospitalId, @Param("process") int process,
 			@Param("start") String start, @Param("end") String end);
 
 	// Cut Lines
@@ -107,13 +107,13 @@ public interface PrescriptionDao {
 	// Used for receiveList/ to get PrsList with Process type. No user_name
 	// included.
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where p.process = #{process} and h.name = #{hospitalName} and p.hospital_id = h.id")
+			+ "where p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id")
 	List<Prescription> getPrsListWithProAndHospital(@Param("process") int process,
-			@Param("hospitalName") String hospitalName);
+			@Param("hospitalId") int hospitalId);
 
-	@Select("select h.name from prescription as p, hospital as h "
+	@Select("select h.id from prescription as p, hospital as h "
 			+ "where p.process = #{process} and p.hospital_id = h.id")
-	List<String> listInProgressHospitalwithProcess(@Param("process") int process);
+	List<Integer> listInProgressHospitalwithProcess(@Param("process") int process);
 
 	@Update("update prescription set finish_time = #{currentTime}, process = " + Constants.FINISH + " where process = "
 			+ Constants.SHIP + " and process_id = #{orderId}")

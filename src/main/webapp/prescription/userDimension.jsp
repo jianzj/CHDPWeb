@@ -22,19 +22,11 @@
 			<option value=1>配送</option>
 		</select>
 		<span class="input-group input-append date col-xs-2" id="hospital-datePicker-start">
-         		<% if (request.getAttribute("startTime") != null && !((String)request.getAttribute("startTime")).equals(Constants.DEFAULT_START)) {%>
-         		<input type="text" class="form-control" name="startTime" value="${startTime}"/>
-         		<% } else { %>
-         		<input type="text" class="form-control" name="startTime" />
-         		<% } %>
+				<input type="text" class="form-control" name="startTime" value="${startTime}"/>
                 <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <span class="input-group input-append date col-xs-2" id="hospital-datePicker-end">
-         		<% if (request.getAttribute("endTime") != null && !((String)request.getAttribute("endTime")).equals(Constants.DEFAULT_END)) {%>
          		<input type="text" class="form-control" name="endTime" value="${endTime}"/>
-         		<% } else { %>
-         		<input type="text" class="form-control" name="endTime"/>
-         		<% } %>
          <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>

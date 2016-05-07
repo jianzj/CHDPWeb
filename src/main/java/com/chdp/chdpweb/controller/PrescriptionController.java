@@ -388,7 +388,7 @@ public class PrescriptionController {
 		if (hospitalId == 0) {
 			prsList = prsService.listPrsWithProcessNoUser(Constants.RECEIVE);
 		} else {
-			prsList = prsService.listPrsWithProHospitalNoUser(Constants.RECEIVE, "");
+			prsList = prsService.listPrsWithProHospitalNoUser(Constants.RECEIVE, hospitalId);
 		}
 		request.setAttribute("receiveList", prsList);
 		return "process/receiveList";
@@ -397,13 +397,13 @@ public class PrescriptionController {
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/currentList", method = RequestMethod.GET)
 	public String getCurrentList(HttpServletRequest request,
-			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, @Param("hospital") String hospital,
+			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, @Param("hospitalId") Integer hospitalId,
 			@Param("process") Integer process) {
 
 		request.setAttribute("nav", "当前处方列表");
 
-		if (hospital == null || hospital.equals("")) {
-			hospital = "ALL";
+		if (hospitalId == null) {
+			hospitalId = 0;
 		}
 		if (process == null) {
 			process = 0;
@@ -411,14 +411,14 @@ public class PrescriptionController {
 
 		List<Prescription> prsList = null;
 
-		if (hospital.equals("ALL") && process == 0) {
+		if (hospitalId == 0 && process == 0) {
 			prsList = prsService.listPrsWithProcessUnfinished(pageNum);
-		} else if (hospital.equals("ALL")) {
+		} else if (hospitalId == 0) {
 			prsList = prsService.listPrsWithProcess(process, pageNum);
 		} else if (process == 0) {
-			prsList = prsService.listPrsWithHospital(hospital, pageNum);
+			prsList = prsService.listPrsWithHospital(hospitalId, pageNum);
 		} else {
-			prsList = prsService.listPrsWithParams(process, hospital, pageNum);
+			prsList = prsService.listPrsWithParams(process, hospitalId, pageNum);
 		}
 
 		List<Prescription> finalList = new ArrayList<Prescription>();
@@ -431,7 +431,7 @@ public class PrescriptionController {
 			finalList.add(prs);
 		}
 
-		request.setAttribute("hospital", hospital);
+		request.setAttribute("hospitalId", hospitalId);
 		request.setAttribute("process", process);
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
@@ -447,13 +447,13 @@ public class PrescriptionController {
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/historyList", method = RequestMethod.GET)
 	public String getHistoryList(HttpServletRequest request,
-			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, @Param("hospitalId") String hospitalId,
+			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, @Param("hospitalId") Integer hospitalId,
 			@Param("startTime") String start, @Param("endTime") String end) {
 
 		request.setAttribute("nav", "历史处方列表");
 
-		if (hospitalId == null || hospitalId.equals("")) {
-			hospitalId = "ALL";
+		if (hospitalId == null) {
+			hospitalId = 0;
 		}
 		if (start == null || start.equals("")) {
 			start = Constants.DEFAULT_START;
@@ -470,10 +470,10 @@ public class PrescriptionController {
 		end = Utils.formatEndTime(end);
 
 		List<Prescription> prsList = null;
-		if (hospitalId.equals("ALL")) {
+		if (hospitalId == 0) {
 			prsList = prsService.listPrsWithProcessAndTime(Constants.FINISH, pageNum, start, end);
 		} else {
-			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, Integer.parseInt(hospitalId), pageNum,
+			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalId, pageNum,
 					start, end);
 		}
 
@@ -516,14 +516,14 @@ public class PrescriptionController {
 			int num = 0;
 			while (itr.hasNext()) {
 				Hospital temp = itr.next();
-				num = prsService.countPrsNumForHospital(temp.getName(), Constants.FINISH, start, end);
+				num = prsService.countPrsNumForHospital(temp.getId(), Constants.FINISH, start, end);
 				temp.setFinishedPrsNum(num);
 				newHospList.add(temp);
 			}
 		} else {
 			Hospital item = hospitalService.getHospitalById(Integer.parseInt(hospitalId));
 			if (item != null) {
-				int num = prsService.countPrsNumForHospital(item.getName(), Constants.FINISH, start, end);
+				int num = prsService.countPrsNumForHospital(item.getId(), Constants.FINISH, start, end);
 				item.setFinishedPrsNum(num);
 				newHospList.add(item);
 			}
@@ -689,16 +689,16 @@ public class PrescriptionController {
 
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/printSingleLabel")
-	public String printSingleLabelPackage(HttpServletRequest request, @Param("hospital") String hospital,
+	public String printSingleLabelPackage(HttpServletRequest request, @Param("hospitalId") Integer hospitalId,
 			@Param("process") Integer process, @Param("pageNum") Integer pageNum, @Param("printType") String printType,
 			@Param("from") String from, @Param("prsId") Integer prsId) {
-		if (hospital == null) {
-			hospital = "ALL";
+		if (hospitalId == null) {
+			hospitalId = 0;
 		}
 		if (process == null) {
 			process = 0;
 		}
-		request.setAttribute("hospital", hospital);
+		request.setAttribute("hospitalId", hospitalId);
 		request.setAttribute("process", process);
 
 		if (pageNum == null) {
@@ -741,14 +741,14 @@ public class PrescriptionController {
 
 		List<Prescription> prsList = null;
 
-		if (hospital.equals("ALL") && process == 0) {
+		if (hospitalId == 0 && process == 0) {
 			prsList = prsService.listPrsWithProcessUnfinished(pageNum);
-		} else if (hospital.equals("ALL")) {
+		} else if (hospitalId == 0) {
 			prsList = prsService.listPrsWithProcess(process, pageNum);
 		} else if (process == 0) {
-			prsList = prsService.listPrsWithHospital(hospital, pageNum);
+			prsList = prsService.listPrsWithHospital(hospitalId, pageNum);
 		} else {
-			prsList = prsService.listPrsWithParams(process, hospital, pageNum);
+			prsList = prsService.listPrsWithParams(process, hospitalId, pageNum);
 		}
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
@@ -767,17 +767,17 @@ public class PrescriptionController {
 
 	@RequiresRoles("RECEIVE")
 	@RequestMapping(value = "/printReceiveList")
-	public String printReceiveList(HttpServletRequest request, @Param("hospital") String hospital) {
+	public String printReceiveList(HttpServletRequest request, @Param("hospitalId") Integer hospitalId) {
 
-		if (hospital == null) {
-			hospital = "ALL";
+		if (hospitalId == null) {
+			hospitalId = 0;
 		}
 
 		List<Prescription> prsList = null;
-		if (hospital.equals("ALL")) {
+		if (hospitalId == 0) {
 			prsList = prsService.listPrsWithProcessNoUser(Constants.RECEIVE);
 		} else {
-			prsList = prsService.listPrsWithProHospitalNoUser(Constants.RECEIVE, hospital);
+			prsList = prsService.listPrsWithProHospitalNoUser(Constants.RECEIVE, hospitalId);
 		}
 
 		Iterator<Prescription> itr = prsList.iterator();
@@ -852,17 +852,17 @@ public class PrescriptionController {
 	// 打印包装标签
 	@RequiresRoles("PACKAGE")
 	@RequestMapping(value = "/printPackageList")
-	public String printPackageList(HttpServletRequest request, @Param("hospital") String hospital) {
+	public String printPackageList(HttpServletRequest request, @Param("hospitalId") Integer hospitalId) {
 
-		if (hospital == null) {
-			hospital = "ALL";
+		if (hospitalId == null) {
+			hospitalId = 0;
 		}
 
 		List<Prescription> prsList = null;
-		if (hospital.equals("ALL")) {
+		if (hospitalId == 0) {
 			prsList = prsService.listPrsWithProcessNoUser(Constants.PACKAGE);
 		} else {
-			prsList = prsService.listPrsWithProHospitalNoUser(Constants.PACKAGE, hospital);
+			prsList = prsService.listPrsWithProHospitalNoUser(Constants.PACKAGE, hospitalId);
 		}
 
 		Iterator<Prescription> itr = prsList.iterator();
@@ -949,30 +949,31 @@ public class PrescriptionController {
 	// 生成出货清单
 	@RequiresRoles("PACKAGE")
 	@RequestMapping(value = "/printShipListXls")
-	public String printShipListXls(HttpServletRequest request, @Param("hospital") String hospital) {
+	public String printShipListXls(HttpServletRequest request, @Param("hospitalId") Integer hospitalId) {
 
-		if (hospital == null) {
-			hospital = "ALL";
+		if (hospitalId == null) {
+			hospitalId = 0;
 		}
 
-		List<String> usedHospitals = new ArrayList<String>();
-		if (hospital.equals("ALL")) {
+		List<Integer> usedHospitals = new ArrayList<Integer>();
+		if (hospitalId == 0) {
 			usedHospitals = prsService.listInProgressHospitalwithProcess(Constants.SHIP);
 		} else {
-			usedHospitals.add(hospital);
+			usedHospitals.add(hospitalId);
 		}
 
 		List<Prescription> prs = null;
-		String hospitalName = "";
+		int tempHospitalId;
 		int count = 0;
 
-		Iterator<String> itr = usedHospitals.iterator();
+		Iterator<Integer> itr = usedHospitals.iterator();
 		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
 
 		while (itr.hasNext()) {
-			hospitalName = itr.next();
-			prs = prsService.listPrsWithProHospitalNoUser(Constants.SHIP, hospitalName);
-			if (prsService.generatePrsListXls(hospitalName, currentUser, prs)) {
+			tempHospitalId = itr.next();
+			Hospital tempHospital = hospitalService.getHospitalById(tempHospitalId);
+			prs = prsService.listPrsWithProHospitalNoUser(Constants.SHIP, tempHospitalId);
+			if (prsService.generatePrsListXls(tempHospitalId, currentUser, prs)) {
 				SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
 				String currentTime = df.format(new Date());
 
@@ -981,7 +982,7 @@ public class PrescriptionController {
 				String uuid = currentTime + String.valueOf(randomNum);
 				Order newOrder = new Order();
 				newOrder.setUuid(uuid);
-				newOrder.setHospital_id(hospitalService.getHospitalIdByName(hospitalName));
+				newOrder.setHospital_id(tempHospitalId);
 				newOrder.setCreate_time(currentTime);
 				newOrder.setCreate_user_id(currentUser.getId());
 				newOrder.setStatus(Constants.ORDER_BEGIN);
@@ -996,12 +997,12 @@ public class PrescriptionController {
 						prsService.updatePrescriptionProcess(item);
 					}
 				} else {
-					request.setAttribute("errorMsg", "打印 " + hospitalName + " 的出货单出错，请重新打印！");
+					request.setAttribute("errorMsg", "打印 " + tempHospital.getName() + " 的出货单出错，请重新打印！");
 					break;
 				}
 				count += 1;
 			} else {
-				request.setAttribute("errorMsg", "打印 " + hospitalName + " 的出货单出错，请重新打印！");
+				request.setAttribute("errorMsg", "打印 " + tempHospital.getName() + " 的出货单出错，请重新打印！");
 				break;
 			}
 		}
