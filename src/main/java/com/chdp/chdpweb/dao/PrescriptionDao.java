@@ -37,9 +37,9 @@ public interface PrescriptionDao {
 
 	// Used to find out finished prescriptions by hospital and time.
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where p.process = #{process} and h.name = #{hospitalName} and p.hospital_id = h.id and p.create_time >= #{start} and p.finish_time <= #{end}")
+			+ "where p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id and p.create_time >= #{start} and p.finish_time <= #{end}")
 	List<Prescription> getPrescriptionsByParamswithTime(@Param("process") int process,
-			@Param("hospitalName") String hospitalName, @Param("start") String start, @Param("end") String end);
+			@Param("hospitalId") int hospitalId, @Param("start") String start, @Param("end") String end);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.process = #{process} and h.name = #{hospitalName} and p.hospital_id = h.id")
 	List<Prescription> getPrescriptionsByParams(@Param("process") int process,

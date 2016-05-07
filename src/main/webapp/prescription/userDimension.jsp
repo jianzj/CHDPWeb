@@ -70,7 +70,7 @@
 					<td><c:out value="${user.position}" /></td>
 					<td><c:out value="${user.done_prs_num}" /></td>
 					<td><c:out value="${user.error_num}" /></td>
-					<% if(request.getAttribute("startTime") == null || (String)request.getAttribute("endTime") == ""){ %>
+					<% if(request.getAttribute("startTime") == null || (String)request.getAttribute("endTime").equals("")){ %>
 					<td><%=Constants.DEFAULT_START %></td>
 					<% }else{ %>
 					<td><c:out value="${startTime}" /></td>

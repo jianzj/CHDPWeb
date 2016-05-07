@@ -61,7 +61,7 @@
 					<c:if test="${hosp2.finishedPrsNum > 0}">
 					<td width="100">
 						<div class="btn-group" role="group" aria-label="...">
-						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&userId=&hospital=${hosp2.name}&from=HOSPITAL">处方详情</a>
+						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&userId=&hospitalId=${hosp2.id}&from=HOSPITAL">处方详情</a>
 						</div>
 					</td>
 					</c:if>
