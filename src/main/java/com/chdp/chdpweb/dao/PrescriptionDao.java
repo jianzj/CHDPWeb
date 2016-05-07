@@ -138,4 +138,17 @@ public interface PrescriptionDao {
 	@Select("select count(*) from prescription as p, process as pro, user as u where p.process = 11 and u.id = #{userId} and pro.error_type > 0 "
 			+ "and pro.prescription_id = p.id and pro.user_id = u.id and p.create_time >= #{start} and p.finish_time <= #{end}")
 	int countProcsErrorByUser(@Param("userId") int userId, @Param("start") String start, @Param("end") String end);
+	
+	@Select("select * from prescription where hospital_id = #{hospital_id}")
+	List<Prescription> getPrescriptionByHospital(@Param("hospital_id") int hospital_id);
+	
+	@Update("update prescription set class_of_medicines = #{prs.class_of_medicines}, process = #{prs.process}, process_id = #{prs.process_id}, "
+			+ "need_decoct_first = #{prs.need_decoct_first}, decoct_first_list = #{prs.decoct_first_list, jdbcType=LONGVARCHAR},"
+			+ "need_decoct_later = #{prs.need_decoct_later}, decoct_later_list = #{prs.decoct_later_list, jdbcType=LONGVARCHAR},"
+			+ "need_wrapped_decoct = #{prs.need_wrapped_decoct}, wrapped_decoct_list = #{prs.wrapped_decoct_list, jdbcType=LONGVARCHAR},"
+			+ "need_take_drenched = #{prs.need_take_drenched}, take_drenched_list = #{prs.take_drenched_list, jdbcType=LONGVARCHAR},"
+			+ "need_melt = #{prs.need_melt}, melt_list = #{prs.melt_list, jdbcType=LONGVARCHAR},"
+			+ "need_decoct_alone = #{prs.need_decoct_alone}, decoct_alone_list = #{prs.decoct_alone_list, jdbcType=LONGVARCHAR}"
+			+ " where id = #{prs.id}")
+	int updatePrescription(@Param("prs") Prescription prs);
 }
