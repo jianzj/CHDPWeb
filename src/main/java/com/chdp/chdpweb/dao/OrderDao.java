@@ -39,11 +39,11 @@ public interface OrderDao {
     Order getOrderByUuid(@Param("uuid") String uuid);
 
 	@Select("select o.*, h.name as hospital_name from CHDP.order as o, hospital as h where o.status = #{order_status} and " +
-				"h.name = #{hospital} and o.hospital_id = h.id and o.create_time > #{start} and o.create_time < #{end}")
-	List<Order> listOrder(@Param("hospital")String hospital, @Param("start") String start, @Param("end") String end, @Param("order_status") int order_status);
+				"h.id = #{hospitalId} and o.hospital_id = h.id and o.create_time >= #{start} and o.create_time <= #{end}")
+	List<Order> listOrder(@Param("hospitalId")int hospitalId, @Param("start") String start, @Param("end") String end, @Param("order_status") int order_status);
 	
 	@Select("select o.*, h.name as hospital_name from CHDP.order as o, hospital as h where o.status = #{order_status} and " +
-				"o.hospital_id = h.id and o.create_time > #{start} and o.create_time < #{end}")
+				"o.hospital_id = h.id and o.create_time >= #{start} and o.create_time <= #{end}")
 	List<Order> listOrderAllHospital(@Param("start") String start, @Param("end") String end, @Param("order_status") int order_status);
 	
 	@Select("select count(*) from CHDP.order as o, prescription as p where o.id = #{orderId} and p.process = 11 and o.status = 2 and p.process_id = o.id")

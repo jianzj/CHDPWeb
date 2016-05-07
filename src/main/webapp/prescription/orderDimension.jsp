@@ -21,11 +21,11 @@
 			</c:forEach>
 		</select>
 		<span class="input-group input-append date col-xs-2" id="hospital-datePicker-start">
-                <input type="text" class="form-control" name="startTime"/>
+                <input type="text" class="form-control" name="startTime" value="${startTime}"/>
                 <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <span class="input-group input-append date col-xs-2" id="hospital-datePicker-end">
-                <input type="text" class="form-control" name="endTime"/>
+                <input type="text" class="form-control" name="endTime" value="${endTime}"/>
          <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
