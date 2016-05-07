@@ -116,14 +116,14 @@ public class PrescriptionController {
 				newProcess.setPrescription_id(newPrs.getId());
 				newProcess.setBegin(currentTime);
 				newProcess.setPrevious_process_id(0);
-				int newProcId = proService.createProccess(newProcess);
-				if (newProcId != -1){
-					newPrs.setProcess_id(newProcId);
+				int result = proService.createProccess(newProcess);
+				if (result != -1){
+					newPrs.setProcess_id(newProcess.getId());
 					if (prsService.updatePrescriptionProcess(newPrs)){
 						request.setAttribute("successMsg", "添加处方成功！");
 					}else{
 						request.setAttribute("errorMsg", "添加处方失败，请稍后重试！");
-						proService.deleteProcess(newProcId);
+						proService.deleteProcess(newProcess.getId());
 						prsService.deletePrescription(newPrs.getId());
 					}
 				}else{
@@ -747,18 +747,18 @@ public class PrescriptionController {
 				User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
 				
 				Process newProcess = new Process();
-				Process currentProcess = proService.getProcessById(printItem.getId());
+				Process currentProcess = proService.getProcessById(printItem.getProcess_id());
 				newProcess.setProcess_type(Constants.CHECK);
 				newProcess.setUser_id(currentUser.getId());
 				newProcess.setPrescription_id(printItem.getId());
 				newProcess.setBegin(currentTime);
 				newProcess.setPrevious_process_id(printItem.getProcess_id());
-				int newProcessId = proService.createProccess(newProcess);
-				if (newProcessId != -1){
+				int result = proService.createProccess(newProcess);
+				if (result != -1){
 					currentProcess.setFinish(currentTime);
 					if (proService.updateProcessTime(currentProcess)){
 						printItem.setProcess(Constants.CHECK);
-						printItem.setProcess_id(newProcessId);
+						printItem.setProcess_id(newProcess.getId());
 						if(prsService.updatePrescriptionProcess(printItem)){
 							count += 1;
 						}else{
