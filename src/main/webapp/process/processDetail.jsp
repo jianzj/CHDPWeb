@@ -46,25 +46,38 @@
 		<%     Process proc = null; %>
 		<%     while (itr.hasNext()){ %>
 		<%         proc = itr.next(); %>
-			<%     if (currentPrs.getProcess() > proc.getProcess_type()){ %>
+			<%     if (proc.getFinish()!=null){ %>
 			<div class="col-xs-3 bs-wizard-step complete">
-			<%     }else{ %>
+			<%     } else if (proc.getBegin()==null){ %>
 			<div class="col-xs-3 bs-wizard-step active">
+			<%     } else { %>
+			<div class="col-xs-3 bs-wizard-step disabled">
 			<%     } %>
 			<div class="text-center bs-wizard-stepnum"><%=Constants.getProcessName(proc.getProcess_type()) %></div>
 		    <div class="progress"><div class="progress-bar"></div></div>
 		    <a href="#" class="bs-wizard-dot"></a>
 		    <div class="bs-wizard-info text-center list-group">
-		 	<span class="list-group-item">
-		 		<% if (proc.getProcess_type() != Constants.DECOCT){ %>
-		 		处理时间: <%=proc.getFinish() %><br/>
-		 		<% }else { %>
-		 		煎煮时间:<%=Constants.getDecoctTime(proc.getBegin(), proc.getFinish(), 1) %><br/>
+		 	<span class="txt-center">
+		 		<% if (proc.getProcess_type() != Constants.DECOCT && proc.getProcess_type() != Constants.SOAK && proc.getProcess_type() != Constants.CLEAN){ %>
+		 		<c:if test="${proc.finish == null}">等待处理<br /></c:if>
+		 		<c:if test="${proc.finish != null}">处理时间: <%=proc.getFinish() %><br/></c:if>
+		 		<% } else if (proc.getProcess_type() ==Constants.DECOCT && proc.getBegin()!=null && proc.getFinish()!=null) { %>
+                                           开始时间:<%=proc.getBegin() %><br/>
+                                           结束时间:<%=proc.getFinish() %><br/>
+                <% } else if (proc.getProcess_type() ==Constants.DECOCT && proc.getBegin()!=null && proc.getFinish()!=null) { %>
+		 		开始时间:<%=proc.getBegin() %><br/>
+                                           结束时间:<%=proc.getFinish() %><br/>
+                                           煎煮时间:<%=Constants.getDecoctTime(proc.getBegin(), proc.getFinish(), 1) %><br/>
 		 		保温时间:<%=Constants.getHeatTime(proc.getFinish(), 1) %><br/>
-		 		<% } %>
+		 		<% } else { %>
+		 		开始时间:<%=proc.getBegin() %><br/>
+                                           结束时间:<%=proc.getFinish() %><br/>
+                <% } %>
+		 		<%if(proc.getFinish()!=null || (proc.getBegin()!=null && (proc.getProcess_type() == Constants.DECOCT || proc.getProcess_type() == Constants.SOAK || proc.getProcess_type() == Constants.CLEAN))){ %>
 		 		处理人: <%=proc.getUser_name() %><br/>
+                <% }%>
 		 		<% if (proc.getError_type() == 0){ %>
-		 		顺利通过
+		 		正常
 		 		<% } else { %>
 		 		出错: <%=Constants.getErrorName(proc.getError_type()) %><br/>
 		 		出错原因: <%=proc.getError_msg() %>
