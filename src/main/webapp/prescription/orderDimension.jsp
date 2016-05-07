@@ -12,7 +12,12 @@
 			<option value="ALL">全部医院</option>
 			
 			<c:forEach var='hosp1' items="${hospitalList}">
+				<c:if test="${hospital == hosp1.name}">
+				<option value="${hosp1.name}" selected>${hosp1.name}</option>
+				</c:if>
+				<c:if test="${hospital != hosp1.name}">
 				<option value="${hosp1.name}">${hosp1.name}</option>
+				</c:if>
 			</c:forEach>
 		</select>
 		<span class="input-group input-append date col-xs-2" id="hospital-datePicker-start">

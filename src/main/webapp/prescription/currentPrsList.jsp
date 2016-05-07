@@ -113,19 +113,7 @@
 					<td><c:out value="${prs.outer_id}" /></td>
 					<td><c:out value="${prs.patient_name}" /></td>
 					<td><c:out value="${prs.packet_num}" /></td>
-					<td>
-					<c:if test="${prs.process == 1}"><c:out value="接方" /></c:if>
-					<c:if test="${prs.process == 2}"><c:out value="审方" /></c:if>
-					<c:if test="${prs.process == 3}"><c:out value="调配" /></c:if>
-					<c:if test="${prs.process == 4}"><c:out value="调配审核" /></c:if>
-					<c:if test="${prs.process == 5}"><c:out value="浸泡" /></c:if>
-					<c:if test="${prs.process == 6}"><c:out value="煎煮" /></c:if>
-					<c:if test="${prs.process == 7}"><c:out value="灌装" /></c:if>
-					<c:if test="${prs.process == 8}"><c:out value="清场" /></c:if>
-					<c:if test="${prs.process == 9}"><c:out value="包装" /></c:if>
-					<c:if test="${prs.process == 10}"><c:out value="出库" /></c:if>
-					</td>
-					<td><c:out value="${prs.user_name}" /></td>
+					<td><c:out value="${prs.phase_name}" /></td>
 					<td width="320">
 						<div class="btn-group" role="group" aria-label="...">
 							<% if (request.getParameter("pageNum") == null){ %>
