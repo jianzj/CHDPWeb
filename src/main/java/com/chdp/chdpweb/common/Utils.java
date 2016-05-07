@@ -24,4 +24,12 @@ public class Utils {
 		}
 	}
 	
+	public static String getMaxTime(){
+		return "2099-12-31";
+	}
+	
+	public static String getMinTime(){
+		return "2001-01-01";
+	}
+	
 }

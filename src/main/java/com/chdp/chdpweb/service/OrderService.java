@@ -104,25 +104,25 @@ public class OrderService {
     	}
     }
     
-    public List<Order> listOrderFinished(String hospital, String start, String end){
+    public List<Order> listOrderFinished(int hospitalId, String start, String end){
     	try{
-    		if (hospital.equals("ALL")){
+    		if (hospitalId == 0){
     			return orderDao.listOrderAllHospital(start, end, Constants.ORDER_FINISH);
     		}else{
-    			return orderDao.listOrder(hospital, start, end, Constants.ORDER_FINISH);
+    			return orderDao.listOrder(hospitalId, start, end, Constants.ORDER_FINISH);
     		}
     	}catch (Exception e){
     		return new ArrayList<Order>();
     	}
     }
     
-    public List<Order> listOrderFinished(String hospital, String start, String end, int pageNum){
+    public List<Order> listOrderFinished(int hospitalId, String start, String end, int pageNum){
     	PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
     	try{
-    		if (hospital.equals("ALL")){
+    		if (hospitalId == 0){
     			return orderDao.listOrderAllHospital(start, end, Constants.ORDER_FINISH);
     		}else{
-    			return orderDao.listOrder(hospital, start, end, Constants.ORDER_FINISH);
+    			return orderDao.listOrder(hospitalId, start, end, Constants.ORDER_FINISH);
     		}
     	}catch (Exception e){
     		return new ArrayList<Order>();
