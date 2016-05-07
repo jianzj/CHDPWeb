@@ -509,7 +509,7 @@ public class PrescriptionController {
 			start = Utils.getMinTime();
 		}
 		if (end == null || end.equals("")) {
-			end = Utils.getMinTime();
+			end = Utils.getMaxTime();
 		}
 		
 		start = Utils.formatStartTime(start);
@@ -654,9 +654,7 @@ public class PrescriptionController {
 			userId = 0;
 		}
 		
-		if (from.equals("HOSPITAL")) {
-			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/hospitalDimensionList";
-		} else if (from.equals("USER") && userId <= 0) {
+		if (from.equals("USER") && userId <= 0) {
 			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
 		}
 
@@ -671,7 +669,7 @@ public class PrescriptionController {
 			start = Utils.getMinTime();
 		}
 		if (end == null || end.equals("")) {
-			end = Utils.getMinTime();
+			end = Utils.getMaxTime();
 		}
 		
 		start = Utils.formatStartTime(start);

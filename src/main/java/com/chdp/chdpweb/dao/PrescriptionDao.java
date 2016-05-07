@@ -55,7 +55,7 @@ public interface PrescriptionDao {
 
 	// 获取在一段时间内指定一家医院完成的处方
 	@Select("select count(*) from prescription as p, hospital as h where h.id = #{hospitalId} and p.hospital_id = h.id and p.process = #{process} "
-			+ "and p.create_time > #{start} and p.finish_time < #{end}")
+			+ "and p.create_time >= #{start} and p.finish_time <= #{end}")
 	int countPrsNumForHospital(@Param("hospitalId") int hospitalId, @Param("process") int process,
 			@Param("start") String start, @Param("end") String end);
 
