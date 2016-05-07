@@ -30,6 +30,7 @@ import com.chdp.chdpweb.bean.Hospital;
 import com.chdp.chdpweb.bean.Order;
 import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.bean.User;
+import com.chdp.chdpweb.common.Utils;
 import com.chdp.chdpweb.bean.Process;
 
 @Controller
@@ -152,7 +153,7 @@ public class PrescriptionController {
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
-		request.setAttribute("hospital", "ALL");
+		//request.setAttribute("hospital", "ALL");
 		List<Prescription> prsList = null;
 
 		if (prsId == null) {
@@ -171,7 +172,7 @@ public class PrescriptionController {
 				return "process/shipList";
 			} else if (from.equals("CURRENT")) {
 				prsList = prsService.listPrsWithProcessUnfinished(1);
-				request.setAttribute("hospital", "ALL");
+				//request.setAttribute("hospital", "ALL");
 				request.setAttribute("process", 0);
 				request.setAttribute("currentPrsList", prsList);
 				PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
@@ -202,7 +203,7 @@ public class PrescriptionController {
 		} else if (from.equals("CURRENT") && ((currentUser.getAuthority() & 1024) == 0)) {
 			request.setAttribute("errorMsg", "您暂无此操作权限！");
 			prsList = prsService.listPrsWithProcessUnfinished(1);
-			request.setAttribute("hospital", "ALL");
+			//request.setAttribute("hospital", "ALL");
 			request.setAttribute("process", 0);
 			request.setAttribute("currentPrsList", prsList);
 			PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
@@ -228,7 +229,7 @@ public class PrescriptionController {
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
-		request.setAttribute("hospital", "ALL");
+		//request.setAttribute("hospital", "ALL");
 		List<Prescription> prsList = null;
 
 		if (prsId == null) {
@@ -245,7 +246,7 @@ public class PrescriptionController {
 				prsList = prsService.listPrsWithProcessNoUser(Constants.SHIP);
 				request.setAttribute("shipList", prsList);
 				return "process/shipList";
-			} else if (from.equals("ALL")) {
+			} else if (from.equals("CURRENT")) {
 				prsList = prsService.listPrsWithProcessUnfinished(1);
 				request.setAttribute("process", 0);
 				request.setAttribute("currentPrsList", prsList);
@@ -349,15 +350,15 @@ public class PrescriptionController {
 	@RequiresRoles("RECEIVE")
 	@RequestMapping(value = "/delete")
 	public String delete(HttpServletRequest request, @Param("prsId") Integer prsId,
-			@Param("hospital") String hospital) {
+			@Param("hospitalId") Integer hospitalId) {
 
-		if (hospital == null) {
-			hospital = "ALL";
+		if (hospitalId == null) {
+			hospitalId = 0;
 		}
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
-		request.setAttribute("hospital", hospital);
+		request.setAttribute("hospitalId", hospitalId);
 		List<Prescription> prsList = null;
 
 		if (prsId == null) {
@@ -380,10 +381,10 @@ public class PrescriptionController {
 			}
 		}
 
-		if (hospital.equals("ALL")) {
+		if (hospitalId == 0) {
 			prsList = prsService.listPrsWithProcessNoUser(Constants.RECEIVE);
 		} else {
-			prsList = prsService.listPrsWithProHospitalNoUser(Constants.RECEIVE, hospital);
+			prsList = prsService.listPrsWithProHospitalNoUser(Constants.RECEIVE, "");
 		}
 		request.setAttribute("receiveList", prsList);
 		return "process/receiveList";
@@ -457,16 +458,19 @@ public class PrescriptionController {
 			end = Constants.DEFAULT_END;
 		}
 
+		request.setAttribute("hospitalId", hospitalId);
+		request.setAttribute("startTime", start);
+		request.setAttribute("endTime", end);
+		
+		start = Utils.formatStartTime(start);
+		end = Utils.formatEndTime(end);
+		
 		List<Prescription> prsList = null;
 		if (hospitalId.equals("ALL")) {
 			prsList = prsService.listPrsWithProcessAndTime(Constants.FINISH, pageNum, start, end);
 		} else {
 			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, Integer.parseInt(hospitalId), pageNum, start, end);
 		}
-
-		request.setAttribute("hospitalId", hospitalId);
-		request.setAttribute("startTime", start);
-		request.setAttribute("endTime", end);
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
@@ -497,6 +501,9 @@ public class PrescriptionController {
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
 
+		start = Utils.formatStartTime(start);
+		end = Utils.formatEndTime(end);
+		
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		List<Hospital> newHospList = new ArrayList<Hospital>();
 		Iterator<Hospital> itr = hospitalList.iterator();
@@ -544,7 +551,10 @@ public class PrescriptionController {
 		request.setAttribute("hospital", hospital);
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
-
+		
+		start = Utils.formatStartTime(start);
+		end = Utils.formatEndTime(end);
+		
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 
 		List<Order> orderList = orderService.listOrderFinished(hospital, start, end, pageNum);
@@ -589,6 +599,9 @@ public class PrescriptionController {
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
 
+		start = Utils.formatStartTime(start);
+		end = Utils.formatEndTime(end);
+		
 		List<User> userList = userService.getUserListNoAdmin();
 		Iterator<User> itr = userList.iterator();
 		List<User> finalUserList = new ArrayList<User>();
@@ -646,6 +659,9 @@ public class PrescriptionController {
 		request.setAttribute("userId", userId);
 		request.setAttribute("from", from);
 
+		start = Utils.formatStartTime(start);
+		end = Utils.formatEndTime(end);
+		
 		List<Prescription> prsList = null;
 		if (from.equals("HOSPITAL")) {
 			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, Integer.parseInt(hospitalId), pageNum,

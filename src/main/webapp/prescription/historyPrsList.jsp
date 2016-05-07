@@ -7,15 +7,15 @@
 <h3 class="sub-header">
 	历史处方列表
 	<span>
-		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital" name="hospital">
-			<option value="ALL">全部医院</option>
+		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospitalId" name="hospitalId">
+			<option value=0>全部医院</option>
 			
 			<c:forEach var='hosp' items="${hospitalList}">
-				<c:if test="${hospital == hosp.name}">
-				<option value="${hosp.name}" selected>${hosp.name}</option>
+				<c:if test="${hospitalId == hosp.id}">
+				<option value="${hosp.id}" selected>${hosp.name}</option>
 				</c:if>
-				<c:if test="${hospital != hosp.name}">
-				<option value="${hosp.name}">${hosp.name}</option>
+				<c:if test="${hospitalId != hosp.id}">
+				<option value="${hosp.id}">${hosp.name}</option>
 				</c:if>
 			</c:forEach>
 		</select>
@@ -82,10 +82,10 @@
 	</table>
 </div>
 <div class="text-right">
-	<% if (request.getAttribute("hospital") != null){ %>
-		<% request.setAttribute("hospital", (String)request.getAttribute("hospital")); %>
+	<% if (request.getAttribute("hospitalId") != null){ %>
+		<% request.setAttribute("hospitalId", (Integer)request.getAttribute("hospitalId")); %>
 	<% }else{ %>
-		<% request.setAttribute("hospital", "ALL"); %>
+		<% request.setAttribute("hospitalId", 0); %>
 	<% } %>
 	<% if (request.getAttribute("startTime") != null){ %>
 		<% request.setAttribute("startTime", (String)request.getAttribute("startTime")); %>

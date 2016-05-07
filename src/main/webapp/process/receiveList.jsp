@@ -4,20 +4,20 @@
 <form class="form-inline" action="<%=request.getContextPath()%>/process/receiveList" method="GET">
 <h3 class="sub-header">接方流程列表
 	<span>
-		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital" name="hospital">
-			<option value="ALL">全部医院</option>
+		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospitalId" name="hospitalId">
+			<option value=0>全部医院</option>
 			
 			<c:forEach var='hosp' items="${hospitalList}">
-				<c:if test="${hospital == hosp.name}">
-				<option value="${hosp.name}" selected>${hosp.name}</option>
+				<c:if test="${hospitalId == hosp.id}">
+				<option value="${hosp.id}" selected>${hosp.name}</option>
 				</c:if>
-				<c:if test="${hospital != hosp.name}">
-				<option value="${hosp.name}">${hosp.name}</option>
+				<c:if test="${hospitalId != hosp.name}">
+				<option value="${hosp.id}">${hosp.name}</option>
 				</c:if>
 			</c:forEach>
 		</select>
 		<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-		<a type="button" class="btn btn-success" style="" onClick="printPrs('${hospital}')">打印处方标签</a>
+		<a type="button" class="btn btn-success" style="" onClick="printPrs(${hospitalId})">打印处方标签</a>
 		<a class="btn btn-primary" href="<%=request.getContextPath()%>/prescription/add">添加处方</a>
 	</span>
 	</h3>
@@ -56,10 +56,10 @@
 					<td width="200">
 						<div class="btn-group" role="group" aria-label="...">
 							<a type="button" class="btn btn-default" href="<%=request.getContextPath()%>/prescription/modify?prsId=${prs.id}&from=RECEIVE">处方修改</a>
-							<% if (request.getAttribute("hospital") != null){ %>
-							<a type="button" class="btn btn-danger" onClick="deletePrs(${prs.id},${prs.process},'${prs.hospital_name}','${prs.outer_id}','${hospital}');">删除处方</a>
+							<% if (request.getAttribute("hospitalId") != null){ %>
+							<a type="button" class="btn btn-danger" onClick="deletePrs(${prs.id},${prs.process},'${prs.hospital_name}','${prs.outer_id}',${hospitalId});">删除处方</a>
 							<% } else { %>
-							<a type="button" class="btn btn-danger" onClick="deletePrs(${prs.id},${prs.process},'${prs.hospital_name}','${prs.outer_id}','ALL');">删除处方</a>
+							<a type="button" class="btn btn-danger" onClick="deletePrs(${prs.id},${prs.process},'${prs.hospital_name}','${prs.outer_id}',0);">删除处方</a>
 							<% } %>
 						</div>
 					</td>
@@ -83,13 +83,13 @@
 <script>
     var deletePrs = function(id, process, hospital_name, outer_id, selectedHospital){
     	$("#assureMsg").html("确认删除处方 <strong>"+hospital_name+":"+outer_id+"</strong>？");
-        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/delete?prsId="+id+"&hospital="+selectedHospital);
+        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/delete?prsId="+id+"&hospitalId="+selectedHospital);
         $("#assureDlg").modal("show");
     };
     
-    var printPrs = function(hospital_name){
+    var printPrs = function(hospitalId){
     	$("#assureMsg").html("确认打印处方标签?");
-        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printReceiveList?hospital="+hospital_name);
+        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printReceiveList?hospitalId="+hospitalId);
         $("#assureDlg").modal("show");
     };
 </script>

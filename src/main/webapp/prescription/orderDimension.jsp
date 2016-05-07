@@ -8,15 +8,15 @@
 <h3 class="sub-header">
 	出货单维度统计
 	<span>
-		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital" name="hospital">
-			<option value="ALL">全部医院</option>
+		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospitalId" name="hospitalId">
+			<option value=0>全部医院</option>
 			
 			<c:forEach var='hosp1' items="${hospitalList}">
-				<c:if test="${hospital == hosp1.name}">
-				<option value="${hosp1.name}" selected>${hosp1.name}</option>
+				<c:if test="${hospitalId == hosp1.id}">
+				<option value="${hosp1.id}" selected>${hosp1.name}</option>
 				</c:if>
-				<c:if test="${hospital != hosp1.name}">
-				<option value="${hosp1.name}">${hosp1.name}</option>
+				<c:if test="${hospitalId != hosp1.id}">
+				<option value="${hosp1.id}">${hosp1.name}</option>
 				</c:if>
 			</c:forEach>
 		</select>
@@ -62,7 +62,7 @@
 					<c:if test="${order.prs_num > 0}">
 					<td width="100">
 						<div class="btn-group" role="group" aria-label="...">
-						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&orderId=${order.id}&userId=&hospital=&from=ORDER">处方详情</a>
+						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&orderId=${order.id}&userId=&hospitalId=&from=ORDER">处方详情</a>
 						</div>
 					</td>
 					</c:if>
@@ -79,8 +79,8 @@
 	</table>
 </div>
 <div class="text-right">
-	<% if (request.getAttribute("hospital") != null){ %>
-		<% request.setAttribute("hospital", (String)request.getAttribute("hospital")); %>
+	<% if (request.getAttribute("hospitalId") != null){ %>
+		<% request.setAttribute("hospitalId", (Integer)request.getAttribute("hospitalId")); %>
 	<% } %>
 	<% if (request.getAttribute("startTime") != null){ %>
 		<% request.setAttribute("startTime", (String)request.getAttribute("startTime")); %>

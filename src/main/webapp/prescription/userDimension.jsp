@@ -70,7 +70,7 @@
 					<td><c:out value="${user.position}" /></td>
 					<td><c:out value="${user.done_prs_num}" /></td>
 					<td><c:out value="${user.error_num}" /></td>
-					<% if(request.getAttribute("startTime") == null || (String)request.getAttribute("endTime").equals("")){ %>
+					<% if(request.getAttribute("startTime") == null || ((String)request.getAttribute("startTime")).equals("")){ %>
 					<td><%=Constants.DEFAULT_START %></td>
 					<% }else{ %>
 					<td><c:out value="${startTime}" /></td>
@@ -83,7 +83,7 @@
 					<c:if test="${user.done_prs_num > 0}">
 					<td width="100">
 						<div class="btn-group" role="group" aria-label="...">
-						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&userId=${user.id}&hospital=&from=USER">处方详情</a>
+						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&userId=${user.id}&hospitalId=&from=USER">处方详情</a>
 						</div>
 					</td>
 					</c:if>

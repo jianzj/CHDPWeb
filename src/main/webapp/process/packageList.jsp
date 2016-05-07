@@ -4,15 +4,15 @@
 <form class="form-inline" action="<%=request.getContextPath()%>/process/packageList" method="GET">
 <h3 class="sub-header">包装流程列表
 	<span>
-		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital" name="hospital">
-			<option value="ALL">全部医院</option>
+		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospitalId" name="hospitalId">
+			<option value=0>全部医院</option>
 			
 			<c:forEach var='hosp' items="${hospitalList}">
-				<c:if test="${hospital == hosp.name}">
-				<option value="${hosp.name}" selected>${hosp.name}</option>
+				<c:if test="${hospitalId == hosp.id}">
+				<option value="${hosp.id}" selected>${hosp.name}</option>
 				</c:if>
-				<c:if test="${hospital != hosp.name}">
-				<option value="${hosp.name}">${hosp.name}</option>
+				<c:if test="${hospitalId != hosp.id}">
+				<option value="${hosp.id}">${hosp.name}</option>
 				</c:if>
 			</c:forEach>
 		</select>

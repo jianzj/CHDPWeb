@@ -4,19 +4,19 @@
 <form class="form-inline" action="<%=request.getContextPath()%>/process/shipList" method="GET">
 <h3 class="sub-header">出库流程列表
 	<span>
-		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital" name="hospital">
-			<option value="ALL">全部医院</option>
+		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospitalId" name="hospitalId">
+			<option value=0>全部医院</option>
 			<c:forEach var='hosp' items="${hospitalList}">
-				<c:if test="${hospital == hosp.name}">
-					<option value="${hosp.name}" selected>${hosp.name}</option>
+				<c:if test="${hospitalId == hosp.id}">
+					<option value="${hosp.id}" selected>${hosp.name}</option>
 				</c:if>
-				<c:if test="${hospital != hosp.name}">
-					<option value="${hosp.name}">${hosp.name}</option>
+				<c:if test="${hospitalId != hosp.id}">
+					<option value="${hosp.id}">${hosp.name}</option>
 				</c:if>
 			</c:forEach>
 		</select>
 		<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-		<a type="button" class="btn btn-success" style="" onClick="printList('${hospital}')">生成出库清单</a>
+		<a type="button" class="btn btn-success" style="" onClick="printList(${hospitalId})">生成出库清单</a>
 	</span>
 	</h3>
 </form>
@@ -74,9 +74,9 @@
 	</div>
 </div>
 <script>
-    var printList = function(hospital_name){
+    var printList = function(hospitalId){
     	$("#assureMsg").html("确认生成出库清单?");
-        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printShipListXls?hospital="+hospital_name);
+        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printShipListXls?hospitalId="+hospitalId);
         $("#assureDlg").modal("show");
     };
 </script>

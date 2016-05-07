@@ -53,8 +53,8 @@
 	</table>
 </div>
 <div class="text-right">
-	<% if (request.getAttribute("hospital") != null){ %>
-		<% request.setAttribute("hospital", (String)request.getAttribute("hospital")); %>
+	<% if (request.getAttribute("hospitalId") != null){ %>
+		<% request.setAttribute("hospitalId", (Integer)request.getAttribute("hospitalId")); %>
 	<% } %>
 	<% if (request.getAttribute("startTime") != null){ %>
 		<% request.setAttribute("startTime", (String)request.getAttribute("startTime")); %>

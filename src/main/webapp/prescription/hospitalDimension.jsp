@@ -8,11 +8,15 @@
 <h3 class="sub-header">
 	处方统计
 	<span>
-		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital" name="hospital">
-			<option value="ALL">全部医院</option>
-			
+		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospitalId" name="hospitalId">
+			<option value=0>全部医院</option>
 			<c:forEach var='hosp1' items="${hospitalList}">
-				<option value="${hosp1.name}">${hosp1.name}</option>
+				<c:if test="${hospitalId == hosp1.id}">
+				<option value="${hosp1.id}" selected>${hosp1.name}</option>
+				</c:if>
+				<c:if test="${hospitalId != hosp1.id}">
+				<option value="${hosp1.id}">${hosp1.name}</option>
+				</c:if>
 			</c:forEach>
 		</select>
 		<span class="input-group input-append date col-xs-2" id="hospital-datePicker-start">
