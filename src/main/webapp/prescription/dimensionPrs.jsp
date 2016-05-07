@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page import="com.chdp.chdpweb.Constants" %>
+<%@ page import="com.chdp.chdpweb.common.Utils" %>
 <%@ include file="../head.jsp"%>
 
 <h3 class="sub-header">
@@ -58,23 +59,18 @@
 	<% } %>
 	<% if (request.getAttribute("startTime") != null){ %>
 		<% request.setAttribute("startTime", (String)request.getAttribute("startTime")); %>
-	<% }else{ %>
-		<% request.setAttribute("startTime", Constants.DEFAULT_START ); %>
 	<% } %>
 	<% if (request.getAttribute("endTime") != null){ %>
 		<% request.setAttribute("endTime", (String)request.getAttribute("endTime")); %>
-	<% }else{ %>
-		<% request.setAttribute("endTime", Constants.DEFAULT_END); %>
 	<% } %>
 	<% if (request.getAttribute("userId") != null){ %>
 		<% request.setAttribute("userId", (Integer)request.getAttribute("userId")); %>
-	<% }else{ %>
-		<% request.setAttribute("userId", 0); %>
 	<% } %>
 	<% if (request.getAttribute("orderId") != null){ %>
 		<% request.setAttribute("orderId", (Integer)request.getAttribute("orderId")); %>
-	<% }else{ %>
-		<% request.setAttribute("orderId", 1); %>
+	<% } %>
+	<% if (request.getAttribute("from") != null){ %>
+		<% request.setAttribute("from", (String)request.getAttribute("String")); %>
 	<% } %>
 	<c:set var="pageUrl" value="prescription/dimensionPrsList" />
 	<%@ include file="../common/nav.jsp"%>

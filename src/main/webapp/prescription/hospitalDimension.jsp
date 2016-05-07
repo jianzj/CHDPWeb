@@ -6,7 +6,7 @@
 <form class="form-inline" action="<%=request.getContextPath()%>/prescription/hospitalDimensionList" method="GET">
 
 <h3 class="sub-header">
-	处方统计
+	医院维度统计
 	<span>
 		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospitalId" name="hospitalId">
 			<option value=0>全部医院</option>

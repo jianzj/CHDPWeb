@@ -1,5 +1,7 @@
 package com.chdp.chdpweb.bean;
 
+import java.text.SimpleDateFormat;
+
 public class Prescription {
 	private int id;
 	private String uuid;
@@ -104,7 +106,15 @@ public class Prescription {
 	}
 
 	public String getCreate_time() {
-		return create_time;
+		try{
+			if (create_time != null){
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				create_time = sdf.format(sdf.parse(create_time));
+			}
+			return create_time;
+		}catch (Exception e){
+			return create_time;
+		}
 	}
 
 	public void setCreate_time(String create_time) {
@@ -228,7 +238,15 @@ public class Prescription {
 	}
 
 	public String getFinish_time() {
-		return finish_time;
+		try{
+			if (finish_time != null){
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				finish_time = sdf.format(sdf.parse(finish_time));
+			}
+			return finish_time;
+		}catch (Exception e){
+			return finish_time;
+		}
 	}
 
 	public void setFinish_time(String finish_time) {

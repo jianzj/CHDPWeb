@@ -1,6 +1,8 @@
 package com.chdp.chdpweb.common;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class Utils {
 		
@@ -32,4 +34,33 @@ public class Utils {
 		return "2001-01-01";
 	}
 	
+	public static String getCurrentTime(){
+    	SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+    	Date date = new Date();
+    	return sdf1.format(date);
+	}
+	
+	public static String getOneMonthAgoTime(){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar ca = Calendar.getInstance();
+		ca.setTime(new Date());
+		ca.add(Calendar.MONTH, -1);
+		return sdf.format(ca.getTime());
+	}
+	
+	public static boolean validStartEndTime(String start, String end){
+		try{
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date startDate = sdf.parse(start);
+			long startTime = startDate.getTime();
+			Date endDate = sdf.parse(end);
+			long endTime = endDate.getTime();
+			if (endTime > startTime){
+				return true;
+			}
+			return false;
+		} catch (Exception e){
+			return false;
+		}
+	}
 }

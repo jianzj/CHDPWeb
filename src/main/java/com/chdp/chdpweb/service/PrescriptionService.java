@@ -523,4 +523,33 @@ public class PrescriptionService {
 			return -1;
 		}
 	}
+	
+	public Prescription formatPrsTime(Prescription prs){
+		try{
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String startTime = "";
+			String endTime = "";
+			if (prs.getCreate_time() != null){
+				startTime = sdf.format(sdf.parse(prs.getCreate_time()));
+				prs.setCreate_time(startTime);
+			}
+			if (prs.getFinish_time() != null){
+				endTime = sdf.format(sdf.parse(prs.getFinish_time()));
+				prs.setFinish_time(endTime);
+			}
+			return prs;
+		} catch (Exception e){
+			return prs;
+		}
+	}
+	
+	public List<Prescription> formatPrsListForTime(List<Prescription> prsList){
+		try{
+			List<Prescription> finalList = new ArrayList<Prescription>();
+			
+			return prsList;
+		} catch (Exception e){
+			return prsList;
+		}
+	}
 }
