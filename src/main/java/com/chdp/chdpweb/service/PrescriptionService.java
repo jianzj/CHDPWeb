@@ -342,24 +342,6 @@ public class PrescriptionService {
 		}
 	}
 
-	public boolean printReceiveLabel(String uuid) {
-
-		return true;
-	}
-
-	public boolean printPackageLabel(String uuid) {
-
-		return true;
-	}
-
-	public boolean printSinglePackage(String uuid) {
-		return true;
-	}
-
-	public boolean printSinglePrs(String uuid) {
-		return true;
-	}
-
 	public boolean generatePrsListXls(int hospitalId, User user, List<Prescription> prs) {
 		try {
 			String templatePath = Constants.TEMPLATEPATH + "/template.xls";
