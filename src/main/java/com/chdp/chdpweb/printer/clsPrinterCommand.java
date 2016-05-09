@@ -1,8 +1,4 @@
 package com.chdp.chdpweb.printer;
-//---------------------------------------------------------------------------
-// Create clsPrinterCommand.java by Jeffrey 2014/07/21
-//---------------------------------------------------------------------------
-import java.util.*; 
 
 public class clsPrinterCommand 
 {
