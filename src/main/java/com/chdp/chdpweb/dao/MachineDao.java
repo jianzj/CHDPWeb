@@ -11,10 +11,10 @@ import com.chdp.chdpweb.bean.Machine;
 
 public interface MachineDao {
 
-	@Insert("insert machine(type, name, description) values(#{machine.type}, #{machine.name}, #{machine.description})")
+	@Insert("insert machine(uuid, type, pour_machine_id, name, description) values(#{machine.uuid}, #{machine.type}, #{machine.pour_machine_id}, #{machine.name}, #{machine.description})")
 	int createMachine(@Param("machine") Machine machine);
 
-	@Select("select * from machines where type = #{type}")
+	@Select("select * from machine where type = #{type}")
 	List<Machine> getMachinesByType(@Param("type") int type);
 
 	@Select("select * from machine")
@@ -37,4 +37,9 @@ public interface MachineDao {
 	
 	@Select("select * from machine where id = #{id}")
 	Machine getMachineById(@Param("id") int id);
+	
+	@Select("select count(m1.id) from machine as m1, machine as m2 where " +
+				"m2.id = #{machineId} and m1.pour_machine_id = m2.id and m1.type = #{machine_type}")
+	int getRelatedMachineNum(@Param("machineId") int machineId, @Param("machine_type") int machine_type );
+
 }

@@ -45,6 +45,12 @@ public class Utils {
     	return sdf1.format(date);
 	}
 	
+	public static String getCurrentDateAndTime(){
+		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyyMMddHHmmss");
+    	Date date = new Date();
+    	return sdf1.format(date);
+	}
+	
 	public static String getOneMonthAgoTime(){
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Calendar ca = Calendar.getInstance();

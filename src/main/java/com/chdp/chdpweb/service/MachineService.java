@@ -81,4 +81,26 @@ public class MachineService {
 			return null;
 		}
 	}
+	
+	//用于获取所有的灌装机
+	public List<Machine> getMachineListByType(int type){
+		try{
+			return machineDao.getMachinesByType(type);
+		}catch (Exception e){
+			return new ArrayList<Machine>();
+		}
+	}
+	
+	//用于查询一个灌装机时候有相对应的煎煮记，以便判断是否可以删除
+	public boolean existRelatedMachines(int machineId, int relatedMachine_type){
+		try{
+			int countNum = machineDao.getRelatedMachineNum(machineId, relatedMachine_type);
+			if (countNum == 0){
+				return false;
+			}
+			return true;
+		}catch (Exception e){
+			return true;
+		}
+	}
 }

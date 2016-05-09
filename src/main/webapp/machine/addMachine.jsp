@@ -18,10 +18,34 @@
 			<div class="form-group">
 				<label for="type" class="control-label col-sm-4">机器型号</label>
 				<div class="col-sm-4 required">
-					<select class="form-control col-sm-4" id="type" name="type">
-						<option value="<%=Constants.DECOCTION_MACHINE %>" <%if(request.getAttribute("machineAdd")!=null && ((Machine)request.getAttribute("machineAdd")).getType() == 1) out.print("selected"); %>>煎煮机</option>
+					<select class="form-control col-sm-4" id="type" name="type" onchange="myFunction()">
 						<option value="<%=Constants.FILLING_MACHINE %>" <%if(request.getAttribute("machineAdd")!=null && ((Machine)request.getAttribute("machineAdd")).getType() == 2) out.print("selected"); %>>灌装机</option>
+						<option value="<%=Constants.DECOCTION_MACHINE %>" <%if(request.getAttribute("machineAdd")!=null && ((Machine)request.getAttribute("machineAdd")).getType() == 1) out.print("selected"); %>>煎煮机</option>
 					</select>
+				</div>
+			</div>
+			<div id="pour_machine" class="<% if (request.getAttribute("machineAdd") == null || (request.getAttribute("machineAdd") != null && ((Machine)request.getAttribute("machineAdd")).getType() == Constants.FILLING_MACHINE)) out.print("hide"); %>">
+				<div class="form-group">
+					<label for="pour_machine_id" class="control-label col-sm-4">关联的灌装机</label>
+					<div class="col-sm-4 required">
+						<select class="form-control col-sm-4" id="pour_machine_id" name="pour_machine_id">
+							<option value=0>未选择关联的灌装机</option>
+							<% if (request.getAttribute("pourMachineList") != null){ %>
+							<c:forEach var="fill_machine" items="${pourMachineList}">
+								<% if (request.getAttribute("machineAdd") != null){ %>
+								<c:if test="${machineAdd.pour_machine_id == fill_machine.id}">
+								<option value="${fill_machine.id}" selected>${fill_machine.name}</option>
+								</c:if>
+								<c:if test="${machineAdd.pour_machine_id != fill_machine.id}">
+								<option value="${fill_machine.id}">${fill_machine.name}</option>
+								</c:if>
+								<% }else{ %>
+								<option value="${fill_machine.id}">${fill_machine.name}</option>
+								<% } %>
+							</c:forEach>
+							<% } %>
+						</select>
+					</div>
 				</div>
 			</div>
 			<div class="form-group">
@@ -46,4 +70,17 @@
 	</form>
 
 </div>
+<script>
+function myFunction() {
+	var selectedValue = (document).getElementById("type").value;
+
+	if (selectedValue == 1){
+		document.getElementById("pour_machine").classList.remove("hide");
+	}
+	
+	if (selectedValue == 2){
+		document.getElementById("pour_machine").classList.add("hide");
+	}
+}
+</script>
 <%@ include file="../foot.jsp"%>
