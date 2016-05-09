@@ -80,18 +80,12 @@
 <div class="text-right">
 	<% if (request.getAttribute("hospitalId") != null){ %>
 		<% request.setAttribute("hospitalId", (Integer)request.getAttribute("hospitalId")); %>
-	<% }else{ %>
-		<% request.setAttribute("hospitalId", 0); %>
-	<% } %>
+	<% }%>
 	<% if (request.getAttribute("startTime") != null){ %>
 		<% request.setAttribute("startTime", (String)request.getAttribute("startTime")); %>
-	<% }else{ %>
-		<% request.setAttribute("startTime", Constants.DEFAULT_START ); %>
 	<% } %>
 	<% if (request.getAttribute("endTime") != null){ %>
 		<% request.setAttribute("endTime", (String)request.getAttribute("endTime")); %>
-	<% }else{ %>
-		<% request.setAttribute("endTime", Constants.DEFAULT_END); %>
 	<% } %>
 	<c:set var="pageUrl" value="prescription/historyList" />
 	<%@ include file="../common/nav.jsp"%>

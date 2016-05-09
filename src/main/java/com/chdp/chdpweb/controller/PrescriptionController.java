@@ -443,7 +443,7 @@ public class PrescriptionController {
 			prs.setPhase_name(proService.getPhaseNamewithProcess(prs));
 			finalList.add(prs);
 		}
-		
+
 		request.setAttribute("hospitalId", hospitalId);
 		request.setAttribute("process", process);
 
