@@ -30,6 +30,7 @@ import com.chdp.chdpweb.bean.Order;
 import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.bean.User;
 import com.chdp.chdpweb.common.Utils;
+import com.chdp.chdpweb.printer.PrintHelper;
 import com.chdp.chdpweb.bean.Process;
 
 @Controller
@@ -152,11 +153,11 @@ public class PrescriptionController {
 
 		String from = request.getParameter("from");
 		String prsIdStr = request.getParameter("prsId");
-		
+
 		if (from == null) {
 			from = "RECEIVE";
 		}
-		
+
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
 		// request.setAttribute("hospital", "ALL");
@@ -188,7 +189,7 @@ public class PrescriptionController {
 		}
 
 		int prsId = Integer.parseInt(prsIdStr);
-		
+
 		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
 		if (from.equals("RECEIVE")
 				&& ((currentUser.getAuthority() & 1024) == 0 && (currentUser.getAuthority() & 512) == 0)) {
@@ -232,7 +233,7 @@ public class PrescriptionController {
 
 		String prsIdStr = request.getParameter("prsId");
 		String from = request.getParameter("from");
-		
+
 		if (from == null) {
 			from = "RECEIVE";
 		}
@@ -267,7 +268,7 @@ public class PrescriptionController {
 		}
 
 		int prsId = Integer.parseInt(prsIdStr);
-		
+
 		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
 		if (from.equals("RECEIVE")
 				&& ((currentUser.getAuthority() & 1024) == 0 && (currentUser.getAuthority() & 512) == 0)) {
@@ -303,7 +304,7 @@ public class PrescriptionController {
 			prs.setPacket_num(request.getParameter("packet_num_other") == null ? 0
 					: Integer.parseInt(request.getParameter("packet_num_other")));
 		}
-		
+
 		String price = request.getParameter("price_num");
 		double priceNum = 0;
 		try {
@@ -370,11 +371,11 @@ public class PrescriptionController {
 
 		String prsIdStr = request.getParameter("prsId");
 		String hospitalIdStr = request.getParameter("hospitalId");
-		
+
 		int hospitalId = 0;
-		try{
+		try {
 			hospitalId = Integer.parseInt(hospitalIdStr);
-		}catch (Exception e){
+		} catch (Exception e) {
 			hospitalId = 0;
 		}
 
@@ -416,7 +417,7 @@ public class PrescriptionController {
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/currentList", method = RequestMethod.GET)
 	public String getCurrentList(HttpServletRequest request,
-			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, 
+			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
 			@RequestParam(name = "hospitalId", defaultValue = "0") int hospitalId,
 			@RequestParam(name = "process", defaultValue = "0") int process) {
 
@@ -433,7 +434,7 @@ public class PrescriptionController {
 		} else {
 			prsList = prsService.listPrsWithParams(process, hospitalId, pageNum);
 		}
-		
+
 		List<Prescription> finalList = new ArrayList<Prescription>();
 
 		Iterator<Prescription> itr = prsList.iterator();
@@ -460,29 +461,30 @@ public class PrescriptionController {
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/historyList", method = RequestMethod.GET)
 	public String getHistoryList(HttpServletRequest request,
-			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, @RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
+			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
 
 		request.setAttribute("nav", "历史处方列表");
 
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
 		if (start == null || start.equals("")) {
-		    start = Utils.getOneMonthAgoTime();
+			start = Utils.getOneMonthAgoTime();
 		}
 		if (end == null || end.equals("")) {
-		    end = Utils.getCurrentTime();
+			end = Utils.getCurrentTime();
 		}
-		
+
 		request.setAttribute("hospitalId", hospitalId);
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
-		
+
 		start = Utils.formatStartTime(start);
 		end = Utils.formatEndTime(end);
-		
-		if (!Utils.validStartEndTime(start, end)){
+
+		if (!Utils.validStartEndTime(start, end)) {
 			request.setAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
-		}else{
+		} else {
 			List<Prescription> prsList = null;
 			if (hospitalId == 0) {
 				prsList = prsService.listPrsWithProcessAndTime(Constants.FINISH, pageNum, start, end);
@@ -493,7 +495,7 @@ public class PrescriptionController {
 			PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
 			request.setAttribute("page", page);
 		}
-		
+
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
 
@@ -502,7 +504,8 @@ public class PrescriptionController {
 
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/hospitalDimensionList", method = RequestMethod.GET)
-	public String listHospitalDimension(HttpServletRequest request, @RequestParam( value = "hospitalId", defaultValue = "0") int hospitalId) {
+	public String listHospitalDimension(HttpServletRequest request,
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
 
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
@@ -513,20 +516,20 @@ public class PrescriptionController {
 		if (end == null || end.equals("")) {
 			end = Utils.getCurrentTime();
 		}
-		
+
 		request.setAttribute("hospitalId", hospitalId);
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
-		
+
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
-		
+
 		start = Utils.formatStartTime(start);
 		end = Utils.formatEndTime(end);
-		
-		if(!Utils.validStartEndTime(start, end)){
+
+		if (!Utils.validStartEndTime(start, end)) {
 			request.setAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
-		}else{
+		} else {
 			List<Hospital> newHospList = new ArrayList<Hospital>();
 			Iterator<Hospital> itr = hospitalList.iterator();
 			if (hospitalId == 0) {
@@ -546,7 +549,6 @@ public class PrescriptionController {
 				}
 			}
 
-			
 			Collections.sort(newHospList);
 			request.setAttribute("displayHospitalList", newHospList);
 		}
@@ -556,7 +558,8 @@ public class PrescriptionController {
 
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/orderDimensionList", method = RequestMethod.GET)
-	public String listOrderDimension(HttpServletRequest request, @RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
+	public String listOrderDimension(HttpServletRequest request,
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
 			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum) {
 
 		request.setAttribute("nav", "出货单维度统计");
@@ -567,14 +570,14 @@ public class PrescriptionController {
 		request.setAttribute("hospitalId", hospitalId);
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
-		
+
 		if (start == null || start.equals("")) {
 			start = Utils.getMinTime();
 		}
 		if (end == null || end.equals("")) {
 			end = Utils.getMinTime();
 		}
-		
+
 		start = Utils.formatStartTime(start);
 		end = Utils.formatEndTime(end);
 
@@ -605,41 +608,45 @@ public class PrescriptionController {
 
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/userDimensionList", method = RequestMethod.GET)
-	public String listUserDimension(HttpServletRequest request, @RequestParam(value = "userAuth", defaultValue = "0") int userAuth) {
+	public String listUserDimension(HttpServletRequest request,
+			@RequestParam(value = "userAuth", defaultValue = "0") int userAuth) {
 
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
 
 		if (start == null || start.equals("")) {
-		  start = Utils.getOneMonthAgoTime();
+			start = Utils.getOneMonthAgoTime();
 		}
 		if (end == null || end.equals("")) {
-		  end = Utils.getCurrentTime();
+			end = Utils.getCurrentTime();
 		}
-		
+
 		request.setAttribute("userAuth", userAuth);
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
-		
+
 		start = Utils.formatStartTime(start);
 		end = Utils.formatEndTime(end);
 
-		if (!Utils.validStartEndTime(start, end)){
+		if (!Utils.validStartEndTime(start, end)) {
 			request.setAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
-		}else{
+		} else {
 			List<User> userList = prsService.getUserListForPrsSummary(userAuth, start, end);
 			Collections.sort(userList);
 			request.setAttribute("finalUserList", userList);
 		}
-		
+
 		return "prescription/userDimension";
 	}
 
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/dimensionPrsList", method = RequestMethod.GET)
-	public String dimensionPrsList(HttpServletRequest request, @RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
-			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, @RequestParam(value = "from", defaultValue = "HOSPITAL") String from, 
-			@RequestParam(name = "userId", defaultValue = "0") int userId, @RequestParam(value = "orderId", defaultValue = "0")int orderId,
+	public String dimensionPrsList(HttpServletRequest request,
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
+			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
+			@RequestParam(value = "from", defaultValue = "HOSPITAL") String from,
+			@RequestParam(name = "userId", defaultValue = "0") int userId,
+			@RequestParam(value = "orderId", defaultValue = "0") int orderId,
 			@RequestParam(name = "userAuth", defaultValue = "0") int userAuth) {
 
 		request.setAttribute("nav", "处方汇总列表");
@@ -648,12 +655,12 @@ public class PrescriptionController {
 		String end = request.getParameter("endTime");
 
 		if (start == null || start.equals("")) {
-		  start = Utils.getOneMonthAgoTime();
+			start = Utils.getOneMonthAgoTime();
 		}
 		if (end == null || end.equals("")) {
-		  end = Utils.getCurrentTime();
+			end = Utils.getCurrentTime();
 		}
-		
+
 		if (from.equals("USER") && userId == 0) {
 			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
 		}
@@ -669,24 +676,23 @@ public class PrescriptionController {
 
 		start = Utils.formatStartTime(start);
 		end = Utils.formatEndTime(end);
-		
-		if(!Utils.validStartEndTime(start, end)){
-			if (from.equals("HOSPITAL")){
+
+		if (!Utils.validStartEndTime(start, end)) {
+			if (from.equals("HOSPITAL")) {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/hospitalDimensionList";
-			}else if (from.equals("USER")){
+			} else if (from.equals("USER")) {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
 			}
 		}
 
 		List<Prescription> prsList = null;
-		
+
 		if (from.equals("HOSPITAL")) {
 			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalId, pageNum, start, end);
 		} else if (from.equals("USER")) {
 			prsList = prsService.listPrsByUser(userAuth, userId, start, end);
 		} else {
-			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalId, pageNum,
-					start, end);
+			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalId, pageNum, start, end);
 		}
 
 		PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
@@ -698,9 +704,13 @@ public class PrescriptionController {
 
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/printSingleLabel")
-	public String printSingleLabelPackage(HttpServletRequest request, @RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
-			@RequestParam(value = "process", defaultValue = "0") int process, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum, @RequestParam(value = "printType", defaultValue = "PACKAGE") String printType,
-			@RequestParam(value = "from", defaultValue = "CURRENT") String from, @RequestParam(value = "prsId", defaultValue = "0") int prsId) {
+	public String printSingleLabelPackage(HttpServletRequest request,
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
+			@RequestParam(value = "process", defaultValue = "0") int process,
+			@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+			@RequestParam(value = "printType", defaultValue = "PACKAGE") String printType,
+			@RequestParam(value = "from", defaultValue = "CURRENT") String from,
+			@RequestParam(value = "prsId", defaultValue = "0") int prsId) {
 
 		request.setAttribute("hospitalId", hospitalId);
 		request.setAttribute("process", process);
@@ -716,19 +726,11 @@ public class PrescriptionController {
 			request.setAttribute("errorMsg", "未知处方无法打印！");
 		} else {
 			Prescription prs = prsService.getPrsNoUser(prsId);
-			if (printType.equals("PACKAGE")) {
-				if (prsService.printSinglePackage(prs.getUuid())) {
-					request.setAttribute("successMsg", "打印成功！");
-				} else {
-					request.setAttribute("errorMsg", "打印失败，请稍后重试！");
-				}
-			} else if (printType.equals("PRS")) {
-				if (prsService.printSinglePrs(prs.getUuid())) {
-					request.setAttribute("successMsg", "打印成功！");
-				} else {
-					request.setAttribute("errorMsg", "打印失败，请稍后重试！");
-				}
-			}
+			PrintHelper.startAndSetup();
+			PrintHelper.printSingle(prs.getPatient_name(), prs.getPacket_num(), prs.getSex(), prs.getHospital_name(),
+					prs.getUuid());
+			PrintHelper.close();
+			request.setAttribute("successMsg", "打印成功！");
 		}
 
 		List<Prescription> prsList = null;
@@ -759,7 +761,8 @@ public class PrescriptionController {
 
 	@RequiresRoles("RECEIVE")
 	@RequestMapping(value = "/printReceiveList")
-	public String printReceiveList(HttpServletRequest request, @RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
+	public String printReceiveList(HttpServletRequest request,
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
 
 		List<Prescription> prsList = null;
 		if (hospitalId == 0) {
@@ -773,31 +776,26 @@ public class PrescriptionController {
 		int count = 0;
 		while (itr.hasNext()) {
 			printItem = itr.next();
-			if (prsService.printReceiveLabel(printItem.getUuid())) {
 
-				SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-				String currentTime = df.format(new Date());
-				User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
+			SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+			String currentTime = df.format(new Date());
+			User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
 
-				Process newProcess = new Process();
-				Process currentProcess = proService.getProcessById(printItem.getProcess_id());
-				newProcess.setProcess_type(Constants.CHECK);
-				newProcess.setUser_id(currentUser.getId());
-				newProcess.setPrescription_id(printItem.getId());
-				newProcess.setBegin(currentTime);
-				newProcess.setPrevious_process_id(printItem.getProcess_id());
-				int result = proService.createProccess(newProcess);
-				if (result != -1) {
-					currentProcess.setFinish(currentTime);
-					if (proService.updateProcessTime(currentProcess)) {
-						printItem.setProcess(Constants.CHECK);
-						printItem.setProcess_id(newProcess.getId());
-						if (prsService.updatePrescriptionProcess(printItem)) {
-							count += 1;
-						} else {
-							request.setAttribute("errorMsg", "打印到处方" + String.valueOf(printItem.getId()) + "出错，请重新打印");
-							break;
-						}
+			Process newProcess = new Process();
+			Process currentProcess = proService.getProcessById(printItem.getProcess_id());
+			newProcess.setProcess_type(Constants.CHECK);
+			newProcess.setUser_id(currentUser.getId());
+			newProcess.setPrescription_id(printItem.getId());
+			newProcess.setBegin(currentTime);
+			newProcess.setPrevious_process_id(printItem.getProcess_id());
+			int result = proService.createProccess(newProcess);
+			if (result != -1) {
+				currentProcess.setFinish(currentTime);
+				if (proService.updateProcessTime(currentProcess)) {
+					printItem.setProcess(Constants.CHECK);
+					printItem.setProcess_id(newProcess.getId());
+					if (prsService.updatePrescriptionProcess(printItem)) {
+						count += 1;
 					} else {
 						request.setAttribute("errorMsg", "打印到处方" + String.valueOf(printItem.getId()) + "出错，请重新打印");
 						break;
@@ -806,7 +804,6 @@ public class PrescriptionController {
 					request.setAttribute("errorMsg", "打印到处方" + String.valueOf(printItem.getId()) + "出错，请重新打印");
 					break;
 				}
-
 			} else {
 				request.setAttribute("errorMsg", "打印到处方" + String.valueOf(printItem.getId()) + "出错，请重新打印");
 				break;
@@ -814,6 +811,12 @@ public class PrescriptionController {
 		}
 
 		if (count == prsList.size()) {
+			PrintHelper.startAndSetup();
+			for (Prescription prs : prsList) {
+				PrintHelper.printSingle(prs.getPatient_name(), prs.getPacket_num(), prs.getSex(),
+						prs.getHospital_name(), prs.getUuid());
+			}
+			PrintHelper.close();
 			request.setAttribute("successMsg", "打印完成！");
 		} else {
 			request.setAttribute("errorMsg", "打印中存在错误，漏打了" + String.valueOf(prsList.size() - count) + "份处方标签");
@@ -834,7 +837,8 @@ public class PrescriptionController {
 	// 打印包装标签
 	@RequiresRoles("PACKAGE")
 	@RequestMapping(value = "/printPackageList")
-	public String printPackageList(HttpServletRequest request, @RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
+	public String printPackageList(HttpServletRequest request,
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
 
 		List<Prescription> prsList = null;
 		if (hospitalId == 0) {
@@ -843,42 +847,13 @@ public class PrescriptionController {
 			prsList = prsService.listPrsWithProHospitalNoUser(Constants.PACKAGE, hospitalId);
 		}
 
-		Iterator<Prescription> itr = prsList.iterator();
-		Prescription printItem = null;
-		int count = 0;
-		while (itr.hasNext()) {
-			printItem = itr.next();
-			if (prsService.printPackageLabel(printItem.getUuid())) {
-
-				SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-				String currentTime = df.format(new Date());
-
-				printItem.setProcess(Constants.SHIP);
-				printItem.setProcess_id(-1);
-				if (prsService.updatePrescriptionProcess(printItem)) {
-					Process currentProcess = proService.getProcessById(printItem.getId());
-					currentProcess.setFinish(currentTime);
-					if (proService.updateProcessTime(currentProcess)) {
-						count += 1;
-					} else {
-						request.setAttribute("errorMsg", "打印到处方" + String.valueOf(printItem.getId()) + "出错，请重新打印");
-						break;
-					}
-				} else {
-					request.setAttribute("errorMsg", "打印到处方" + String.valueOf(printItem.getId()) + "出错，请重新打印");
-					break;
-				}
-			} else {
-				request.setAttribute("errorMsg", "打印到处方" + String.valueOf(printItem.getId()) + "出错，请重新打印");
-				break;
-			}
+		PrintHelper.startAndSetup();
+		for (Prescription prs : prsList) {
+			PrintHelper.printSingle(prs.getPatient_name(), prs.getPacket_num(), prs.getSex(), prs.getHospital_name(),
+					prs.getUuid());
 		}
-
-		if (count == prsList.size()) {
-			request.setAttribute("successMsg", "打印完成！");
-		} else {
-			request.setAttribute("errorMsg", "打印中存在错误，漏打了" + String.valueOf(prsList.size() - count) + "份处方标签");
-		}
+		PrintHelper.close();
+		request.setAttribute("successMsg", "打印完成！");
 
 		prsList = prsService.listPrsWithProcessNoUser(Constants.PACKAGE);
 
@@ -895,7 +870,8 @@ public class PrescriptionController {
 	// 生成出货清单
 	@RequiresRoles("PACKAGE")
 	@RequestMapping(value = "/printShipListXls")
-	public String printShipListXls(HttpServletRequest request, @RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
+	public String printShipListXls(HttpServletRequest request,
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
 
 		List<Integer> usedHospitals = new ArrayList<Integer>();
 		if (hospitalId == 0) {
