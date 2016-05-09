@@ -102,6 +102,14 @@ public class PrescriptionService {
 			return null;
 		}
 	}
+	
+	public Prescription getPrescriptionByCleanMachineUuid(String uuid) {
+		try {
+			return prsDao.getPrescriptionByCleanMachineUuid(uuid);
+		} catch (Exception e) {
+			return null;
+		}
+	}
 
 	public List<Prescription> listPrsWithProcessUnfinished() {
 		try {

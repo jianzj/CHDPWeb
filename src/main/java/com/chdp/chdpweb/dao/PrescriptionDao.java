@@ -27,6 +27,12 @@ public interface PrescriptionDao {
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.uuid = #{uuid} and p.hospital_id = h.id")
 	Prescription getPrescriptionByUUID(@Param("uuid") String uuid);
 
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h"
+			+ "where p.process = 8 and p.hospital_id = h.id and p.process = ("
+			+ "select id from process as pr, machine as m where "
+			+ "and pr.process_type = 8 and pr.machine_id = m.id and m.uuid = #{uuid} )")
+	Prescription getPrescriptionByCleanMachineUuid(@Param("uuid") String uuid);
+
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.process = #{process} and p.hospital_id = h.id")
 	List<Prescription> getPrescriptionsByProcess(@Param("process") int process);
 
@@ -95,7 +101,7 @@ public interface PrescriptionDao {
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
 			+ "where p.process = #{process} and p.process_id = -1 and p.hospital_id = h.id")
 	List<Prescription> getPrsListWithProcess_Ship(@Param("process") int process);
-	
+
 	// New added
 	// Used for receiveList/ to get PrsList with Process type. No user_name
 	// included.
@@ -113,13 +119,12 @@ public interface PrescriptionDao {
 			+ "where p.process = #{process} and p.process_id = -1 and h.id = #{hospitalId} and p.hospital_id = h.id")
 	List<Prescription> getPrsListWithProAndHospital_Ship(@Param("process") int process,
 			@Param("hospitalId") int hospitalId);
-	
+
 	// Used for receiveList/ to get PrsList with Process type. No user_name
 	// included.
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
 			+ "where p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id")
-	List<Prescription> getPrsListWithProAndHospital(@Param("process") int process,
-			@Param("hospitalId") int hospitalId);
+	List<Prescription> getPrsListWithProAndHospital(@Param("process") int process, @Param("hospitalId") int hospitalId);
 
 	@Select("select h.id from prescription as p, hospital as h "
 			+ "where p.process = #{process} and p.hospital_id = h.id")
@@ -139,28 +144,32 @@ public interface PrescriptionDao {
 
 	@Select("select distinct p.id from prescription as p, process as pro, user as u where p.process = 11 and u.id = #{userId} and pro.user_id = u.id "
 			+ "and pro.prescription_id = p.id and p.create_time >= #{start} and p.finish_time <= #{end}")
-	List<Integer> listDealPrsIdByUser_NoShip(@Param("userId") int userId, @Param("start") String start, @Param("end") String end);
-	
+	List<Integer> listDealPrsIdByUser_NoShip(@Param("userId") int userId, @Param("start") String start,
+			@Param("end") String end);
+
 	// 用户维度统计:计算处理的Prs, Process < 10;
 	@Select("select count(distinct p.id) from prescription as p, process as pro, user as u where p.process = 11 and u.id = #{userId} and pro.user_id = u.id "
 			+ "and pro.prescription_id = p.id and pro.process_type = #{process_type} and p.create_time >= #{start} and p.finish_time <= #{end}")
-	int countPrsDealByUserAndProcess_NoShip(@Param("userId") int userId, @Param("process_type") int process_type,@Param("start") String start, @Param("end") String end);
+	int countPrsDealByUserAndProcess_NoShip(@Param("userId") int userId, @Param("process_type") int process_type,
+			@Param("start") String start, @Param("end") String end);
 
 	// 用户维度统计:计算处理的Prs, Process < 10;
 	@Select("select distinct p.id from prescription as p, process as pro, user as u where p.process = 11 and u.id = #{userId} and pro.user_id = u.id "
 			+ "and pro.prescription_id = p.id and pro.process_type = #{process_type} and p.create_time >= #{start} and p.finish_time <= #{end}")
-	List<Integer> listDealPrsIdByUserAndProcess_NoShip(@Param("userId") int userId, @Param("process_type") int process_type,@Param("start") String start, @Param("end") String end);
+	List<Integer> listDealPrsIdByUserAndProcess_NoShip(@Param("userId") int userId,
+			@Param("process_type") int process_type, @Param("start") String start, @Param("end") String end);
 
-	@Select("select count(distinct p.id) from prescription as p, user as u, CHDP.order as o where u.id = #{userId} and " +
-				"(o.create_user_id = u.id or o.outbound_user_id = u.id) and p.process = 11 and p.process_id = o.id and " +
-			 	"p.create_time >= #{start} and p.finish_time <= #{end}")
+	@Select("select count(distinct p.id) from prescription as p, user as u, CHDP.order as o where u.id = #{userId} and "
+			+ "(o.create_user_id = u.id or o.outbound_user_id = u.id) and p.process = 11 and p.process_id = o.id and "
+			+ "p.create_time >= #{start} and p.finish_time <= #{end}")
 	int countPrsDealByUser_Ship(@Param("userId") int userId, @Param("start") String start, @Param("end") String end);
-	
-	@Select("select distinct p.id from prescription as p, user as u, CHDP.order as o where u.id = #{userId} and " +
-			"(o.create_user_id = u.id or o.outbound_user_id = u.id) and p.process = 11 and p.process_id = o.id and " +
-		 	"p.create_time >= #{start} and p.finish_time <= #{end}")
-    List<Integer> listDealPrsIdByUserr_Ship(@Param("userId") int userId, @Param("start") String start, @Param("end") String end);
-	
+
+	@Select("select distinct p.id from prescription as p, user as u, CHDP.order as o where u.id = #{userId} and "
+			+ "(o.create_user_id = u.id or o.outbound_user_id = u.id) and p.process = 11 and p.process_id = o.id and "
+			+ "p.create_time >= #{start} and p.finish_time <= #{end}")
+	List<Integer> listDealPrsIdByUserr_Ship(@Param("userId") int userId, @Param("start") String start,
+			@Param("end") String end);
+
 	// 用户维度统计:PrsList
 	@Select("select p.*, h.name as hospital_name from prescription as p, process as pro, user as u, hospital as h where p.process = 11 and u.id = #{userId} and pro.process_type = #{process_type} "
 			+ "and p.hospital_id = h.id and pro.prescription_id = p.id and pro.user_id = u.id and p.create_time >= #{start} and p.finish_time <= #{end}")
@@ -168,18 +177,19 @@ public interface PrescriptionDao {
 			@Param("start") String start, @Param("end") String end);
 
 	// 用户维度统计:计算出错的Process
-	@Select("select count(distinct p1.prescription_id) from process as p1, process as p2 where p2.user_id = #{userId} and " +
-				"p1.previous_process_id = p2.id and p1.error_type != 0 and p1.begin >= #{start} and p1.finish <= #{end} group by p2.user_id")
+	@Select("select count(distinct p1.prescription_id) from process as p1, process as p2 where p2.user_id = #{userId} and "
+			+ "p1.previous_process_id = p2.id and p1.error_type != 0 and p1.begin >= #{start} and p1.finish <= #{end} group by p2.user_id")
 	Integer countProcsErrorByUser(@Param("userId") int userId, @Param("start") String start, @Param("end") String end);
-	
-	//Errors
-	@Select("select count(distinct p1.prescription_id) from process as p1, process as p2 where p2.user_id = #{userId} and p1.process_type = #{process_type} " +
-			"p1.previous_process_id = p2.id and p1.error_type != 0 and p1.begin != null and p1.begin >= #{start} and p1.finish != null and p1.finish <= #{end} group by p2.user_id")
-	Integer countProcsErrorByUse_Process(@Param("process_type") int process_type, @Param("userId") int userId, @Param("start") String start, @Param("end") String end);
-	
+
+	// Errors
+	@Select("select count(distinct p1.prescription_id) from process as p1, process as p2 where p2.user_id = #{userId} and p1.process_type = #{process_type} "
+			+ "p1.previous_process_id = p2.id and p1.error_type != 0 and p1.begin != null and p1.begin >= #{start} and p1.finish != null and p1.finish <= #{end} group by p2.user_id")
+	Integer countProcsErrorByUse_Process(@Param("process_type") int process_type, @Param("userId") int userId,
+			@Param("start") String start, @Param("end") String end);
+
 	@Select("select * from prescription where hospital_id = #{hospital_id}")
 	List<Prescription> getPrescriptionByHospital(@Param("hospital_id") int hospital_id);
-	
+
 	@Update("update prescription set class_of_medicines = #{prs.class_of_medicines}, process = #{prs.process}, process_id = #{prs.process_id}, "
 			+ "need_decoct_first = #{prs.need_decoct_first}, decoct_first_list = #{prs.decoct_first_list, jdbcType=LONGVARCHAR},"
 			+ "need_decoct_later = #{prs.need_decoct_later}, decoct_later_list = #{prs.decoct_later_list, jdbcType=LONGVARCHAR},"

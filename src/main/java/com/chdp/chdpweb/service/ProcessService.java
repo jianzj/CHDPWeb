@@ -198,7 +198,13 @@ public class ProcessService {
 					proc.setPrescription_id(prsId);
 					proc.setPrevious_process_id(procId);
 					proc.setUser_id(user.getId());
-					proDao.createProcess(proc);
+					if (forwardTo == Constants.CLEAN) {
+						proc.setMachine_id(machineId);
+						proDao.createProcessWithMachine(proc);
+					} else {
+						proDao.createProcess(proc);
+					}
+
 					try {
 						Prescription prs = new Prescription();
 						prs.setId(prsId);
@@ -367,43 +373,43 @@ public class ProcessService {
 		}
 	}
 
-    public int getProcIdwithPrsandStatus(int prsId, int process_type){
-    	try{
-    		return proDao.getProcIdwithPrsandStatus(prsId, process_type);
-    	} catch (Exception e){
-    		return -1;
-    	}
-    }
-    	
-	//获取当前订单状态的信息
-	public String getPhaseNamewithProcess(Prescription prs){
-		
-		try{
+	public int getProcIdwithPrsandStatus(int prsId, int process_type) {
+		try {
+			return proDao.getProcIdwithPrsandStatus(prsId, process_type);
+		} catch (Exception e) {
+			return -1;
+		}
+	}
+
+	// 获取当前订单状态的信息
+	public String getPhaseNamewithProcess(Prescription prs) {
+
+		try {
 			Process proc = null;
-			switch (prs.getProcess()){
+			switch (prs.getProcess()) {
 			case Constants.RECEIVE:
 				return "正在接方";
 			case Constants.SHIP:
-				if (prs.getProcess_id() == -1){
+				if (prs.getProcess_id() == -1) {
 					return "包装完成";
-				}else{
+				} else {
 					return "等待出库";
 				}
 			case Constants.FINISH:
 				return "处方完成";
 			case Constants.DECOCT:
 				proc = proDao.getProcessesById(prs.getProcess_id());
-				if (proc.getBegin() == null){
+				if (proc.getBegin() == null) {
 					return "正在浸泡";
-				}else {
+				} else {
 					return "正在煎煮";
 				}
 			default:
 				return Constants.getProcessName(prs.getProcess() - 1) + "完成";
 			}
-		} catch (Exception e){
+		} catch (Exception e) {
 			return "未知状态";
 		}
-		
+
 	}
 }

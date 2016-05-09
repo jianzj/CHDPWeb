@@ -28,4 +28,15 @@ public class PrescriptionAppController {
 			return prsService.getPrescriptionByUuid(uuid);
 		}
 	}
+	
+	@RequestMapping(value = "/getPrescriptionByCleanMachineUuid", method = RequestMethod.POST)
+	@ResponseBody
+	public Prescription getPrescriptionByCleanMachineUuid(HttpServletRequest request) {
+		String uuid = request.getParameter("uuid");
+		if (uuid == null) {
+			return null;
+		} else {
+			return prsService.getPrescriptionByCleanMachineUuid(uuid);
+		}
+	}
 }

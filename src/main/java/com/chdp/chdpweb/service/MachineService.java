@@ -73,4 +73,12 @@ public class MachineService {
 			return null;
 		}
 	}
+
+	public Machine getMachineById(int id) {
+		try {
+			return machineDao.getMachineById(id);
+		} catch (Exception e) {
+			return null;
+		}
+	}
 }

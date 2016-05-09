@@ -15,7 +15,7 @@ public class PrintHelper {
 		Printer.Config.CopyNo(1);
 	}
 
-	public static void printSingle(String name, String hospitalNo, int num, int sex, String hospital, String uuid,
+	public static void printPrescription(String name, String hospitalNo, int num, int sex, String hospital, String uuid,
 			String createTime) {
 		System.setProperty("jna.encoding", "GBK");
 		Printer.Command.Start();

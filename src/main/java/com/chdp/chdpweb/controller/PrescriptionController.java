@@ -727,7 +727,7 @@ public class PrescriptionController {
 		} else {
 			Prescription prs = prsService.getPrsNoUser(prsId);
 			PrintHelper.startAndSetup();
-			PrintHelper.printSingle(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
+			PrintHelper.printPrescription(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
 					prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
 			PrintHelper.close();
 			request.setAttribute("successMsg", "打印成功！");
@@ -813,7 +813,7 @@ public class PrescriptionController {
 		if (count == prsList.size()) {
 			PrintHelper.startAndSetup();
 			for (Prescription prs : prsList) {
-				PrintHelper.printSingle(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
+				PrintHelper.printPrescription(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
 						prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
 			}
 			PrintHelper.close();
@@ -849,7 +849,7 @@ public class PrescriptionController {
 
 		PrintHelper.startAndSetup();
 		for (Prescription prs : prsList) {
-			PrintHelper.printSingle(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
+			PrintHelper.printPrescription(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
 					prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
 		}
 		PrintHelper.close();

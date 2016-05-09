@@ -34,4 +34,7 @@ public interface MachineDao {
 
 	@Select("select * from machine where uuid = #{uuid} and type = #{type}")
 	Machine getMachineByUuidAndType(@Param("uuid") String uuid, @Param("type") int type);
+	
+	@Select("select * from machine where id = #{id}")
+	Machine getMachineById(@Param("id") int id);
 }

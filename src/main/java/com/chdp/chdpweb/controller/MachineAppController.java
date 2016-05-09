@@ -24,4 +24,10 @@ public class MachineAppController {
 		return machineService.getMachineByUuidAndType(request.getParameter("uuid"),
 				Integer.parseInt(request.getParameter("type")));
 	}
+
+	@RequestMapping(value = "/getMachineById", method = RequestMethod.POST)
+	@ResponseBody
+	public Machine getMachineById(HttpServletRequest request) {
+		return machineService.getMachineById(Integer.parseInt(request.getParameter("id")));
+	}
 }
