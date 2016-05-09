@@ -97,7 +97,7 @@ public class ProcessController {
 	@RequiresRoles(value = "ADMIN")
 	@RequestMapping(value = "/showAllProcs", method = RequestMethod.GET)
 	public String showAllProcesses(HttpServletRequest request, @RequestParam(value = "prsId", defaultValue = "0") int prsId, @RequestParam(value = "from", defaultValue = "CURRENT") String from){
-
+		
 		if (prsId == 0){
 			request.setAttribute("errorMsg", "未知处方ID！");
 			if (from.equals("CURRENT")){
