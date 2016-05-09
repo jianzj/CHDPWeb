@@ -29,6 +29,15 @@ public class PrintHelper {
 		Printer.Command.End();
 	}
 
+	public static void printMachine(String name, String uuid) {
+		System.setProperty("jna.encoding", "GBK");
+		Printer.Command.Start();
+		Printer.Command.PrintText_EZPL_Internal("Z1", 10, 15, 3, 3, 0, "0", name);
+		Printer.Command.PrintQRCode(10, 40, 3, 3, "H", 8, 6, 0, uuid);
+		Printer.Command.PrintText_EZPL_Internal("Z1", 10, 246, 2, 2, 0, "0", "上海青浦中药饮片有限公司");
+		Printer.Command.End();
+	}
+
 	public static void close() {
 		Printer.Close();
 	}
