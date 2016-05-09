@@ -32,9 +32,10 @@
 					</c:if>
 					<td><c:out value="${machine.name}" /></td>
 					<td><c:out value="${machine.description}" /></td>
-					<td width="100">
+					<td width="190">
 						<div class="btn-group" role="group" aria-label="...">
 							<a type="button" class="btn btn-danger" onClick="deleteMachine(${machine.id}, '${machine.name}');">删除机器</a>
+							<a type="button" class="btn btn-success" onClick="printMachineLabel(${machine.id}, '${machine.name}');">打印标签</a>
 						</div>
 					</td>
 				</tr>
@@ -61,6 +62,12 @@
     var deleteMachine = function(id, machine_name){
     	$("#assureMsg").html("确认删除机器<strong>"+machine_name+"</strong>？");
         $("#assureBtn").attr('href',"<%=request.getContextPath()%>/machine/delete?machineId="+id+"&pageNum=${page.pageNum}");
+        $("#assureDlg").modal("show");
+    };
+    
+    var printMachineLabel = function(id, machine_name){
+    	$("#assureMsg").html("确认打印机器<strong>"+machine_name+"</strong>的标签？");
+        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/machine/printMachineLabel?machineId="+id+"&pageNum=${page.pageNum}");
         $("#assureDlg").modal("show");
     };
 </script>
