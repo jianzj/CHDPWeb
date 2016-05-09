@@ -13,12 +13,12 @@ import org.apache.ibatis.annotations.Update;
 
 public interface ProcessDao {
 
-	@Insert("insert process(process_type, begin, user_id, prescription_id, previous_process_id, machine_id) "
+	@Insert("insert process(process_type, begin, user_id, prescription_id, previous_process_id) "
 			+ "values(#{proc.process_type}, #{proc.begin}, #{proc.user_id}, #{proc.prescription_id}, #{proc.previous_process_id})")
 	@Options(useGeneratedKeys = true, keyProperty = "proc.id")
 	int createProcess(@Param("proc") Process proc);
 	
-	@Insert("insert process(process_type, begin, user_id, prescription_id, previous_process_id) "
+	@Insert("insert process(process_type, begin, user_id, prescription_id, previous_process_id, machine_id) "
 			+ "values(#{proc.process_type}, #{proc.begin}, #{proc.user_id}, #{proc.prescription_id}, #{proc.previous_process_id}, #{proc.machine_id})")
 	@Options(useGeneratedKeys = true, keyProperty = "proc.id")
 	int createProcessWithMachine(@Param("proc") Process proc);
@@ -48,10 +48,10 @@ public interface ProcessDao {
 	@Delete("delete from process where id = #{processId}")
 	int deleteProcess(@Param("processId") int processId);
 
-	@Select("select p.*, u.name as user_name, m.name as machine_name from process as p, user as u left join machine as m on p.machine_id = m.id where p.id = #{id} and p.user_id = u.id")
+	@Select("select p.*, u.name as user_name, m.name as machine_name from user as u, process as p left join machine as m on p.machine_id = m.id where p.id = #{id} and p.user_id = u.id")
 	Process getProcessesById(@Param("id") int id);
 
-	@Select("select p.*, u.name as user_name, m.name as machine_name from process as p, user as u left join machine as m on p.machine_id = m.id where p.id = (select process_id from prescription where id = #{id}) and p.user_id = u.id")
+	@Select("select p.*, u.name as user_name, m.name as machine_name from user as u, process as p left join machine as m on p.machine_id = m.id where p.id = (select process_id from prescription where id = #{id}) and p.user_id = u.id")
 	Process getPrescriptionPresentProcess(@Param("id") int id);
 
 	@Update("update process set finish = #{finish}, user_id = #{user_id} where id = #{id}")

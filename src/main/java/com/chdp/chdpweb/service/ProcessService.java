@@ -133,7 +133,6 @@ public class ProcessService {
 
 			try {
 				Process proc = new Process();
-				proc.setBegin(currentTime);
 				proc.setProcess_type(Constants.MIX);
 				proc.setPrescription_id(prsId);
 				proc.setPrevious_process_id(procId);

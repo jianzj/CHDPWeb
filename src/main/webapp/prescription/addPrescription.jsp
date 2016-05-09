@@ -115,9 +115,9 @@
 				<label for="price" class="control-label col-sm-4">金额</label>
 				<div class="col-sm-4">
 					<% if(request.getAttribute("lastestPrs") != null && request.getAttribute("prsAdd") == null){ %>
-					<input type="text" class="form-control" id="prs_price" name="prs_price" placeholder="价格" value="${lastestPrs.price}" required>
+					<input type="number" step="0.01" class="form-control" id="prs_price" name="prs_price" placeholder="价格" value="${lastestPrs.price}" required>
 					<% }else {%>
-					<input type="text" class="form-control" id="prs_price" name="prs_price" placeholder="价格" value="${prsAdd.price}" required>
+					<input type="number" step="0.01" class="form-control" id="prs_price" name="prs_price" placeholder="价格" value="${prsAdd.price}" required>
 					<% } %>
 				</div>
 			</div>
