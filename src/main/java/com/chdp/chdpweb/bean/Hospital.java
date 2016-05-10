@@ -5,7 +5,11 @@ public class Hospital implements Comparable<Hospital> {
 	private int id;
 	private String name;
 	private String description;
+	
+	//以下变量用于医院维度统计处方情况时使用
 	private int finishedPrsNum;
+	private int totalPacketNum;
+	private double totalPrice;
 	
 	public int getId(){
 		return id;
@@ -38,7 +42,23 @@ public class Hospital implements Comparable<Hospital> {
 	public void setFinishedPrsNum(int num){
 		this.finishedPrsNum = num;
 	}
+
+	public int getTotalPacketNum(){
+		return totalPacketNum;
+	}
 	
+	public void setTotalPacketNum(int totalPacketNum){
+		this.totalPacketNum = totalPacketNum;
+	}
+	
+	public double getTotalPrice(){
+		return totalPrice;
+	}
+	
+	public void setTotalPrice(double price){
+		this.totalPrice = price;
+	}
+
 	public int compareTo(Hospital hosp1) {
 		if (this.getFinishedPrsNum() > hosp1.getFinishedPrsNum()){
 			return -1;

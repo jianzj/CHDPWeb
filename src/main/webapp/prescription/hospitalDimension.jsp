@@ -46,6 +46,8 @@
 				<th>ID</th>
 				<th>医院</th>
 				<th>已完成处方</th>
+				<th>贴数</th>
+				<th>总计</th>
 				<th>始于</th>
 				<th>止于</th>
 			</tr>
@@ -56,6 +58,8 @@
 					<td><c:out value="${hosp2.id}" /></td>
 					<td><c:out value="${hosp2.name}" /></td>
 					<td><c:out value="${hosp2.finishedPrsNum}" /></td>
+					<td><c:out value="${hosp2.totalPacketNum}" /></td>
+					<td><c:out value="${hosp2.totalPrice}" /></td>
 					<td><c:out value="${startTime}" /></td>
 					<% if (request.getAttribute("endTime") == null || ((String)request.getAttribute("endTime")).equals(Constants.DEFAULT_END)){ %>
 					<td><%=Constants.getCurrentTime() %></td>

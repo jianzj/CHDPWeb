@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class Constants {
 
-    public static final int PAGE_SIZE = 10;
+    public static final int PAGE_SIZE = 1;
     public static final String DEFAULT_PASSWORD = "123456";
 
     // These params are for Machine

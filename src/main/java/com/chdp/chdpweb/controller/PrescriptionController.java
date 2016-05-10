@@ -435,14 +435,8 @@ public class PrescriptionController {
 			prsList = prsService.listPrsWithParams(process, hospitalId, pageNum);
 		}
 
-		List<Prescription> finalList = new ArrayList<Prescription>();
-
-		Iterator<Prescription> itr = prsList.iterator();
-		Prescription prs = null;
-		while (itr.hasNext()) {
-			prs = itr.next();
-			prs.setPhase_name(proService.getPhaseNamewithProcess(prs));
-			finalList.add(prs);
+		for(Prescription prsItem : prsList){
+			prsItem.setPhase_name(proService.getPhaseNamewithProcess(prsItem));
 		}
 
 		request.setAttribute("hospitalId", hospitalId);
@@ -450,9 +444,8 @@ public class PrescriptionController {
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
-
-		request.setAttribute("currentPrsList", finalList);
-		PageInfo<Prescription> page = new PageInfo<Prescription>(finalList);
+		request.setAttribute("currentPrsList", prsList);
+		PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
 		request.setAttribute("page", page);
 
 		return "prescription/currentPrsList";
@@ -478,7 +471,9 @@ public class PrescriptionController {
 		request.setAttribute("hospitalId", hospitalId);
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
-
+		List<Hospital> hospitalList = hospitalService.getHospitalList();
+		request.setAttribute("hospitalList", hospitalList);
+		
 		start = Utils.formatStartTime(start);
 		end = Utils.formatEndTime(end);
 
@@ -495,9 +490,6 @@ public class PrescriptionController {
 			PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
 			request.setAttribute("page", page);
 		}
-
-		List<Hospital> hospitalList = hospitalService.getHospitalList();
-		request.setAttribute("hospitalList", hospitalList);
 
 		return "prescription/historyPrsList";
 	}
@@ -520,7 +512,6 @@ public class PrescriptionController {
 		request.setAttribute("hospitalId", hospitalId);
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
-
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
 
@@ -530,27 +521,23 @@ public class PrescriptionController {
 		if (!Utils.validStartEndTime(start, end)) {
 			request.setAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
-			List<Hospital> newHospList = new ArrayList<Hospital>();
-			Iterator<Hospital> itr = hospitalList.iterator();
-			if (hospitalId == 0) {
-				int num = 0;
-				while (itr.hasNext()) {
-					Hospital temp = itr.next();
-					num = prsService.countPrsNumForHospital(temp.getId(), Constants.FINISH, start, end);
-					temp.setFinishedPrsNum(num);
-					newHospList.add(temp);
+			List<Hospital> returnHospitalList = hospitalService.getHospitalList();
+			List<Prescription> prsList = new ArrayList<Prescription>();
+			for (Hospital hospitalItem : returnHospitalList){
+				prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalItem.getId(), start, end);
+				int packetNum = 0;
+				int totalPrice = 0;
+				hospitalItem.setFinishedPrsNum(prsList.size());
+				for( Prescription item : prsList ){
+					packetNum += item.getPacket_num();
+					totalPrice += item.getPrice();
 				}
-			} else {
-				Hospital item = hospitalService.getHospitalById(hospitalId);
-				if (item != null) {
-					int num = prsService.countPrsNumForHospital(item.getId(), Constants.FINISH, start, end);
-					item.setFinishedPrsNum(num);
-					newHospList.add(item);
-				}
+				hospitalItem.setTotalPacketNum(packetNum);
+				hospitalItem.setTotalPrice(totalPrice);
 			}
 
-			Collections.sort(newHospList);
-			request.setAttribute("displayHospitalList", newHospList);
+			Collections.sort(returnHospitalList);
+			request.setAttribute("displayHospitalList", returnHospitalList);
 		}
 
 		return "prescription/hospitalDimension";

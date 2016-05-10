@@ -205,10 +205,19 @@ public class PrescriptionService {
 			return new ArrayList<Prescription>();
 		}
 	}
-
+	
+	//获取所有与指定医院相关，且订单处于某一特定阶段的处方列表
 	public List<Prescription> listPrsWithParamsAndTime(int process, int hospitalId, int pageNum, String start,
 			String end) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+		try {
+			return prsDao.getPrescriptionsByParamswithTime(process, hospitalId, start, end);
+		} catch (Exception e) {
+			return new ArrayList<Prescription>();
+		}
+	}
+	//获取所有与指定医院相关，且订单处于某一特定阶段的处方列表
+	public List<Prescription> listPrsWithParamsAndTime(int process, int hospitalId, String start, String end) {
 		try {
 			return prsDao.getPrescriptionsByParamswithTime(process, hospitalId, start, end);
 		} catch (Exception e) {
