@@ -1,13 +1,12 @@
 package com.chdp.chdpweb.controller;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,12 +25,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import com.chdp.chdpweb.service.HospitalService;
-import com.chdp.chdpweb.service.OrderService;
-import com.chdp.chdpweb.service.PrescriptionService;
-import com.chdp.chdpweb.service.ProcessService;
-import com.chdp.chdpweb.service.UserService;
-import com.github.pagehelper.PageInfo;
 import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.Hospital;
 import com.chdp.chdpweb.bean.Order;
@@ -39,7 +32,12 @@ import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.bean.User;
 import com.chdp.chdpweb.common.Utils;
 import com.chdp.chdpweb.printer.PrintHelper;
-import com.chdp.chdpweb.bean.Process;
+import com.chdp.chdpweb.service.HospitalService;
+import com.chdp.chdpweb.service.OrderService;
+import com.chdp.chdpweb.service.PrescriptionService;
+import com.chdp.chdpweb.service.ProcessService;
+import com.chdp.chdpweb.service.UserService;
+import com.github.pagehelper.PageInfo;
 
 @Controller
 @RequestMapping("/prescription")
@@ -59,21 +57,27 @@ public class PrescriptionController {
 	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)
 	@RequestMapping(value = "/add", method = RequestMethod.GET)
 	public String add(HttpServletRequest request) {
+		request.setAttribute("nav", "出库流程列表");
+
 		Prescription lastestPrs = prsService.getLastestPrs();
 		if (lastestPrs != null) {
 			request.setAttribute("lastestPrs", lastestPrs);
 		}
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
-		if (hospitalList.size() > 0) {
-			request.setAttribute("hospitalList", hospitalList);
-		}
+		request.setAttribute("hospitalList", hospitalList);
+
 		return "prescription/addPrescription";
 	}
 
 	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
-	public String addPost(HttpServletRequest request, Prescription prs) {
+	public String add(HttpServletRequest request, Prescription prs) {
+		request.setAttribute("nav", "出库流程列表");
+
+		List<Hospital> hospitalList = hospitalService.getHospitalList();
+		request.setAttribute("hospitalList", hospitalList);
+
 		if (prs.getPacket_num() == -1) {
 			prs.setPacket_num(request.getParameter("packet_num_other") == null ? 0
 					: Integer.parseInt(request.getParameter("packet_num_other")));
@@ -85,71 +89,25 @@ public class PrescriptionController {
 			priceNum = Double.parseDouble(price);
 		} catch (Exception e) {
 			request.setAttribute("errorMsg", "您输入的价格格式不正确，请重新输入！");
-			List<Hospital> hospitalList = hospitalService.getHospitalList();
-			request.setAttribute("hospitalList", hospitalList);
 
 			request.setAttribute("prsAdd", prs);
 			return "prescription/addPrescription";
 		}
-
 		prs.setPrice(priceNum);
-		String hospitalName = request.getParameter("hospital_name");
-		if (hospitalService.getHospitalIdByName(hospitalName) <= 0) {
-			request.setAttribute("errorMsg", "您输入的医院不存在，请联系管理员！");
-			List<Hospital> hospitalList = hospitalService.getHospitalList();
-			request.setAttribute("hospitalList", hospitalList);
-
-			request.setAttribute("prsAdd", prs);
-			return "prescription/addPrescription";
-		}
-		prs.setHospital_id(hospitalService.getHospitalIdByName(hospitalName));
-		prs.setHospital_name(hospitalName);
 
 		if (prsService.validPrescriptionHospitalInfo(prs)) {
 			request.setAttribute("errorMsg", "与此处方相同医院名称，相同订单编号的处方已经存在，请检查输入！");
 		} else {
-			SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-			String currentTime = df.format(new Date());
-			prs.setCreate_time(currentTime);
-
-			// 生成UUID，形如20160502213800386, 当前日期+三位随机数
-			int randomNum = (int) (Math.random() * 900) + 100;
-			String uuid = currentTime + String.valueOf(randomNum);
-			prs.setUuid(uuid);
-
-			// Set these values as default.
+			prs.setCreate_time(Utils.getCurrentDateAndTime());
+			prs.setUuid(Utils.generateUuid());
 			prs.setProcess(Constants.RECEIVE);
 
-			if (prsService.createPrescription(prs)) {
-				Prescription newPrs = prsService.getPrescriptionByUuid(prs.getUuid());
-				User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
-				Process newProcess = new Process();
-				newProcess.setProcess_type(Constants.RECEIVE);
-				newProcess.setUser_id(currentUser.getId());
-				newProcess.setPrescription_id(newPrs.getId());
-				newProcess.setBegin(currentTime);
-				newProcess.setPrevious_process_id(0);
-				int result = proService.createProccess(newProcess);
-				if (result != -1) {
-					newPrs.setProcess_id(newProcess.getId());
-					if (prsService.updatePrescriptionProcess(newPrs)) {
-						request.setAttribute("successMsg", "添加处方成功！");
-					} else {
-						request.setAttribute("errorMsg", "添加处方失败，请稍后重试！");
-						proService.deleteProcess(newProcess.getId());
-						prsService.deletePrescription(newPrs.getId());
-					}
-				} else {
-					request.setAttribute("errorMsg", "添加处方失败，请稍后重试！");
-					prsService.deletePrescription(newPrs.getId());
-				}
+			if (prsService.add(prs)) {
+				request.setAttribute("successMsg", "添加处方成功！");
 			} else {
 				request.setAttribute("errorMsg", "添加处方失败，请稍后重试！");
 			}
 		}
-
-		List<Hospital> hospitalList = hospitalService.getHospitalList();
-		request.setAttribute("hospitalList", hospitalList);
 
 		request.setAttribute("prsAdd", prs);
 		return "prescription/addPrescription";
@@ -158,7 +116,6 @@ public class PrescriptionController {
 	@RequiresRoles(value = { "ADMIN", "RECEIVE", "PACKAGE", "SHIP" }, logical = Logical.OR)
 	@RequestMapping(value = "/modify", method = RequestMethod.GET)
 	public String modify(HttpServletRequest request) {
-
 		String from = request.getParameter("from");
 		String prsIdStr = request.getParameter("prsId");
 
@@ -376,21 +333,8 @@ public class PrescriptionController {
 	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)
 	@RequestMapping(value = "/delete")
 	public String delete(HttpServletRequest request) {
-
 		String prsIdStr = request.getParameter("prsId");
 		String hospitalIdStr = request.getParameter("hospitalId");
-
-		int hospitalId = 0;
-		try {
-			hospitalId = Integer.parseInt(hospitalIdStr);
-		} catch (Exception e) {
-			hospitalId = 0;
-		}
-
-		List<Hospital> hospitalList = hospitalService.getHospitalList();
-		request.setAttribute("hospitalList", hospitalList);
-		request.setAttribute("hospitalId", hospitalId);
-		List<Prescription> prsList = null;
 
 		if (prsIdStr == null) {
 			request.setAttribute("errorMsg", "未知处方ID，无法删除！");
@@ -412,14 +356,8 @@ public class PrescriptionController {
 				request.setAttribute("errorMsg", "处方不存在，无法删除！");
 			}
 		}
-
-		if (hospitalId == 0) {
-			prsList = prsService.listPrsWithProcessNoUser(Constants.RECEIVE);
-		} else {
-			prsList = prsService.listPrsWithProHospitalNoUser(Constants.RECEIVE, hospitalId);
-		}
-		request.setAttribute("receiveList", prsList);
-		return "process/receiveList";
+		
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "process/receiveList?hospitalId=" + hospitalIdStr;
 	}
 
 	@RequiresRoles("ADMIN")

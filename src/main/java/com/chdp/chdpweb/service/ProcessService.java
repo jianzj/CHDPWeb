@@ -20,6 +20,7 @@ import com.chdp.chdpweb.bean.AppResult;
 import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.bean.Process;
 import com.chdp.chdpweb.bean.User;
+import com.chdp.chdpweb.common.Utils;
 
 @Repository
 public class ProcessService {
@@ -126,10 +127,8 @@ public class ProcessService {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		AppResult result = new AppResult();
 		try {
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String currentTime = df.format(new Date());
 			User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
-			proDao.finishProcess(procId, currentTime, user.getId());
+			proDao.finishProcess(procId, Utils.getCurrentDateAndTime(), user.getId());
 
 			try {
 				Process proc = new Process();
@@ -177,22 +176,20 @@ public class ProcessService {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		AppResult result = new AppResult();
 		try {
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String currentTime = df.format(new Date());
 			User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
 			if (forwardTo != Constants.DECOCT) {
 				if (machineId == 0)
-					proDao.finishProcess(procId, currentTime, user.getId());
+					proDao.finishProcess(procId, Utils.getCurrentDateAndTime(), user.getId());
 				else
-					proDao.finishProcessWithMachine(procId, currentTime, user.getId(), machineId);
+					proDao.finishProcessWithMachine(procId, Utils.getCurrentDateAndTime(), user.getId(), machineId);
 			} else
-				proDao.startProcess(procId, currentTime, user.getId());
+				proDao.startProcess(procId, Utils.getCurrentDateAndTime(), user.getId());
 
 			try {
 				if (forwardTo != Constants.SHIP) {
 					Process proc = new Process();
 					if (forwardTo != Constants.SOAK && forwardTo != Constants.DECOCT)
-						proc.setBegin(currentTime);
+						proc.setBegin(Utils.getCurrentDateAndTime());
 					proc.setProcess_type(forwardTo);
 					proc.setPrescription_id(prsId);
 					proc.setPrevious_process_id(procId);
@@ -258,15 +255,13 @@ public class ProcessService {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		AppResult result = new AppResult();
 		try {
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String currentTime = df.format(new Date());
 			User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
-			proDao.cancelProcess(procId, currentTime, user.getId(), type, reason);
+			proDao.cancelProcess(procId, Utils.getCurrentDateAndTime(), user.getId(), type, reason);
 
 			try {
 				Process proc = new Process();
 				if (backTo != Constants.SOAK && backTo != Constants.DECOCT)
-					proc.setBegin(currentTime);
+					proc.setBegin(Utils.getCurrentDateAndTime());
 				proc.setProcess_type(backTo);
 				proc.setPrescription_id(prsId);
 				proc.setPrevious_process_id(procId);
@@ -309,10 +304,8 @@ public class ProcessService {
 	public AppResult startProcess(int procId, int proc) {
 		AppResult result = new AppResult();
 		try {
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String currentTime = df.format(new Date());
 			User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
-			proDao.startProcess(procId, currentTime, user.getId());
+			proDao.startProcess(procId, Utils.getCurrentDateAndTime(), user.getId());
 			result.setSuccess(true);
 			return result;
 		} catch (Exception e) {
@@ -325,10 +318,8 @@ public class ProcessService {
 	public AppResult startProcessWithMachine(int procId, int proc, int machineId) {
 		AppResult result = new AppResult();
 		try {
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String currentTime = df.format(new Date());
 			User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
-			proDao.startProcessWithMachine(procId, currentTime, user.getId(), machineId);
+			proDao.startProcessWithMachine(procId, Utils.getCurrentDateAndTime(), user.getId(), machineId);
 			result.setSuccess(true);
 			return result;
 		} catch (Exception e) {

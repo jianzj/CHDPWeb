@@ -16,17 +16,17 @@
 	<form class="form-horizontal" action="<%=request.getContextPath()%>/prescription/add" method="POST">
 		<fieldset>
 			<div class="form-group">
-				<label for="hospital_name" class="control-label col-sm-4">医院</label>
+				<label for="hospital_id" class="control-label col-sm-4">医院</label>
 				<div class="col-sm-4 required">
 					<% if(request.getAttribute("hospitalList") != null){ %>
-					<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital_name" name="hospital_name">
+					<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital_id" name="hospital_id">
 						<% if(request.getAttribute("prsAdd") != null) { %>
 						<c:forEach var='hospital' items="${hospitalList}">
-							<c:if test="${prsAdd.hospital_name == hospital.name}">
-								<option value="${hospital.name}" selected>${hospital.name}</option>						
+							<c:if test="${prsAdd.hospital_id == hospital.id}">
+								<option value="${hospital.id}" selected>${hospital.name}</option>						
 							</c:if>
-							<c:if test="${prsAdd.hospital_name != hospital.name}">
-								<option value="${hospital.name}">${hospital.name}</option>						
+							<c:if test="${prsAdd.hospital_id != hospital.id}">
+								<option value="${hospital.id}">${hospital.name}</option>						
 							</c:if>
 						</c:forEach>
 						<% } else if (request.getAttribute("lastestPrs") != null){ %>

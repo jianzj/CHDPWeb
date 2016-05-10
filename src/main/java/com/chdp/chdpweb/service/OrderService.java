@@ -2,8 +2,6 @@ package com.chdp.chdpweb.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,7 @@ import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.AppResult;
 import com.chdp.chdpweb.bean.Order;
 import com.chdp.chdpweb.bean.User;
+import com.chdp.chdpweb.common.Utils;
 import com.chdp.chdpweb.dao.OrderDao;
 import com.chdp.chdpweb.dao.PrescriptionDao;
 import com.github.pagehelper.PageHelper;
@@ -55,18 +54,16 @@ public class OrderService {
         TransactionStatus status = transactionManager.getTransaction(def);
         AppResult result = new AppResult();
         try {
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String currentTime = df.format(new Date());
             User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
             Order order = new Order();
             order.setId(orderId);
-            order.setOutbound_time(currentTime);
+            order.setOutbound_time(Utils.getCurrentDateAndTime());
             order.setOutbound_user_id(user.getId());
             order.setStatus(Constants.ORDER_FINISH);
             orderDao.updateOutboundAction(order);
 
             try {
-                prsDao.finishPrescription(orderId, currentTime);
+                prsDao.finishPrescription(orderId, Utils.getCurrentDateAndTime());
             } catch (Exception e) {
             	transactionManager.rollback(status);
                 result.setErrorMsg("更新处方信息失败");

@@ -2,6 +2,7 @@ package com.chdp.chdpweb.dao;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -18,6 +19,7 @@ public interface PrescriptionDao {
 			+ "values(#{prs.uuid}, #{prs.outer_id}, #{prs.hospital_id}, #{prs.patient_name}, #{prs.sex}, #{prs.packet_num}, #{prs.price}, #{prs.create_time}, "
 			+ "#{prs.class_of_medicines}, #{prs.need_decoct_first}, #{prs.need_decoct_later}, #{prs.need_wrapped_decoct}, #{prs.need_take_drenched}, "
 			+ "#{prs.need_melt}, #{prs.need_decoct_alone}, #{prs.process}, #{prs.process_id})")
+	@Options(useGeneratedKeys = true, keyProperty = "prs.id")
 	int createPrescription(@Param("prs") Prescription prs);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "

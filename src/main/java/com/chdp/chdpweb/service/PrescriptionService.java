@@ -111,11 +111,31 @@ public class PrescriptionService {
 		}
 	}
 
-	public boolean createPrescription(Prescription prs) {
+	public boolean add(Prescription prs) {
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		TransactionStatus status = transactionManager.getTransaction(def);
+
 		try {
 			prsDao.createPrescription(prs);
+
+			User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
+
+			Process newProcess = new Process();
+			newProcess.setProcess_type(Constants.RECEIVE);
+			newProcess.setUser_id(currentUser.getId());
+			newProcess.setPrescription_id(prs.getId());
+			newProcess.setBegin(Utils.getCurrentDateAndTime());
+			newProcess.setPrevious_process_id(0);
+			processDao.createProcess(newProcess);
+
+			prs.setProcess_id(newProcess.getId());
+			prsDao.updatePrescriptionProcess(prs);
+
+			transactionManager.commit(status);
 			return true;
 		} catch (Exception e) {
+			transactionManager.rollback(status);
 			return false;
 		}
 	}
@@ -580,8 +600,6 @@ public class PrescriptionService {
 		try {
 			PrintHelper.startAndSetup();
 			for (Prescription prs : prsList) {
-				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				String currentTime = df.format(new Date());
 				User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
 				Process currentProcess = processDao.getProcessesById(prs.getProcess_id());
 
@@ -589,11 +607,11 @@ public class PrescriptionService {
 				newProcess.setProcess_type(Constants.CHECK);
 				newProcess.setUser_id(currentUser.getId());
 				newProcess.setPrescription_id(prs.getId());
-				newProcess.setBegin(currentTime);
+				newProcess.setBegin(Utils.getCurrentDateAndTime());
 				newProcess.setPrevious_process_id(prs.getProcess_id());
 				processDao.createProcess(newProcess);
 
-				currentProcess.setFinish(currentTime);
+				currentProcess.setFinish(Utils.getCurrentDateAndTime());
 				processDao.refreshProcessTime(currentProcess);
 
 				prs.setProcess(Constants.CHECK);
@@ -627,19 +645,11 @@ public class PrescriptionService {
 
 		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
 
-		// 生成UUID，形如20160502213800386, 当前日期+三位随机数
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-		String currentTime = df.format(new Date());
-		int randomNum = (int) (Math.random() * 900) + 100;
-		String uuid = currentTime + String.valueOf(randomNum);
-
-		df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		currentTime = df.format(new Date());
-
+		String uuid = Utils.generateUuid();
 		Order newOrder = new Order();
 		newOrder.setUuid(uuid);
 		newOrder.setHospital_id(hospitalId);
-		newOrder.setCreate_time(currentTime);
+		newOrder.setCreate_time(Utils.getCurrentDateAndTime());
 		newOrder.setCreate_user_id(currentUser.getId());
 		newOrder.setStatus(Constants.ORDER_BEGIN);
 
@@ -732,12 +742,6 @@ public class PrescriptionService {
 			lastRow = templateSt.getRow(templateSt.getLastRowNum());
 			lastRow.setHeightInPoints(25);
 
-			// 生成UUID，形如20160502213800386, 当前日期+三位随机数
-			int randomNum = (int) (Math.random() * 900) + 100;
-			df = new SimpleDateFormat("yyyyMMdd-HHmmss");
-			currentTime = df.format(new Date());
-			String uuid = currentTime + String.valueOf(randomNum);
-
 			Map<EncodeHintType, Object> hints = new HashMap<EncodeHintType, Object>();
 			hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
 			hints.put(EncodeHintType.MARGIN, 1);
@@ -762,7 +766,7 @@ public class PrescriptionService {
 					templateWb.addPicture(baos.toByteArray(), HSSFWorkbook.PICTURE_TYPE_JPEG));
 			picture.resize();
 
-			String newPath = Constants.TEMPPATH + hospital.getName() + "-" + uuid + ".xls";
+			String newPath = Constants.TEMPPATH + hospital.getName() + "-" + orderUuid + ".xls";
 			File newShipList = new File(newPath);
 			try {
 				newShipList.createNewFile();

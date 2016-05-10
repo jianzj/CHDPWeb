@@ -1,8 +1,5 @@
 package com.chdp.chdpweb;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class Constants {
 
 	public static final int PAGE_SIZE = 1;
@@ -81,58 +78,6 @@ public class Constants {
 		default:
 			return "未知";
 		}
-	}
-
-	public static String getDecoctTime(String start, String end, int decoct_type) {
-		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat sdf3 = new SimpleDateFormat("HH:mm");
-
-		if (end != null && start != null) {
-			try {
-				Date startDate = sdf1.parse(start);
-				Date endDate = sdf1.parse(end);
-				String dayStr = sdf2.format(endDate);
-				long time = endDate.getTime();
-				time = time - getHeatTime(decoct_type) * 60 * 1000;
-				Date newDate = new Date(time);
-				String timeStr = dayStr + " " + sdf3.format(startDate) + " - " + sdf3.format(newDate);
-				return timeStr;
-			} catch (Exception e) {
-				return "";
-			}
-		}
-
-		return "";
-	}
-
-	public static String getHeatTime(String end, int decoct_type) {
-
-		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat sdf3 = new SimpleDateFormat("HH:mm");
-
-		if (end != null) {
-			try {
-				Date endDate = sdf1.parse(end);
-				String dayStr = sdf2.format(endDate);
-				long time = endDate.getTime();
-				time = time - getHeatTime(decoct_type) * 60 * 1000;
-				Date newDate = new Date(time);
-				String timeStr = dayStr + " " + sdf3.format(newDate) + " - " + sdf3.format(endDate);
-				return timeStr;
-			} catch (Exception e) {
-				return "";
-			}
-		}
-
-		return "";
-	}
-
-	public static String getCurrentTime() {
-		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
-		Date date = new Date();
-		return sdf1.format(date);
 	}
 
 	public static int getHeatTime(int decoct_type) {
