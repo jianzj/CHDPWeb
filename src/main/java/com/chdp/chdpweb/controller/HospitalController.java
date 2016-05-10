@@ -81,7 +81,7 @@ public class HospitalController {
 			}
 		}
 		
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "hospital/hospitalList?pageNum=" + pageNum;
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../hospital/hospitalList?pageNum=" + pageNum;
 	}
 
 }

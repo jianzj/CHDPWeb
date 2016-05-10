@@ -102,7 +102,7 @@
 				<th>姓名</th>
 				<th>贴数</th>
 				<th>当前状态</th>
-				<!--<th>处理人员</th> -->
+				<th>操作</th>
 			</tr>
 		</thead>
 		<tbody>

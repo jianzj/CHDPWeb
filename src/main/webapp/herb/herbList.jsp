@@ -18,6 +18,7 @@
 				<th>中药类型</th>
 				<th>中药名称</th>
 				<th>中药描述</th>
+				<th>操作</th>
 			</tr>
 		</thead>
 		<tbody>

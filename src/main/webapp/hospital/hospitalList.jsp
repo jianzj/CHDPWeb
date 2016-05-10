@@ -16,7 +16,8 @@
 			<tr>
 				<th>ID</th>
 				<th>医院名称</th>
-				<th>医院简介</th>
+				<th>医院描述</th>
+				<th>操作</th>
 			</tr>
 		</thead>
 		<tbody>

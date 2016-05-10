@@ -77,7 +77,6 @@ body {
 
 .bs-wizard {margin-top: 40px;}
 
-/*Form Wizard*/
 .bs-wizard {border-bottom: solid 1px #e0e0e0; padding: 0 0 10px 0;}
 .bs-wizard > .bs-wizard-step {padding: 0; position: relative;}
 .bs-wizard > .bs-wizard-step + .bs-wizard-step {}
@@ -96,18 +95,32 @@ body {
 .bs-wizard > .bs-wizard-step:first-child  > .progress {left: 50%; width: 50%;}
 .bs-wizard > .bs-wizard-step:last-child  > .progress {width: 50%;}
 .bs-wizard > .bs-wizard-step.disabled a.bs-wizard-dot{ pointer-events: none; }
-/*END Form Wizard*/
 
-/**
- * Override feedback icon position
- * See http://formvalidation.io/examples/adjusting-feedback-icon-position/
- */
 #eventForm .form-control-feedback {
     top: 0;
     right: -15px;
 }
 
 </style>
+
+<script src="<%=request.getContextPath()%>/js/jquery-1.12.3.min.js"></script>
+<script src="<%=request.getContextPath()%>/js/bootstrap.min.js"></script>
+<script src="<%=request.getContextPath()%>/js/common.js"></script>
+<script src="<%=request.getContextPath() %>/js/bootstrap-select.js"></script>
+<script src="<%=request.getContextPath() %>/js/bootstrap-datepicker.js"></script>
+<script>
+$(document).ready(function() {
+    $('#hospital-datePicker-start')
+        .datepicker({
+            format: 'yyyy-mm-dd'
+        });
+    $('#hospital-datePicker-end')
+    .datepicker({
+        format: 'yyyy-mm-dd'
+    });
+});
+</script>
+    
 </head>
 <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">

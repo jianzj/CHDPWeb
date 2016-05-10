@@ -15,9 +15,11 @@
 		<thead>
 			<tr>
 				<th>ID</th>
-				<th>机器型号</th>
+				<th>机器类型</th>
 				<th>机器名称</th>
+				<th>关联灌装机</th>
 				<th>机器描述</th>
+				<th>操作</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -31,9 +33,11 @@
 						<td><c:out value="灌装机" /></td>
 					</c:if>
 					<td><c:out value="${machine.name}" /></td>
+					<td>
 					<c:if test="${machine.pour_machine_name !=null}">
-                        <td>${machine.pour_machine_name}</td>
+                        ${machine.pour_machine_name}
                     </c:if>
+                    </td>
 					<td><c:out value="${machine.description}" /></td>
 					<td width="190">
 						<div class="btn-group" role="group" aria-label="...">

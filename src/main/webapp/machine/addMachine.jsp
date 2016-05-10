@@ -24,7 +24,7 @@
 					</select>
 				</div>
 			</div>
-			<div id="pour_machine" class="<% if (request.getAttribute("machineAdd") == null || (request.getAttribute("machineAdd") != null && ((Machine)request.getAttribute("machineAdd")).getType() == Constants.FILLING_MACHINE)) out.print("hide"); %>">
+			<div id="pour_machine">
 				<div class="form-group">
 					<label for="pour_machine_id" class="control-label col-sm-4">关联的灌装机</label>
 					<div class="col-sm-4 required">
@@ -71,8 +71,14 @@
 
 </div>
 <script>
+if ($("#machine_type").val() == '<%=Constants.DECOCTION_MACHINE %>') {
+    $("#pour_machine").show();
+} else {
+    $("#pour_machine").hide();
+}
+
 $("#machine_type").change(function(){
-	if ($("#machine_type").val() == <%=Constants.DECOCTION_MACHINE %>) {
+	if ($("#machine_type").val() == '<%=Constants.DECOCTION_MACHINE %>') {
         $("#pour_machine").show();
     } else {
     	$("#pour_machine").hide();

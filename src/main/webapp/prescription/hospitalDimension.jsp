@@ -50,6 +50,7 @@
 				<th>总计</th>
 				<th>始于</th>
 				<th>止于</th>
+				<th>操作</th>
 			</tr>
 		</thead>
 		<tbody>

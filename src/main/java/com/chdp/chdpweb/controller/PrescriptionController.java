@@ -357,7 +357,7 @@ public class PrescriptionController {
 			}
 		}
 		
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "process/receiveList?hospitalId=" + hospitalIdStr;
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../process/receiveList?hospitalId=" + hospitalIdStr;
 	}
 
 	@RequiresRoles("ADMIN")
@@ -698,7 +698,7 @@ public class PrescriptionController {
 			request.setAttribute("errorMsg", "打印解放标签出错，请重试！");
 		}
 
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "process/receiveList?hospitalId=" + hospitalId;
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../process/receiveList?hospitalId=" + hospitalId;
 	}
 
 	// 打印包装标签
@@ -722,7 +722,7 @@ public class PrescriptionController {
 		PrintHelper.close();
 		request.setAttribute("successMsg", "打印完成！");
 
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "process/packageList?hospitalId=" + hospitalId;
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../process/packageList?hospitalId=" + hospitalId;
 	}
 
 	// 生成出货清单

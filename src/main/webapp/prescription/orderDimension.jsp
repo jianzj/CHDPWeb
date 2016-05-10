@@ -49,6 +49,7 @@
 				<th>创建人</th>
 				<th>运送人</th>
 				<th>包含处方数</th>
+				<th>操作</th>
 			</tr>
 		</thead>
 		<tbody>

@@ -128,7 +128,7 @@ public class UserController {
 			}
 		}
 
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "user/userList?pageNum=" + pageNum;
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../user/userList?pageNum=" + pageNum;
 	}
 
 	@RequiresRoles("ADMIN")
@@ -146,7 +146,7 @@ public class UserController {
 				request.setAttribute("errorMsg", "重置用户密码失败");
 		}
 
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "user/userList?pageNum=" + pageNum;
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../user/userList?pageNum=" + pageNum;
 	}
 
 	@RequiresRoles("ADMIN")

@@ -50,6 +50,7 @@
 				<th>贴数</th>
 				<th>当前状态</th>
 				<th>结束时间</th>
+				<th>操作</th>
 			</tr>
 		</thead>
 		<tbody>

@@ -11,7 +11,7 @@ public class EZioLib
 {
 	public interface API extends Library
 	{	
-		String path = new ClassPathResource("Ezio64.dll").getPath();
+		String path = new ClassPathResource("EZio64.dll").getPath();
 		API INSTANCE = (API) Native.loadLibrary(path, API.class);
 		
 		public int openport(String strPort);

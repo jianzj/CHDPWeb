@@ -85,7 +85,7 @@ public class HerbController {
 		PageInfo<Herb> page = new PageInfo<Herb>(herbList);
 		request.setAttribute("page", page);
 
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "herb/herbList?pageNum=" + pageNum;
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../herb/herbList?pageNum=" + pageNum;
 	}
 
 }
