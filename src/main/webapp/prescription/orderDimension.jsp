@@ -47,19 +47,23 @@
 				<th>出货单编号</th>
 				<th>医院</th>
 				<th>创建人</th>
-				<th>运送人</th>
-				<th>包含处方数</th>
+				<th>出库人</th>
+				<th>处方数</th>
+				<th>贴数</th>
+				<th>金额</th>
 				<th>操作</th>
 			</tr>
 		</thead>
 		<tbody>
-			<c:forEach var="order" items="${displayOrderList}">
+			<c:forEach var="order" items="${currentOrderList}">
 				<tr>
 					<td><c:out value="${order.uuid}" /></td>
 					<td><c:out value="${order.hospital_name}" /></td>
 					<td><c:out value="${order.create_user_name}" /></td>
 					<td><c:out value="${order.outbound_user_name}" /></td>
 					<td><c:out value="${order.prs_num}" /></td>
+					<td><c:out value="${order.packet_num}" /></td>
+					<td><c:out value="${order.price_total}" /></td>
 					<c:if test="${order.prs_num > 0}">
 					<td width="100">
 						<div class="btn-group" role="group" aria-label="...">
@@ -85,14 +89,10 @@
 	<% } %>
 	<% if (request.getAttribute("startTime") != null){ %>
 		<% request.setAttribute("startTime", (String)request.getAttribute("startTime")); %>
-	<% }else{ %>
-		<% request.setAttribute("startTime", Constants.DEFAULT_START ); %>
 	<% } %>
 	<% if (request.getAttribute("endTime") != null){ %>
 		<% request.setAttribute("endTime", (String)request.getAttribute("endTime")); %>
-	<% }else{ %>
-		<% request.setAttribute("endTime", Constants.DEFAULT_END); %>
-	<% } %>
+	<% }%>
 	<c:set var="pageUrl" value="prescription/orderDimensionList" />
 	<%@ include file="../common/nav.jsp"%>
 </div>

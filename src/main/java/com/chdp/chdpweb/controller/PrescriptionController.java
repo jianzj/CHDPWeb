@@ -3,7 +3,6 @@ package com.chdp.chdpweb.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -461,7 +460,14 @@ public class PrescriptionController {
 		if (!Utils.validStartEndTime(start, end)) {
 			request.setAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
-			List<Hospital> returnHospitalList = hospitalService.getHospitalList();
+			List<Hospital> returnHospitalList = new ArrayList<Hospital>();
+			if (hospitalId == 0){
+				returnHospitalList = hospitalService.getHospitalList();
+			}else{
+				Hospital hospital = hospitalService.getHospitalById(hospitalId);
+				returnHospitalList.add(hospital);
+			}
+			
 			List<Prescription> prsList = new ArrayList<Prescription>();
 			for (Hospital hospitalItem : returnHospitalList) {
 				prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalItem.getId(), start, end);
@@ -493,51 +499,59 @@ public class PrescriptionController {
 
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
-
+		if (start == null || start.equals("")) {
+			start = Utils.getOneMonthAgoTime();
+		}
+		if (end == null || end.equals("")) {
+			end = Utils.getCurrentTime();
+		}
+		
 		request.setAttribute("hospitalId", hospitalId);
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
-
-		if (start == null || start.equals("")) {
-			start = Utils.getMinTime();
-		}
-		if (end == null || end.equals("")) {
-			end = Utils.getMinTime();
-		}
-
+		List<Hospital> hospitalList = hospitalService.getHospitalList();
+		request.setAttribute("hospitalList", hospitalList);
+		
 		start = Utils.formatStartTime(start);
 		end = Utils.formatEndTime(end);
 
-		List<Hospital> hospitalList = hospitalService.getHospitalList();
-
-		List<Order> orderList = orderService.listOrderFinished(hospitalId, start, end, pageNum);
-		List<Order> finalOrderList = new ArrayList<Order>();
-
-		Iterator<Order> itr = orderList.iterator();
-		Order item = null;
-		while (itr.hasNext()) {
-			item = itr.next();
-			int prsNum = orderService.countPrsNumInOrder(item.getId());
-			item.setPrs_num(prsNum);
-			item.setCreate_user_name(userService.getUserById(item.getCreate_user_id()).getName());
-			item.setOutbound_user_name(userService.getUserById(item.getOutbound_user_id()).getName());
-			finalOrderList.add(item);
+		if (!Utils.validStartEndTime(start, end)) {
+			request.setAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
+			request.setAttribute("page", new PageInfo<Order>(new ArrayList<Order>()));
+		} else {
+			List<Order> orderList = orderService.listOrderFinished(hospitalId, start, end, pageNum);
+			List<Prescription> prsList = null;
+			for (Order order : orderList){
+				prsList = prsService.getPrsListByOrderId(order.getId(), start, end);
+				order.setPrs_num(prsList.size());
+				int packet_num = 0;
+				double price_total = 0;
+				for (Prescription item : prsList){
+					packet_num += item.getPacket_num();
+					price_total += item.getPrice();
+				}
+				order.setPacket_num(packet_num);
+				order.setPrice_total(price_total);
+				order.setCreate_user_name(userService.getUserById(order.getCreate_user_id()).getName());
+				order.setOutbound_user_name(userService.getUserById(order.getOutbound_user_id()).getName());
+			}
+			Collections.sort(orderList);
+			PageInfo<Order> page = new PageInfo<Order>(orderList);
+			request.setAttribute("page", page);
+			request.setAttribute("currentOrderList", orderList);
 		}
 
-		Collections.sort(finalOrderList);
-		request.setAttribute("hospitalList", hospitalList);
-		PageInfo<Order> page = new PageInfo<Order>(finalOrderList);
-		request.setAttribute("page", page);
-
-		request.setAttribute("displayOrderList", finalOrderList);
 		return "prescription/orderDimension";
 	}
 
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/userDimensionList", method = RequestMethod.GET)
 	public String listUserDimension(HttpServletRequest request,
-			@RequestParam(value = "userAuth", defaultValue = "0") int userAuth) {
+			@RequestParam(value = "userAuth", defaultValue = "0") int userAuth,
+			@RequestParam(value = "pageNum", defaultValue = "1") int pageNum) {
 
+		request.setAttribute("nav", "员工维度统计");
+		
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
 
@@ -557,8 +571,9 @@ public class PrescriptionController {
 
 		if (!Utils.validStartEndTime(start, end)) {
 			request.setAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
+			request.setAttribute("page", new PageInfo<User>(new ArrayList<User>()));
 		} else {
-			List<User> userList = prsService.getUserListForPrsSummary(userAuth, start, end);
+			List<User> userList = prsService.getUserListForPrsSummary(userAuth, start, end, pageNum);
 			Collections.sort(userList);
 			request.setAttribute("finalUserList", userList);
 		}
@@ -590,6 +605,8 @@ public class PrescriptionController {
 
 		if (from.equals("USER") && userId == 0) {
 			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
+		}else if (from.equals("ORDER") && orderId == 0){
+			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
 		}
 
 		request.setAttribute("startTime", start);
@@ -609,6 +626,10 @@ public class PrescriptionController {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/hospitalDimensionList";
 			} else if (from.equals("USER")) {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
+			} else if (from.equals("ORDER")) {
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
+			}else{
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/currentList";
 			}
 		}
 
@@ -618,6 +639,8 @@ public class PrescriptionController {
 			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalId, pageNum, start, end);
 		} else if (from.equals("USER")) {
 			prsList = prsService.listPrsByUser(userAuth, userId, start, end);
+		} else if (from.equals("ORDER")){
+			prsList = prsService.getPrsListByOrderId(orderId, start, end, pageNum);
 		} else {
 			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalId, pageNum, start, end);
 		}

@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page import="com.chdp.chdpweb.Constants" %>
+<%@ page import="com.chdp.chdpweb.common.Utils" %>
 <%@ include file="../head.jsp"%>
 
 <form class="form-inline" action="<%=request.getContextPath()%>/prescription/userDimensionList" method="GET">
@@ -97,8 +98,12 @@
 			<tr>
 				<th>工号</th>
 				<th>姓名</th>
-				<th>职位</th>
 				<th>完成</th>
+				<th>5帖</th>
+				<th>7帖</th>
+				<th>10帖</th>
+				<th>14帖</th>
+				<th>其他贴数</th>
 				<th>出错</th>
 				<th>始于</th>
 				<th>止于</th>
@@ -110,7 +115,6 @@
 				<tr>
 					<td><c:out value="${user.usercode}" /></td>
 					<td><c:out value="${user.name}" /></td>
-					<td><c:out value="${user.position}"/></td>
 					<td><c:out value="${user.done_prs_num}" /></td>
 					<td><c:out value="${user.error_num}" /></td>
 					<% if(request.getAttribute("startTime") == null || ((String)request.getAttribute("startTime")).equals("")){ %>
@@ -119,7 +123,7 @@
 					<td><c:out value="${startTime}" /></td>
 					<% } %>
 					<% if (request.getAttribute("endTime") == null || ((String)request.getAttribute("endTime")).equals(Constants.DEFAULT_END)){ %>
-					<td><%=Constants.getCurrentTime() %></td>
+					<td><%=Utils.getCurrentTime() %></td>
 					<% }else{ %>
 					<td><c:out value="${endTime}" /></td>
 					<% } %>

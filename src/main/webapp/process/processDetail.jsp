@@ -72,7 +72,6 @@
 		 		处理人: <%=node.getResolvedBy() %><br/>
 		 		<% }else{ %>
 		 		等待处理<br/>
-		 		处理人: <%=node.getResolvedBy() %><br/>
 		 		<% } %>
 			 	<% if (node.getErrorStatus() != 0){ %>
 			 	流程回退: <%=Constants.getErrorName(node.getErrorStatus()) %><br/>

@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ page import="com.chdp.chdpweb.common.Utils" %>
 <%@ page import="com.chdp.chdpweb.Constants" %>
 <%@ include file="../head.jsp"%>
 
@@ -62,11 +63,7 @@
 					<td><c:out value="${hosp2.totalPacketNum}" /></td>
 					<td><c:out value="${hosp2.totalPrice}" /></td>
 					<td><c:out value="${startTime}" /></td>
-					<% if (request.getAttribute("endTime") == null || ((String)request.getAttribute("endTime")).equals(Constants.DEFAULT_END)){ %>
-					<td><%=Constants.getCurrentTime() %></td>
-					<% }else{ %>
 					<td><c:out value="${endTime}" /></td>
-					<% } %>
 					<c:if test="${hosp2.finishedPrsNum > 0}">
 					<td width="100">
 						<div class="btn-group" role="group" aria-label="...">

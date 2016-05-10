@@ -201,4 +201,11 @@ public interface PrescriptionDao {
 			+ "need_decoct_alone = #{prs.need_decoct_alone}, decoct_alone_list = #{prs.decoct_alone_list, jdbcType=LONGVARCHAR}"
 			+ " where id = #{prs.id}")
 	int updatePrescription(@Param("prs") Prescription prs);
+	
+	/**--------------------------------------------------------------------**/
+	// List all finished prescriptions by orderId
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h  where p.process = " + Constants.FINISH + " and " +
+				"h.id = #{hospitalId} and p.process_id = #{orderId} and p.hospital_id = h.id " +
+				"and create_time >= #{startTime} and finish_time <= #{endTime}")
+	List<Prescription> getPrsListByOrderId(@Param("orderId") int orderId, @Param("hospitalId") int hospitalId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 }

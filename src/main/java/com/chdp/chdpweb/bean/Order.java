@@ -18,6 +18,8 @@ public class Order implements Comparable<Order> {
     private int prs_num;
     private String create_user_name;
     private String outbound_user_name;
+    private double price_total;
+    private int packet_num;
     
     public int getId() {
         return id;
@@ -129,6 +131,22 @@ public class Order implements Comparable<Order> {
     
     public void setOutbound_user_name(String user_name){
     	this.outbound_user_name = user_name;
+    }
+  
+    public double getPrice_total(){
+    	return price_total;
+    }
+    
+    public void setPrice_total(double priceTotal){
+    	this.price_total = priceTotal;
+    }
+    
+    public int getPacket_num(){
+    	return packet_num;
+    }
+    
+    public void setPacket_num(int num){
+    	this.packet_num = num;
     }
     
     public int compareTo(Order another){

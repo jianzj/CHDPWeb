@@ -477,15 +477,27 @@ public class PrescriptionService {
 	}
 
 	// 获得用户维度的处方列表
-	public List<User> getUserListForPrsSummary(int userAuth, String start, String end) {
+	public List<User> getUserListForPrsSummary(int userAuth, String start, String end, int pageNum) {
 		try {
 			List<User> userList = null;
 			if (userAuth == 0) {
 				userList = userDao.getUserList();
-				// userList = userDao.getUserListWithoutAdmin();
 			} else {
 				userList = userDao.getUserListWithAuth(userAuth);
 			}
+			
+			for (User user : userList){
+				int prsNum = 0;
+				int fivePacketNum = 0;
+				int sevenPacketNum = 0;
+				int tenPacketNum = 0;
+				int fourteenPacketNum = 0;
+				int otherPacketNum = 0;
+				int errorNum = 0;
+				
+				
+			}
+			
 			List<User> finalUserList = new ArrayList<User>();
 			Iterator<User> itr = userList.iterator();
 			User user = null;
@@ -783,6 +795,28 @@ public class PrescriptionService {
 			return true;
 		} catch (Exception e) {
 			return false;
+		}
+	}
+	
+	/** ------------------------------------------------------------------**/
+	 //根据出库单ID获取所属的处方List
+	public List<Prescription> getPrsListByOrderId(int orderId, String start, String end){
+		try{
+			Order order = orderDao.getOrderById(orderId);
+			return prsDao.getPrsListByOrderId(order.getId(), order.getHospital_id(), start, end);
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	 //根据出库单ID获取所属的处方List, 用于分页
+	public List<Prescription> getPrsListByOrderId(int orderId, String start, String end, int pageNum){
+		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+		try{
+			Order order = orderDao.getOrderById(orderId);
+			return prsDao.getPrsListByOrderId(order.getId(), order.getHospital_id(), start, end);
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
 		}
 	}
 }

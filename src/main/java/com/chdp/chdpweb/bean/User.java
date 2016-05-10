@@ -12,6 +12,11 @@ public class User implements Comparable<User>{
 	
 	private String position;
 	private int done_prs_num;
+	private int prs_five_packet_num;
+	private int prs_seven_packet_num;
+	private int prs_ten_packet_num;
+	private int prs_fourteen_packet_num;
+	private int prt_other_packet_num;
 	private int error_num;
 	
 	public int getId() {
@@ -138,4 +143,45 @@ public class User implements Comparable<User>{
 			return 0;
 		}
 	}
+	
+	public int getPrs_five_packet_num(){
+		return prs_five_packet_num;
+	}
+	
+	public void setPrs_five_packet_num(int num){
+		this.prs_five_packet_num = num;
+	}
+
+	public int getPrs_seven_packet_num(){
+		return prs_seven_packet_num;
+	}
+	
+	public void setPrs_seven_packet_num(int num){
+		this.prs_seven_packet_num = num;
+	}
+
+	public int getPrs_ten_packet_num(){
+		return prs_ten_packet_num;
+	}
+	
+	public void setPrs_ten_packet_num(int num){
+		this.prs_ten_packet_num = num;
+	}
+	
+	public int getPrs_fourteen_packet_num(){
+		return prs_fourteen_packet_num;
+	}
+	
+	public void setPrs_fourteen_packet_num(int num){
+		this.prs_fourteen_packet_num = num;
+	}
+	
+	public int getPrs_other_packet_num(){
+		return prt_other_packet_num;
+	}
+	
+	public void setPrs_other_packet_num(int num){
+		this.prt_other_packet_num = num;
+	}
+
 }

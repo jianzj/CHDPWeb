@@ -432,8 +432,10 @@ public class ProcessService {
 				node.setNodeTypeName(Utils.getProcessName(process.getProcess_type()));
 				node.setStartTime(process.getBegin());
 				node.setSpecialDisplay(false);
+				node.setErrorStatus(process.getError_type());
+				node.setErrorMsg(process.getError_msg());
 				if (process.getProcess_type() == Constants.DECOCT || process.getProcess_type() == Constants.SOAK || process.getProcess_type() == Constants.POUR
-						|| process.getProcess_type() == Constants.CLEAN || process.getProcess_type() == Constants.SHIP){
+						|| process.getProcess_type() == Constants.CLEAN || process.getProcess_type() == Constants.SHIP || process.getProcess_type() == Constants.MIX){
 					node.setSpecialDisplay(true);
 				}
 				if (process.getFinish() == null){
@@ -451,17 +453,7 @@ public class ProcessService {
 				}
 				nodeList.add(node);
 			}
-			
-			for (Process item1 : processList){
-				for (Node item2 : nodeList){
-					
-					if (item1.getPrevious_process_id() == item2.getNodeId() && item1.getError_type() != 0){
-						item2.setErrorStatus(item1.getError_type());
-						item2.setErrorMsg(item1.getError_msg());
-					}
-				}
-			}
-			
+
 			Node shipNode = new Node();
 			if (prs.getProcess() >= Constants.SHIP){
 				shipNode.setNodeId(prs.getProcess_id());
