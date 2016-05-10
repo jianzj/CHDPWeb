@@ -13,13 +13,17 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import com.chdp.chdpweb.dao.OrderDao;
 import com.chdp.chdpweb.dao.PrescriptionDao;
 import com.chdp.chdpweb.dao.ProcessDao;
+import com.chdp.chdpweb.dao.UserDao;
 import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.AppResult;
 import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.bean.Process;
 import com.chdp.chdpweb.bean.User;
+import com.chdp.chdpweb.bean.Node;
+import com.chdp.chdpweb.bean.Order;
 import com.chdp.chdpweb.common.Utils;
 
 @Repository
@@ -34,6 +38,11 @@ public class ProcessService {
 	@Autowired
 	private DataSourceTransactionManager transactionManager;
 
+	@Autowired
+	private OrderDao orderDao;
+	@Autowired
+	private UserDao userDao;
+	
 	public int createProccess(Process newProcess) {
 		try {
 			return proDao.createProcess(newProcess);
@@ -69,7 +78,6 @@ public class ProcessService {
 
 	public List<Process> getProcessChainWithProcessId(int id) {
 		List<Process> list = new ArrayList<Process>();
-
 		try {
 			Process prs = proDao.getProcessesById(id);
 			if (prs.getPrevious_process_id() > 0) {
@@ -401,5 +409,98 @@ public class ProcessService {
 			return "未知状态";
 		}
 
+	}
+	
+	//获取一个订单的所有节点状态
+	public List<Node> getPrsWorkFlowNods(Prescription prs){
+		try{
+			List<Node> nodeList = new ArrayList<Node>();
+			
+			List<Process> processList = new ArrayList<Process>();
+			if (prs.getProcess() < Constants.SHIP){
+				processList = this.getProcessChainWithProcessId(prs.getProcess_id());
+			} else {
+				Process temp = proDao.getProcesswithPrsIdandProcess(prs.getId(), Constants.PACKAGE);
+				processList = this.getProcessChainWithProcessId(temp.getId());
+			}
+			
+			System.out.println(processList.size());
+			
+			for (Process process : processList){
+				Node node = new Node();
+				node.setResolvedBy(process.getUser_name());
+				node.setNodeId(process.getId());
+				node.setNodeType(process.getProcess_type());
+				node.setNodeTypeName(Utils.getProcessName(process.getProcess_type()));
+				node.setStartTime(process.getBegin());
+				node.setSpecialDisplay(false);
+				if (process.getProcess_type() == Constants.DECOCT || process.getProcess_type() == Constants.SOAK
+						|| process.getProcess_type() == Constants.CLEAN || process.getProcess_type() == Constants.SHIP){
+					node.setSpecialDisplay(true);
+				}
+				if (process.getFinish() == null){
+					node.setStatus(1);
+				}else{
+					node.setStatus(2);
+					node.setEndTime(process.getFinish());
+					if (process.getProcess_type() == Constants.DECOCT){
+						node.setDecoctTime(Utils.getDecoctTime(node.getStartTime(), node.getEndTime(), prs.getClass_of_medicines()));
+						node.setHeatTime(Utils.getHeatTime(node.getEndTime(), prs.getClass_of_medicines()));
+						node.setMachineName(process.getMachine_name());
+					}else if (process.getProcess_type() == Constants.SOAK){
+						node.setMachineName(process.getMachine_name());
+					}
+				}
+				nodeList.add(node);
+			}
+			
+			for (Process item1 : processList){
+				for (Node item2 : nodeList){
+					if (item1.getPrevious_process_id() == item2.getNodeId() && item2.getErrorStatus() != 0){
+						item2.setErrorStatus(item1.getError_type());
+						item2.setErrorMsg(item1.getError_msg());
+					}
+				}
+			}
+			
+			Node shipNode = new Node();
+			if (prs.getProcess() >= Constants.SHIP){
+				shipNode.setNodeId(prs.getProcess_id());
+				shipNode.setNodeType(Constants.SHIP);
+				shipNode.setNodeTypeName(Utils.getProcessName(Constants.SHIP));
+				shipNode.setSpecialDisplay(true);
+				shipNode.setErrorStatus(0);
+				shipNode.setStatus(1);
+				if (prs.getProcess() == Constants.FINISH){
+					shipNode.setStatus(2);
+				}
+				if (prs.getProcess_id() == -1){
+					shipNode.setOrderStatus("等待出库");
+				}else{
+					Order order = orderDao.getOrderById(prs.getProcess_id());
+					shipNode.setStartTime(order.getCreate_time());
+					if (order.getStatus() == 1){
+						shipNode.setOrderStatus("等待出库");
+					}else {
+						shipNode.setOrderStatus("已出库");
+						shipNode.setEndTime(order.getOutbound_time());
+					}
+					shipNode.setResolvedBy(userDao.getUserById(order.getCreate_user_id()).getName());
+				}
+			}
+			nodeList.add(shipNode);
+			
+			//统计订单中所有未完成部分
+			for (int i = prs.getProcess(); i < Constants.FINISH ; i++){
+				Node node = new Node();
+				node.setStatus(0);
+				node.setNodeTypeName(Utils.getProcessName(i));
+				nodeList.add(node);
+			}
+			
+			return nodeList;
+		} catch (Exception e){
+			return new ArrayList<Node>();
+		}
 	}
 }

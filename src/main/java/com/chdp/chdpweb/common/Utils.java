@@ -195,4 +195,34 @@ public class Utils {
 		String currentTime = df.format(new Date());
 		return currentTime + String.valueOf(randomNum);
 	}
+	
+	public static String getProcessName(int process) {
+		switch (process) {
+		case Constants.RECEIVE:
+			return "接方";
+		case Constants.CHECK:
+			return "审方";
+		case Constants.MIX:
+			return "调配";
+		case Constants.MIXCHECK:
+			return "调配审核";
+		case Constants.SOAK:
+			return "浸泡";
+		case Constants.DECOCT:
+			return "煎煮";
+		case Constants.POUR:
+			return "灌装";
+		case Constants.CLEAN:
+			return "清场";
+		case Constants.PACKAGE:
+			return "包装";
+		case Constants.SHIP:
+			return "运输";
+		case Constants.FINISH:
+			return "完成";
+		default:
+			return "未知";
+		}
+	}
+
 }

@@ -1,5 +1,7 @@
 package com.chdp.chdpweb.bean;
 
+import java.text.SimpleDateFormat;
+
 public class Process {
 
 	private int id;
@@ -32,7 +34,15 @@ public class Process {
 	}
 
 	public String getBegin() {
-		return begin;
+		try{
+			if (begin != null){
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				begin = sdf.format(sdf.parse(begin));
+			}
+			return begin;
+		}catch (Exception e){
+			return begin;
+		}
 	}
 
 	public void setBegin(String begin) {
@@ -40,7 +50,15 @@ public class Process {
 	}
 
 	public String getFinish() {
-		return finish;
+		try{
+			if (finish != null){
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				finish = sdf.format(sdf.parse(finish));
+			}
+			return finish;
+		}catch (Exception e){
+			return finish;
+		}
 	}
 
 	public void setFinish(String finish) {

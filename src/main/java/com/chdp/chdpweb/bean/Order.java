@@ -1,5 +1,7 @@
 package com.chdp.chdpweb.bean;
 
+import java.text.SimpleDateFormat;
+
 public class Order implements Comparable<Order> {
 
     private int id;
@@ -42,7 +44,15 @@ public class Order implements Comparable<Order> {
     }
 
     public String getCreate_time() {
-        return create_time;
+		try{
+			if (create_time != null){
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				create_time = sdf.format(sdf.parse(create_time));
+			}
+			return create_time;
+		}catch (Exception e){
+			return create_time;
+		}
     }
 
     public void setCreate_time(String create_time) {
@@ -58,7 +68,15 @@ public class Order implements Comparable<Order> {
     }
 
     public String getOutbound_time() {
-        return outbound_time;
+		try{
+			if (outbound_time != null){
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				outbound_time = sdf.format(sdf.parse(outbound_time));
+			}
+			return outbound_time;
+		}catch (Exception e){
+			return outbound_time;
+		}
     }
 
     public void setOutbound_time(String outbound_time) {

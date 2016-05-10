@@ -1,5 +1,6 @@
 package com.chdp.chdpweb.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.Hospital;
 import com.chdp.chdpweb.bean.Order;
+import com.chdp.chdpweb.bean.Node;
 import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.service.HospitalService;
 import com.chdp.chdpweb.service.OrderService;
@@ -115,26 +117,11 @@ public class ProcessController {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
 			}
 		}
-		request.setAttribute("from", from);
-
+		
 		Prescription prs = prsService.getPrsNoUser(prsId);
-		int processId = 0;
-		int orderId = -1;
-		if (prs.getProcess() < Constants.SHIP) {
-			processId = prs.getProcess_id();
-		} else {
-			processId = prsService.getLastestProcIdwithPrsandProcess(prs.getId(), Constants.SHIP);
-			orderId = prs.getProcess_id();
-		}
-
-		List<Process> processList = proService.getProcessChainWithProcessId(processId);
-		request.setAttribute("processList", processList);
+		List<Node> nodeList = proService.getPrsWorkFlowNods(prs);
+		request.setAttribute("nodeList", nodeList);
 		request.setAttribute("currentPrs", prs);
-
-		if (orderId > 0) {
-			Order order = orderService.getOrder(orderId);
-			request.setAttribute("shipOrder", order);
-		}
 
 		return "process/processDetail";
 	}
