@@ -32,6 +32,7 @@ public class UserController {
 	public String login() {
 		if (SecurityUtils.getSubject().isAuthenticated())
 			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/";
+		
 		return "user/login";
 	}
 
@@ -39,7 +40,7 @@ public class UserController {
 	public String login(HttpServletRequest request) {
 		String usercode = request.getParameter("usercode");
 		String password = request.getParameter("password");
-		
+
 		UsernamePasswordToken token = new UsernamePasswordToken(usercode,
 				userService.encodePassword(usercode, password));
 		Subject currentUser = SecurityUtils.getSubject();
@@ -95,13 +96,16 @@ public class UserController {
 	}
 
 	@RequiresRoles("ADMIN")
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	@RequestMapping(value = "/list")
 	public String list(HttpServletRequest request, @RequestParam(name = "pageNum", defaultValue = "1") int pageNum) {
 		request.setAttribute("nav", "用户管理");
+		
 		List<User> userList = userService.getUserList(pageNum);
 		request.setAttribute("userList", userList);
+		
 		PageInfo<User> page = new PageInfo<User>(userList);
 		request.setAttribute("page", page);
+		
 		return "user/userList";
 	}
 
@@ -124,12 +128,7 @@ public class UserController {
 			}
 		}
 
-		List<User> userList = userService.getUserList(pageNum);
-		request.setAttribute("userList", userList);
-		PageInfo<User> page = new PageInfo<User>(userList);
-		request.setAttribute("page", page);
-
-		return "user/userList";
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "user/userList?pageNum=" + pageNum;
 	}
 
 	@RequiresRoles("ADMIN")
@@ -147,12 +146,7 @@ public class UserController {
 				request.setAttribute("errorMsg", "重置用户密码失败");
 		}
 
-		List<User> userList = userService.getUserList(pageNum);
-		request.setAttribute("userList", userList);
-		PageInfo<User> page = new PageInfo<User>(userList);
-		request.setAttribute("page", page);
-
-		return "user/userList";
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "user/userList?pageNum=" + pageNum;
 	}
 
 	@RequiresRoles("ADMIN")
@@ -166,6 +160,7 @@ public class UserController {
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public String addPost(HttpServletRequest request, User user) {
 		request.setAttribute("nav", "用户管理");
+		
 		String rePassword = request.getParameter("rePassword");
 		user.setAuthority((request.getParameter("authority-1024") == null ? 0 : 1024)
 				| (request.getParameter("authority-512") == null ? 0 : 512)
@@ -192,6 +187,7 @@ public class UserController {
 			}
 		}
 		request.setAttribute("userAdd", user);
+		
 		return "user/addUser";
 	}
 
@@ -199,6 +195,7 @@ public class UserController {
 	@RequestMapping(value = "/modify", method = RequestMethod.GET)
 	public String modify(HttpServletRequest request, @RequestParam(name = "userId") Integer userId) {
 		request.setAttribute("nav", "用户管理");
+		
 		if (userId == null)
 			request.setAttribute("errorMsg", "未知的用户ID");
 		else
@@ -211,6 +208,7 @@ public class UserController {
 	@RequestMapping(value = "/modify", method = RequestMethod.POST)
 	public String modifyPost(HttpServletRequest request, @RequestParam(name = "userId") Integer userId) {
 		request.setAttribute("nav", "用户管理");
+		
 		if (userId == null)
 			request.setAttribute("errorMsg", "未知的用户ID");
 		else {
@@ -235,6 +233,7 @@ public class UserController {
 
 			request.setAttribute("userModify", user);
 		}
+		
 		return "user/modifyUser";
 	}
 }

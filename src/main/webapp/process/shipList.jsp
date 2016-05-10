@@ -5,7 +5,6 @@
 <h3 class="sub-header">出库流程列表
 	<span>
 		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospitalId" name="hospitalId">
-			<option value=0>全部医院</option>
 			<c:forEach var='hosp' items="${hospitalList}">
 				<c:if test="${hospitalId == hosp.id}">
 					<option value="${hosp.id}" selected>${hosp.name}</option>
@@ -67,7 +66,7 @@
 		<div class="modal-content">
 			<div class="modal-body" id="assureMsg"></div>
 			<div class="modal-footer">
-				<a type="button" class="btn btn-success" id="assureBtn">确认</a> <a type="button" class="btn btn-default"
+				<a type="button" class="btn btn-success" id="assureBtn" target="_blank">确认</a> <a type="button" class="btn btn-default"
 					data-dismiss="modal">取消</a>
 			</div>
 		</div>

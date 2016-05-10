@@ -31,7 +31,7 @@ public interface PrescriptionDao {
 			+ "where p.process = 8 and p.hospital_id = h.id and p.process_id = ("
 			+ "select pr.id from process as pr, machine as m where "
 			+ "pr.process_type = 8 and pr.machine_id = m.id and m.uuid = #{uuid} )")
-	Prescription getPrescriptionByCleanMachineUuid(@Param("uuid") String uuid);
+	Prescription getPrescriptionByPourMachineUuid(@Param("uuid") String uuid);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.process = #{process} and p.hospital_id = h.id")
 	List<Prescription> getPrescriptionsByProcess(@Param("process") int process);
@@ -117,7 +117,7 @@ public interface PrescriptionDao {
 	// included.
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
 			+ "where p.process = #{process} and p.process_id = -1 and h.id = #{hospitalId} and p.hospital_id = h.id")
-	List<Prescription> getPrsListWithProAndHospital_Ship(@Param("process") int process,
+	List<Prescription> listShipPrescription(@Param("process") int process,
 			@Param("hospitalId") int hospitalId);
 
 	// Used for receiveList/ to get PrsList with Process type. No user_name

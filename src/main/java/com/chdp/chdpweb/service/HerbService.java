@@ -64,7 +64,7 @@ public class HerbService {
 
 	public boolean doesHerbExist(Herb herb) {
 		try {
-			if (herbDao.doesHerbExist(herb) > 0){
+			if (herbDao.doesHerbExist(herb) > 0) {
 				return true;
 			}
 			return false;

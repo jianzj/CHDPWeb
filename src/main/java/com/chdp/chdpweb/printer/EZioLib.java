@@ -1,4 +1,6 @@
 package com.chdp.chdpweb.printer;
+import org.springframework.core.io.ClassPathResource;
+
 //---------------------------------------------------------------------------
 // Create EZioLib.java by Jeffrey 2014/07/21
 //---------------------------------------------------------------------------
@@ -9,7 +11,7 @@ public class EZioLib
 {
 	public interface API extends Library
 	{	
-		String path = API.class.getResource("/").getPath().replaceAll("%20", " ").substring(1) + "Ezio64.dll";
+		String path = new ClassPathResource("Ezio64.dll").getPath();
 		API INSTANCE = (API) Native.loadLibrary(path, API.class);
 		
 		public int openport(String strPort);
@@ -543,6 +545,6 @@ enum Image_Type
  	            return PCX;
  	        default:
  	            return BMP;
- 	    }
- 	}
+		}
+	}
 };

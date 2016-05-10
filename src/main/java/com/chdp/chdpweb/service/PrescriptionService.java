@@ -1,19 +1,35 @@
 package com.chdp.chdpweb.service;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import javax.imageio.ImageIO;
+
+import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Drawing;
+import org.apache.poi.ss.usermodel.Picture;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.Hospital;
@@ -27,7 +43,13 @@ import com.chdp.chdpweb.dao.OrderDao;
 import com.chdp.chdpweb.dao.PrescriptionDao;
 import com.chdp.chdpweb.dao.ProcessDao;
 import com.chdp.chdpweb.dao.UserDao;
+import com.chdp.chdpweb.printer.PrintHelper;
 import com.github.pagehelper.PageHelper;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 @Repository
 public class PrescriptionService {
@@ -42,7 +64,10 @@ public class PrescriptionService {
 	private ProcessDao processDao;
 	@Autowired
 	private HospitalDao hospitalDao;
-	
+
+	@Autowired
+	private DataSourceTransactionManager transactionManager;
+
 	public Prescription getPrescription(int id) {
 		try {
 			Prescription prs = prsDao.getPrswithIdNoUser(id);
@@ -102,10 +127,10 @@ public class PrescriptionService {
 			return null;
 		}
 	}
-	
-	public Prescription getPrescriptionByCleanMachineUuid(String uuid) {
+
+	public Prescription getPrescriptionByPourMachineUuid(String uuid) {
 		try {
-			return prsDao.getPrescriptionByCleanMachineUuid(uuid);
+			return prsDao.getPrescriptionByPourMachineUuid(uuid);
 		} catch (Exception e) {
 			return null;
 		}
@@ -115,7 +140,7 @@ public class PrescriptionService {
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsUnfinished();
 			return prsList;
-			//return this.updatePrsListwithUsername(prsList);
+			// return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -126,7 +151,7 @@ public class PrescriptionService {
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsUnfinished();
 			return prsList;
-			//return this.updatePrsListwithUsername(prsList);
+			// return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -140,7 +165,7 @@ public class PrescriptionService {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
+
 	// No user_name included
 	public List<Prescription> listPrsWithProcessNoUser(int process) {
 		try {
@@ -149,11 +174,11 @@ public class PrescriptionService {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
-	public List<Integer> listInProgressHospitalwithProcess(int process){
-		try{
+
+	public List<Integer> listInProgressHospitalwithProcess(int process) {
+		try {
 			return prsDao.listInProgressHospitalwithProcess(process);
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Integer>();
 		}
 	}
@@ -171,21 +196,21 @@ public class PrescriptionService {
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsByProcess(process);
 			return prsList;
-			//return this.updatePrsListwithUsername(prsList);
+			// return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
 
 	// No user_name included 为了出库列表
-	public List<Prescription> listPrsWithProHospitalNoUser_Ship(int process, int hospitalId) {
+	public List<Prescription> listShipPrescription(int process, int hospitalId) {
 		try {
-			return prsDao.getPrsListWithProAndHospital_Ship(process, hospitalId);
+			return prsDao.listShipPrescription(process, hospitalId);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
+
 	// No user_name included
 	public List<Prescription> listPrsWithProHospitalNoUser(int process, int hospitalId) {
 		try {
@@ -200,13 +225,13 @@ public class PrescriptionService {
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsByProcess(process);
 			return prsList;
-			//return this.updatePrsListwithUsername(prsList);
+			// return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
-	//获取所有与指定医院相关，且订单处于某一特定阶段的处方列表
+
+	// 获取所有与指定医院相关，且订单处于某一特定阶段的处方列表
 	public List<Prescription> listPrsWithParamsAndTime(int process, int hospitalId, int pageNum, String start,
 			String end) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
@@ -216,7 +241,8 @@ public class PrescriptionService {
 			return new ArrayList<Prescription>();
 		}
 	}
-	//获取所有与指定医院相关，且订单处于某一特定阶段的处方列表
+
+	// 获取所有与指定医院相关，且订单处于某一特定阶段的处方列表
 	public List<Prescription> listPrsWithParamsAndTime(int process, int hospitalId, String start, String end) {
 		try {
 			return prsDao.getPrescriptionsByParamswithTime(process, hospitalId, start, end);
@@ -229,7 +255,7 @@ public class PrescriptionService {
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionByHospitalName(hospitalId);
 			return prsList;
-			//return this.updatePrsListwithUsername(prsList);
+			// return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -240,7 +266,7 @@ public class PrescriptionService {
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionByHospitalName(hospitalId);
 			return prsList;
-			//return this.updatePrsListwithUsername(prsList);
+			// return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -250,7 +276,7 @@ public class PrescriptionService {
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsByParams(process, hospitalId);
 			return prsList;
-			//return this.updatePrsListwithUsername(prsList);
+			// return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -261,7 +287,7 @@ public class PrescriptionService {
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsByParams(process, hospitalId);
 			return prsList;
-			//return this.updatePrsListwithUsername(prsList);
+			// return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -351,104 +377,11 @@ public class PrescriptionService {
 		}
 	}
 
-	public int countPrsNumForHospital(int hospitalId, int process, String start, String end){
-		try{
-			return prsDao.countPrsNumForHospital(hospitalId, process, start, end);
-		} catch (Exception e){
-			return 0;
-		}
-	}
-
-	public boolean generatePrsListXls(int hospitalId, User user, List<Prescription> prs) {
+	public int countPrsNumForHospital(int hospitalId, int process, String start, String end) {
 		try {
-			String templatePath = Constants.TEMPLATEPATH + "/template.xls";
-
-			File tempFile = new File(templatePath);
-			if (!tempFile.exists()) {
-				return false;
-			}
-
-			FileInputStream fis = new FileInputStream(templatePath);
-			HSSFWorkbook templateWb = new HSSFWorkbook(fis);
-			HSSFSheet templateSt = templateWb.getSheetAt(0);
-
-			HSSFRow titleRow = templateSt.getRow(1);
-			HSSFRow itemRow = templateSt.getRow(2);
-
-			Hospital hospital = hospitalDao.getHospitalwithID(hospitalId);
-			titleRow.getCell(1).setCellValue(hospital.getName());
-
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-			String currentTime = df.format(new Date());
-			titleRow.getCell(5).setCellValue(currentTime);
-
-			int prsNum = prs.size();
-			templateSt.shiftRows(3, templateSt.getLastRowNum(), prsNum);
-			int index = 3;
-			double totalPrice = 0;
-			int totalNum = 0;
-
-			Iterator<Prescription> itr = prs.iterator();
-			Prescription printItem = null;
-			while (itr.hasNext()) {
-				printItem = itr.next();
-				HSSFRow insertRow = templateSt.createRow(index);
-
-				insertRow.createCell(0).setCellValue(printItem.getUuid());
-				insertRow.getCell(0).setCellStyle(itemRow.getCell(0).getCellStyle());
-
-				insertRow.createCell(1).setCellValue(printItem.getOuter_id());
-				insertRow.getCell(1).setCellStyle(itemRow.getCell(1).getCellStyle());
-
-				insertRow.createCell(2).setCellValue(printItem.getPatient_name());
-				insertRow.getCell(2).setCellStyle(itemRow.getCell(2).getCellStyle());
-
-				insertRow.createCell(3).setCellValue(printItem.getPacket_num());
-				insertRow.getCell(3).setCellStyle(itemRow.getCell(3).getCellStyle());
-
-				insertRow.createCell(4).setCellValue(printItem.getPrice());
-				insertRow.getCell(4).setCellStyle(itemRow.getCell(4).getCellStyle());
-
-				insertRow.createCell(5).setCellValue("");
-				insertRow.getCell(5).setCellStyle(itemRow.getCell(5).getCellStyle());
-
-				totalPrice += printItem.getPrice();
-				totalNum += printItem.getPacket_num();
-				index += 1;
-			}
-
-			HSSFRow lastRow = templateSt.getRow(templateSt.getLastRowNum() - 1);
-			lastRow.getCell(1).setCellValue(prs.size());
-			lastRow.getCell(3).setCellValue(totalNum + "帖");
-			lastRow.getCell(4).setCellValue(totalPrice);
-
-			// 生成UUID，形如20160502213800386, 当前日期+三位随机数
-			int randomNum = (int) (Math.random() * 900) + 100;
-			df = new SimpleDateFormat("yyyyMMdd-HHmmss");
-			currentTime = df.format(new Date());
-			String uuid = currentTime + String.valueOf(randomNum);
-
-			String newPath = hospital.getName() + "-" + uuid + ".xls";
-			File newShipList = new File(newPath);
-			try {
-				newShipList.createNewFile();
-			} catch (Exception e) {
-				templateWb.close();
-				fis.close();
-				return false;
-			}
-
-			FileOutputStream fileOut = new FileOutputStream(newShipList);
-			templateWb.write(fileOut);
-			fileOut.flush();
-			fileOut.close();
-			fis.close();
-			templateWb.close();
-
-			return true;
+			return prsDao.countPrsNumForHospital(hospitalId, process, start, end);
 		} catch (Exception e) {
-
-			return false;
+			return 0;
 		}
 	}
 
@@ -522,53 +455,56 @@ public class PrescriptionService {
 			return -1;
 		}
 	}
-	
-	//获得用户维度的处方列表
-	public List<User> getUserListForPrsSummary(int userAuth, String start, String end){
-		try{
+
+	// 获得用户维度的处方列表
+	public List<User> getUserListForPrsSummary(int userAuth, String start, String end) {
+		try {
 			List<User> userList = null;
-			if (userAuth == 0){
+			if (userAuth == 0) {
 				userList = userDao.getUserList();
-				//userList = userDao.getUserListWithoutAdmin();
-			}else{
+				// userList = userDao.getUserListWithoutAdmin();
+			} else {
 				userList = userDao.getUserListWithAuth(userAuth);
 			}
 			List<User> finalUserList = new ArrayList<User>();
 			Iterator<User> itr = userList.iterator();
 			User user = null;
-			while (itr.hasNext()){
+			while (itr.hasNext()) {
 				user = itr.next();
 				int prsNum = 0;
 				int errorNum = 0;
-				if (userAuth == 0){
+				if (userAuth == 0) {
 					List<Integer> tempPrsIdList = prsDao.listDealPrsIdByUser_NoShip(user.getId(), start, end);
-					if ((user.getAuthority() & 1) != 0){
+					if ((user.getAuthority() & 1) != 0) {
 						List<Integer> tempPrsIdList02 = prsDao.listDealPrsIdByUserr_Ship(user.getId(), start, end);
 						tempPrsIdList = Utils.mergeTwoPrsIdList(tempPrsIdList, tempPrsIdList02);
 					}
 					prsNum = tempPrsIdList.size();
-				}else{
+				} else {
 					int process_type = Utils.getProcessTypebyUserAuth(userAuth);
-					if (process_type == Constants.SHIP){
+					if (process_type == Constants.SHIP) {
 						prsNum = prsDao.countPrsDealByUser_Ship(user.getId(), start, end);
-					}else{
+					} else {
 						prsNum = prsDao.countPrsDealByUserAndProcess_NoShip(user.getId(), process_type, start, end);
 					}
 				}
-				if (userAuth == 0){
+				if (userAuth == 0) {
 					Integer temp = prsDao.countProcsErrorByUser(user.getId(), start, end);
-					if (temp == null){
+					if (temp == null) {
 						errorNum = 0;
-					}else{
+					} else {
 						errorNum = temp;
 					}
-				}else{
-					//int process_type = Utils.getProcessTypebyUserAuth(userAuth);
-					//Integer temp = prsDao.countProcsErrorByUse_Process(process_type,user.getId(), start, end);
+				} else {
+					// int process_type =
+					// Utils.getProcessTypebyUserAuth(userAuth);
+					// Integer temp =
+					// prsDao.countProcsErrorByUse_Process(process_type,user.getId(),
+					// start, end);
 					Integer temp = prsDao.countProcsErrorByUser(user.getId(), start, end);
-					if (temp == null){
+					if (temp == null) {
 						errorNum = 0;
-					}else{
+					} else {
 						errorNum = temp;
 					}
 				}
@@ -577,52 +513,275 @@ public class PrescriptionService {
 				user.setPosition(user.getAuthority_str());
 				finalUserList.add(user);
 			}
-			
+
 			return finalUserList;
-		}catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<User>();
 		}
 	}
 
-	public List<Prescription> listPrsByUser(int userAuth, int userId, String start, String end){
-		try{
+	public List<Prescription> listPrsByUser(int userAuth, int userId, String start, String end) {
+		try {
 			User user = userDao.getUserById(userId);
 			List<Prescription> prsList = new ArrayList<Prescription>();
-			if (userAuth == 0){
+			if (userAuth == 0) {
 				List<Integer> prsIdList = prsDao.listDealPrsIdByUser_NoShip(userId, start, end);
-				if ((user.getAuthority() & 1) != 0){
+				if ((user.getAuthority() & 1) != 0) {
 					List<Integer> tempPrsIdList = prsDao.listDealPrsIdByUserr_Ship(userId, start, end);
 					prsIdList = Utils.mergeTwoPrsIdList(prsIdList, tempPrsIdList);
 				}
 				Iterator<Integer> itr = prsIdList.iterator();
 				Prescription prs = null;
-				while (itr.hasNext()){
+				while (itr.hasNext()) {
 					int tempId = itr.next();
 					prs = prsDao.getPrescriptionByID(tempId);
 					prs.setHospital_name(hospitalDao.getHospitalwithID(prs.getHospital_id()).getName());
 					prsList.add(prs);
 				}
-			}else{
+			} else {
 				List<Integer> prsIdList = prsDao.listDealPrsIdByUser_NoShip(userId, start, end);
-				if (userAuth == 1){
+				if (userAuth == 1) {
 					prsIdList = prsDao.listDealPrsIdByUserr_Ship(userId, start, end);
-				}else{
+				} else {
 					int process_type = Utils.getProcessTypebyUserAuth(userAuth);
 					prsIdList = prsDao.listDealPrsIdByUserAndProcess_NoShip(userId, process_type, start, end);
 				}
 				Iterator<Integer> itr = prsIdList.iterator();
 				Prescription prs = null;
-				while (itr.hasNext()){
+				while (itr.hasNext()) {
 					int tempId = itr.next();
 					prs = prsDao.getPrescriptionByID(tempId);
 					prs.setHospital_name(hospitalDao.getHospitalwithID(prs.getHospital_id()).getName());
 					prsList.add(prs);
 				}
 			}
-			
+
 			return prsList;
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Prescription>();
+		}
+	}
+
+	// 接方打印及流转，带事务控制
+	public boolean printReceiveList(int hospitalId) {
+		List<Prescription> prsList = null;
+		if (hospitalId == 0) {
+			prsList = listPrsWithProcessNoUser(Constants.RECEIVE);
+		} else {
+			prsList = listPrsWithProHospitalNoUser(Constants.RECEIVE, hospitalId);
+		}
+
+		if (prsList == null)
+			return false;
+
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		TransactionStatus status = transactionManager.getTransaction(def);
+		try {
+			PrintHelper.startAndSetup();
+			for (Prescription prs : prsList) {
+				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				String currentTime = df.format(new Date());
+				User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
+				Process currentProcess = processDao.getProcessesById(prs.getProcess_id());
+
+				Process newProcess = new Process();
+				newProcess.setProcess_type(Constants.CHECK);
+				newProcess.setUser_id(currentUser.getId());
+				newProcess.setPrescription_id(prs.getId());
+				newProcess.setBegin(currentTime);
+				newProcess.setPrevious_process_id(prs.getProcess_id());
+				processDao.createProcess(newProcess);
+
+				currentProcess.setFinish(currentTime);
+				processDao.refreshProcessTime(currentProcess);
+
+				prs.setProcess(Constants.CHECK);
+				prs.setProcess_id(newProcess.getId());
+				prsDao.updatePrescriptionProcess(prs);
+
+				PrintHelper.printPrescription(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(),
+						prs.getSex(), prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
+			}
+		} catch (Exception e) {
+			transactionManager.rollback(status);
+			return false;
+		} finally {
+			PrintHelper.close();
+		}
+
+		transactionManager.commit(status);
+		return true;
+	}
+
+	// 出库单生成逻辑，带事务控制
+	public File printShipListXls(int hospitalId) {
+		File file = null;
+
+		if (hospitalId == 0)
+			return file;
+
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		TransactionStatus status = transactionManager.getTransaction(def);
+
+		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
+
+		// 生成UUID，形如20160502213800386, 当前日期+三位随机数
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+		String currentTime = df.format(new Date());
+		int randomNum = (int) (Math.random() * 900) + 100;
+		String uuid = currentTime + String.valueOf(randomNum);
+
+		df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		currentTime = df.format(new Date());
+
+		Order newOrder = new Order();
+		newOrder.setUuid(uuid);
+		newOrder.setHospital_id(hospitalId);
+		newOrder.setCreate_time(currentTime);
+		newOrder.setCreate_user_id(currentUser.getId());
+		newOrder.setStatus(Constants.ORDER_BEGIN);
+
+		try {
+			orderDao.createFullOrder(newOrder);
+
+			List<Prescription> prsList = listShipPrescription(Constants.SHIP, hospitalId);
+
+			for (Prescription prs : prsList) {
+				prs.setProcess_id(newOrder.getId());
+				if (!updatePrescriptionProcess(prs)) {
+					transactionManager.rollback(status);
+					return null;
+				}
+			}
+
+			file = generatePrsListXls(hospitalId, uuid, prsList);
+			if (file == null) {
+				transactionManager.rollback(status);
+				return null;
+			}
+		} catch (Exception e) {
+			transactionManager.rollback(status);
+			return null;
+		}
+
+		transactionManager.commit(status);
+		return file;
+	}
+
+	// 生成Excel出库单
+	private File generatePrsListXls(int hospitalId, String orderUuid, List<Prescription> prsList) {
+		try {
+			Resource tempResource = new ClassPathResource("template.xls");
+
+			FileInputStream fis = new FileInputStream(tempResource.getFile());
+			HSSFWorkbook templateWb = new HSSFWorkbook(fis);
+			HSSFSheet templateSt = templateWb.getSheetAt(0);
+
+			HSSFRow noRow = templateSt.getRow(0);
+			HSSFRow titleRow = templateSt.getRow(2);
+			HSSFRow itemRow = templateSt.getRow(3);
+
+			Hospital hospital = hospitalDao.getHospitalwithID(hospitalId);
+			titleRow.getCell(1).setCellValue(hospital.getName());
+
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			String currentTime = df.format(new Date());
+			titleRow.getCell(5).setCellValue(currentTime);
+
+			noRow.getCell(0).setCellValue("No." + orderUuid);
+
+			templateSt.shiftRows(4, templateSt.getLastRowNum(), prsList.size());
+			int index = 4;
+			double totalPrice = 0;
+			int totalNum = 0;
+
+			for (Prescription printItem : prsList) {
+				HSSFRow insertRow = templateSt.createRow(index);
+				insertRow.setHeightInPoints(25);
+
+				insertRow.createCell(0).setCellValue(printItem.getUuid());
+				insertRow.getCell(0).setCellStyle(itemRow.getCell(0).getCellStyle());
+
+				insertRow.createCell(1).setCellValue(printItem.getOuter_id());
+				insertRow.getCell(1).setCellStyle(itemRow.getCell(1).getCellStyle());
+
+				insertRow.createCell(2).setCellValue(printItem.getPatient_name());
+				insertRow.getCell(2).setCellStyle(itemRow.getCell(2).getCellStyle());
+
+				insertRow.createCell(3).setCellValue(printItem.getPacket_num());
+				insertRow.getCell(3).setCellStyle(itemRow.getCell(3).getCellStyle());
+
+				insertRow.createCell(4).setCellValue(printItem.getPrice());
+				insertRow.getCell(4).setCellStyle(itemRow.getCell(4).getCellStyle());
+
+				insertRow.createCell(5).setCellValue("");
+				insertRow.getCell(5).setCellStyle(itemRow.getCell(5).getCellStyle());
+
+				totalPrice += printItem.getPrice();
+				totalNum += printItem.getPacket_num();
+				index += 1;
+			}
+
+			HSSFRow lastRow = templateSt.getRow(templateSt.getLastRowNum() - 1);
+			lastRow.getCell(1).setCellValue(prsList.size());
+			lastRow.getCell(3).setCellValue(totalNum + "帖");
+			lastRow.getCell(4).setCellValue(totalPrice);
+
+			lastRow = templateSt.getRow(templateSt.getLastRowNum());
+			lastRow.setHeightInPoints(25);
+
+			// 生成UUID，形如20160502213800386, 当前日期+三位随机数
+			int randomNum = (int) (Math.random() * 900) + 100;
+			df = new SimpleDateFormat("yyyyMMdd-HHmmss");
+			currentTime = df.format(new Date());
+			String uuid = currentTime + String.valueOf(randomNum);
+
+			Map<EncodeHintType, Object> hints = new HashMap<EncodeHintType, Object>();
+			hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+			hints.put(EncodeHintType.MARGIN, 1);
+			BitMatrix bitMatrix = new MultiFormatWriter().encode(orderUuid, BarcodeFormat.QR_CODE, 95, 95, hints);
+
+			BufferedImage image = new BufferedImage(bitMatrix.getWidth(), bitMatrix.getHeight(),
+					BufferedImage.TYPE_INT_RGB);
+			for (int x = 0; x < bitMatrix.getWidth(); x++) {
+				for (int y = 0; y < bitMatrix.getHeight(); y++) {
+					image.setRGB(x, y, bitMatrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
+				}
+			}
+
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ImageIO.write(image, "jpeg", baos);
+
+			HSSFClientAnchor anchor = new HSSFClientAnchor();
+			anchor.setCol1(5);
+			anchor.setRow1(0);
+			Drawing drawing = templateSt.createDrawingPatriarch();
+			Picture picture = drawing.createPicture(anchor,
+					templateWb.addPicture(baos.toByteArray(), HSSFWorkbook.PICTURE_TYPE_JPEG));
+			picture.resize();
+
+			String newPath = Constants.TEMPPATH + hospital.getName() + "-" + uuid + ".xls";
+			File newShipList = new File(newPath);
+			try {
+				newShipList.createNewFile();
+			} catch (Exception e) {
+				templateWb.close();
+				fis.close();
+				return null;
+			}
+
+			FileOutputStream fileOut = new FileOutputStream(newShipList);
+			templateWb.write(fileOut);
+			fileOut.flush();
+			fileOut.close();
+			fis.close();
+			templateWb.close();
+
+			return newShipList;
+		} catch (Exception e) {
+			return null;
 		}
 	}
 }

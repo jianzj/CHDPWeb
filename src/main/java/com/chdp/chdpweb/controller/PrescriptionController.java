@@ -5,13 +5,21 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,7 +56,7 @@ public class PrescriptionController {
 	@Autowired
 	private UserService userService;
 
-	@RequiresRoles("RECEIVE")
+	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)
 	@RequestMapping(value = "/add", method = RequestMethod.GET)
 	public String add(HttpServletRequest request) {
 		Prescription lastestPrs = prsService.getLastestPrs();
@@ -63,7 +71,7 @@ public class PrescriptionController {
 		return "prescription/addPrescription";
 	}
 
-	@RequiresRoles("RECEIVE")
+	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public String addPost(HttpServletRequest request, Prescription prs) {
 		if (prs.getPacket_num() == -1) {
@@ -365,7 +373,7 @@ public class PrescriptionController {
 		return "process/receiveList";
 	}
 
-	@RequiresRoles("RECEIVE")
+	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)
 	@RequestMapping(value = "/delete")
 	public String delete(HttpServletRequest request) {
 
@@ -435,7 +443,7 @@ public class PrescriptionController {
 			prsList = prsService.listPrsWithParams(process, hospitalId, pageNum);
 		}
 
-		for(Prescription prsItem : prsList){
+		for (Prescription prsItem : prsList) {
 			prsItem.setPhase_name(proService.getPhaseNamewithProcess(prsItem));
 		}
 
@@ -473,7 +481,7 @@ public class PrescriptionController {
 		request.setAttribute("endTime", end);
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
-		
+
 		start = Utils.formatStartTime(start);
 		end = Utils.formatEndTime(end);
 
@@ -523,12 +531,12 @@ public class PrescriptionController {
 		} else {
 			List<Hospital> returnHospitalList = hospitalService.getHospitalList();
 			List<Prescription> prsList = new ArrayList<Prescription>();
-			for (Hospital hospitalItem : returnHospitalList){
+			for (Hospital hospitalItem : returnHospitalList) {
 				prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalItem.getId(), start, end);
 				int packetNum = 0;
 				int totalPrice = 0;
 				hospitalItem.setFinishedPrsNum(prsList.size());
-				for( Prescription item : prsList ){
+				for (Prescription item : prsList) {
 					packetNum += item.getPacket_num();
 					totalPrice += item.getPrice();
 				}
@@ -739,90 +747,24 @@ public class PrescriptionController {
 		PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
 		request.setAttribute("page", page);
 
-		if (from.equals("CURRENT")) {
-			return "prescription/currentPrsList";
-		}
 		return "prescription/currentPrsList";
-
 	}
 
-	@RequiresRoles("RECEIVE")
+	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)
 	@RequestMapping(value = "/printReceiveList")
 	public String printReceiveList(HttpServletRequest request,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
-
-		List<Prescription> prsList = null;
-		if (hospitalId == 0) {
-			prsList = prsService.listPrsWithProcessNoUser(Constants.RECEIVE);
+		if (prsService.printReceiveList(hospitalId)) {
+			request.setAttribute("successMsg", "打印接方标签成功！");
 		} else {
-			prsList = prsService.listPrsWithProHospitalNoUser(Constants.RECEIVE, hospitalId);
+			request.setAttribute("errorMsg", "打印解放标签出错，请重试！");
 		}
 
-		Iterator<Prescription> itr = prsList.iterator();
-		Prescription printItem = null;
-		int count = 0;
-		while (itr.hasNext()) {
-			printItem = itr.next();
-
-			SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-			String currentTime = df.format(new Date());
-			User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
-
-			Process newProcess = new Process();
-			Process currentProcess = proService.getProcessById(printItem.getProcess_id());
-			newProcess.setProcess_type(Constants.CHECK);
-			newProcess.setUser_id(currentUser.getId());
-			newProcess.setPrescription_id(printItem.getId());
-			newProcess.setBegin(currentTime);
-			newProcess.setPrevious_process_id(printItem.getProcess_id());
-			int result = proService.createProccess(newProcess);
-			if (result != -1) {
-				currentProcess.setFinish(currentTime);
-				if (proService.updateProcessTime(currentProcess)) {
-					printItem.setProcess(Constants.CHECK);
-					printItem.setProcess_id(newProcess.getId());
-					if (prsService.updatePrescriptionProcess(printItem)) {
-						count += 1;
-					} else {
-						request.setAttribute("errorMsg", "打印到处方" + String.valueOf(printItem.getId()) + "出错，请重新打印");
-						break;
-					}
-				} else {
-					request.setAttribute("errorMsg", "打印到处方" + String.valueOf(printItem.getId()) + "出错，请重新打印");
-					break;
-				}
-			} else {
-				request.setAttribute("errorMsg", "打印到处方" + String.valueOf(printItem.getId()) + "出错，请重新打印");
-				break;
-			}
-		}
-
-		if (count == prsList.size()) {
-			PrintHelper.startAndSetup();
-			for (Prescription prs : prsList) {
-				PrintHelper.printPrescription(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
-						prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
-			}
-			PrintHelper.close();
-			request.setAttribute("successMsg", "打印完成！");
-		} else {
-			request.setAttribute("errorMsg", "打印中存在错误，漏打了" + String.valueOf(prsList.size() - count) + "份处方标签");
-		}
-
-		prsList = prsService.listPrsWithProcessNoUser(Constants.RECEIVE);
-
-		List<Hospital> hospitalList = hospitalService.getHospitalList();
-
-		request.setAttribute("hospitalList", hospitalList);
-		// request.setAttribute("hospital", hospital);
-		request.setAttribute("hospital", "ALL");
-		request.setAttribute("receiveList", prsList);
-
-		return "process/receiveList";
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "process/receiveList?hospitalId=" + hospitalId;
 	}
 
 	// 打印包装标签
-	@RequiresRoles("PACKAGE")
+	@RequiresRoles(value = { "ADMIN", "PACKAGE" }, logical = Logical.OR)
 	@RequestMapping(value = "/printPackageList")
 	public String printPackageList(HttpServletRequest request,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
@@ -842,93 +784,24 @@ public class PrescriptionController {
 		PrintHelper.close();
 		request.setAttribute("successMsg", "打印完成！");
 
-		prsList = prsService.listPrsWithProcessNoUser(Constants.PACKAGE);
-
-		List<Hospital> hospitalList = hospitalService.getHospitalList();
-
-		request.setAttribute("hospitalList", hospitalList);
-		// request.setAttribute("hospital", hospital);
-		request.setAttribute("hospital", "ALL");
-		request.setAttribute("packageList", prsList);
-
-		return "process/packageList";
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "process/packageList?hospitalId=" + hospitalId;
 	}
 
 	// 生成出货清单
-	@RequiresRoles("PACKAGE")
+	@RequiresRoles(value = { "ADMIN", "SHIP" }, logical = Logical.OR)
 	@RequestMapping(value = "/printShipListXls")
-	public String printShipListXls(HttpServletRequest request,
-			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
+	public ResponseEntity<byte[]> printShipListXls(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) throws IOException {
+		request.setAttribute("nav", "出库流程列表");
 
-		List<Integer> usedHospitals = new ArrayList<Integer>();
-		if (hospitalId == 0) {
-			usedHospitals = prsService.listInProgressHospitalwithProcess(Constants.SHIP);
+		File file = prsService.printShipListXls(hospitalId);
+		if (file == null) {
+			return null;
 		} else {
-			usedHospitals.add(hospitalId);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+			return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file), headers, HttpStatus.CREATED);
 		}
-
-		List<Prescription> prs = null;
-		int tempHospitalId;
-		int count = 0;
-
-		Iterator<Integer> itr = usedHospitals.iterator();
-		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
-
-		while (itr.hasNext()) {
-			tempHospitalId = itr.next();
-			Hospital tempHospital = hospitalService.getHospitalById(tempHospitalId);
-			prs = prsService.listPrsWithProHospitalNoUser_Ship(Constants.SHIP, tempHospitalId);
-			if (prsService.generatePrsListXls(tempHospitalId, currentUser, prs)) {
-				SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-				String currentTime = df.format(new Date());
-
-				// 生成UUID，形如20160502213800386, 当前日期+三位随机数
-				int randomNum = (int) (Math.random() * 900) + 100;
-				String uuid = currentTime + String.valueOf(randomNum);
-				Order newOrder = new Order();
-				newOrder.setUuid(uuid);
-				newOrder.setHospital_id(tempHospitalId);
-				newOrder.setCreate_time(currentTime);
-				newOrder.setCreate_user_id(currentUser.getId());
-				newOrder.setStatus(Constants.ORDER_BEGIN);
-				if (orderService.createFullOrder(newOrder)) {
-					newOrder.setId(orderService.getOrderIdByUuid(newOrder.getUuid()));
-
-					Iterator<Prescription> prsItems = prs.iterator();
-					Prescription item = null;
-					while (prsItems.hasNext()) {
-						item = prsItems.next();
-						item.setProcess_id(newOrder.getId());
-						prsService.updatePrescriptionProcess(item);
-					}
-				} else {
-					request.setAttribute("errorMsg", "打印 " + tempHospital.getName() + " 的出货单出错，请重新打印！");
-					break;
-				}
-				count += 1;
-			} else {
-				request.setAttribute("errorMsg", "打印 " + tempHospital.getName() + " 的出货单出错，请重新打印！");
-				break;
-			}
-		}
-
-		if (count == usedHospitals.size()) {
-			request.setAttribute("successMsg", "打印完成！");
-		}
-		/**
-		 * else{ request.setAttribute("errorMsg", "打印中存在错误，漏打了" +
-		 * String.valueOf(usedHospitals.size() - count) + "张出货单"); }
-		 **/
-
-		List<Prescription> prsList = prsService.listPrsWithProcessNoUser(Constants.SHIP);
-		List<Hospital> hospitalList = hospitalService.getHospitalList();
-
-		request.setAttribute("hospitalList", hospitalList);
-		// request.setAttribute("hospital", hospital);
-		request.setAttribute("hospital", "ALL");
-		request.setAttribute("shipList", prsList);
-
-		return "process/shipList";
 	}
 
 }

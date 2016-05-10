@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.Machine;
@@ -26,7 +27,7 @@ public class MachineController {
 	private MachineService machineService;
 
 	@RequiresRoles("ADMIN")
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	@RequestMapping(value = "/list")
 	public String list(HttpServletRequest request, @RequestParam(name = "pageNum", defaultValue = "1") int pageNum) {
 		request.setAttribute("nav", "机器管理");
 
@@ -103,12 +104,7 @@ public class MachineController {
 			}
 		}
 
-		List<Machine> machineList = machineService.getMachineList(pageNum);
-		request.setAttribute("machineList", machineList);
-		PageInfo<Machine> page = new PageInfo<Machine>(machineList);
-		request.setAttribute("page", page);
-
-		return "machine/machineList";
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "machine/machineList?pageNum=" + pageNum;
 	}
 
 	// 打印机器标签
@@ -128,11 +124,6 @@ public class MachineController {
 			request.setAttribute("successMsg", "打印成功！");
 		}
 
-		List<Machine> machineList = machineService.getMachineList(pageNum);
-		request.setAttribute("machineList", machineList);
-		PageInfo<Machine> page = new PageInfo<Machine>(machineList);
-		request.setAttribute("page", page);
-
-		return "machine/machineList";
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "machine/machineList?pageNum=" + pageNum;
 	}
 }
