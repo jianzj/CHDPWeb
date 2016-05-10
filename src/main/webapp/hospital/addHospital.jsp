@@ -22,7 +22,7 @@
 			</div>
 			<div class="form-group">
 				<label for="description" class="control-label col-sm-4">医院简介</label>
-				<div class="col-sm-8">
+				<div class="col-sm-6">
 					<textarea class="form-control" rows="5" id="description" name="description" placeholder="医院简介">${hospitalAdd.description}</textarea>
 				</div>
 			</div>

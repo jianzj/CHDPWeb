@@ -31,6 +31,9 @@
 						<td><c:out value="灌装机" /></td>
 					</c:if>
 					<td><c:out value="${machine.name}" /></td>
+					<c:if test="${machine.pour_machine_name !=null}">
+                        <td>${machine.pour_machine_name}</td>
+                    </c:if>
 					<td><c:out value="${machine.description}" /></td>
 					<td width="190">
 						<div class="btn-group" role="group" aria-label="...">

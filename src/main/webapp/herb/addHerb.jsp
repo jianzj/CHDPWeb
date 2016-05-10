@@ -33,7 +33,7 @@
 			</div>
 			<div class="form-group">
 				<label for="description" class="control-label col-sm-4">中药描述</label>
-				<div class="col-sm-8">
+				<div class="col-sm-6">
 				    <textarea class="form-control" rows="5" id="description" name="description" placeholder="中药描述">${herbAdd.description}</textarea>
 				</div>
 			</div>

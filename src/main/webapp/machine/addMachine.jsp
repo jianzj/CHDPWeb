@@ -16,11 +16,11 @@
 	<form class="form-horizontal" action="<%=request.getContextPath()%>/machine/add" method="POST">
 		<fieldset>
 			<div class="form-group">
-				<label for="type" class="control-label col-sm-4">机器型号</label>
+				<label for="type" class="control-label col-sm-4">机器类型</label>
 				<div class="col-sm-4 required">
-					<select class="form-control col-sm-4" id="type" name="type" onchange="myFunction()">
-						<option value="<%=Constants.FILLING_MACHINE %>" <%if(request.getAttribute("machineAdd")!=null && ((Machine)request.getAttribute("machineAdd")).getType() == 2) out.print("selected"); %>>灌装机</option>
+					<select id="machine_type" class="form-control col-sm-4" id="type" name="type">
 						<option value="<%=Constants.DECOCTION_MACHINE %>" <%if(request.getAttribute("machineAdd")!=null && ((Machine)request.getAttribute("machineAdd")).getType() == 1) out.print("selected"); %>>煎煮机</option>
+						<option value="<%=Constants.FILLING_MACHINE %>" <%if(request.getAttribute("machineAdd")!=null && ((Machine)request.getAttribute("machineAdd")).getType() == 2) out.print("selected"); %>>灌装机</option>
 					</select>
 				</div>
 			</div>
@@ -56,7 +56,7 @@
 			</div>
 			<div class="form-group">
 				<label for="description" class="control-label col-sm-4">机器描述</label>
-				<div class="col-sm-8">
+				<div class="col-sm-6">
 					<textarea class="form-control" rows="5" id="description" name="description" placeholder="机器描述">${machineAdd.description}</textarea>
 				</div>
 			</div>
@@ -71,16 +71,12 @@
 
 </div>
 <script>
-function myFunction() {
-	var selectedValue = (document).getElementById("type").value;
-
-	if (selectedValue == 1){
-		document.getElementById("pour_machine").classList.remove("hide");
-	}
-	
-	if (selectedValue == 2){
-		document.getElementById("pour_machine").classList.add("hide");
-	}
-}
+$("#machine_type").change(function(){
+	if ($("#machine_type").val() == <%=Constants.DECOCTION_MACHINE %>) {
+        $("#pour_machine").show();
+    } else {
+    	$("#pour_machine").hide();
+    }
+}); 
 </script>
 <%@ include file="../foot.jsp"%>

@@ -17,7 +17,7 @@ public interface MachineDao {
 	@Select("select * from machine where type = #{type}")
 	List<Machine> getMachinesByType(@Param("type") int type);
 
-	@Select("select * from machine")
+	@Select("select m.*, pm.name as pour_machine_name from machine as m left join machine as pm on m.pour_machine_id = pm.id")
 	List<Machine> getMachines();
 
 	@Select("select * from machine where name = #{name}")

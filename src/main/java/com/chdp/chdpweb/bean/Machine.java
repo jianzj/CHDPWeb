@@ -7,6 +7,7 @@ public class Machine {
 	private int type;
 	private String name;
 	private int pour_machine_id;
+	private String pour_machine_name;
 	private String description;
 
 	public int getId() {
@@ -55,6 +56,14 @@ public class Machine {
 
 	public void setPour_machine_id(int pour_machine_id) {
 		this.pour_machine_id = pour_machine_id;
+	}
+
+	public String getPour_machine_name() {
+		return pour_machine_name;
+	}
+
+	public void setPour_machine_name(String pour_machine_name) {
+		this.pour_machine_name = pour_machine_name;
 	}
 
 }
