@@ -633,11 +633,9 @@ public class PrescriptionService {
 	}
 
 	// 出库单生成逻辑，带事务控制
-	public File printShipListXls(int hospitalId) {
-		File file = null;
-
+	public boolean printShipListXls(int hospitalId) {
 		if (hospitalId == 0)
-			return file;
+			return false;
 
 		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
 		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
@@ -662,26 +660,25 @@ public class PrescriptionService {
 				prs.setProcess_id(newOrder.getId());
 				if (!updatePrescriptionProcess(prs)) {
 					transactionManager.rollback(status);
-					return null;
+					return false;
 				}
 			}
 
-			file = generatePrsListXls(hospitalId, uuid, prsList);
-			if (file == null) {
+			if (!generatePrsListXls(hospitalId, uuid, prsList)) {
 				transactionManager.rollback(status);
-				return null;
+				return false;
 			}
 		} catch (Exception e) {
 			transactionManager.rollback(status);
-			return null;
+			return false;
 		}
 
 		transactionManager.commit(status);
-		return file;
+		return true;
 	}
 
 	// 生成Excel出库单
-	private File generatePrsListXls(int hospitalId, String orderUuid, List<Prescription> prsList) {
+	private boolean generatePrsListXls(int hospitalId, String orderUuid, List<Prescription> prsList) {
 		try {
 			Resource tempResource = new ClassPathResource("template.xls");
 
@@ -773,7 +770,7 @@ public class PrescriptionService {
 			} catch (Exception e) {
 				templateWb.close();
 				fis.close();
-				return null;
+				return false;
 			}
 
 			FileOutputStream fileOut = new FileOutputStream(newShipList);
@@ -783,9 +780,9 @@ public class PrescriptionService {
 			fis.close();
 			templateWb.close();
 
-			return newShipList;
+			return true;
 		} catch (Exception e) {
-			return null;
+			return false;
 		}
 	}
 }

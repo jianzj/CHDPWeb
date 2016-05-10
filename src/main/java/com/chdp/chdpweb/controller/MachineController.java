@@ -124,6 +124,6 @@ public class MachineController {
 			request.setAttribute("successMsg", "打印成功！");
 		}
 
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../machine/machineList?pageNum=" + pageNum;
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../machine/list?pageNum=" + pageNum;
 	}
 }

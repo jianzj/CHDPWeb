@@ -67,7 +67,7 @@
 		<div class="modal-content">
 			<div class="modal-body" id="assureMsg"></div>
 			<div class="modal-footer">
-				<a type="button" class="btn btn-success" id="assureBtn" target="_blank">确认</a> <a type="button" class="btn btn-default"
+				<a type="button" class="btn btn-success" id="assureBtn">确认</a> <a type="button" class="btn btn-default"
 					data-dismiss="modal">取消</a>
 			</div>
 		</div>

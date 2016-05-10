@@ -31,11 +31,11 @@
 						</c:forEach>
 						<% } else if (request.getAttribute("lastestPrs") != null){ %>
 						<c:forEach var='hospital' items="${hospitalList}">
-							<c:if test="${lastestPrs.hospital_name == hospital.name}">
-								<option value="${hospital.name}" selected>${hospital.name}</option>						
+							<c:if test="${lastestPrs.hospital_id == hospital.id}">
+								<option value="${hospital.id}" selected>${hospital.name}</option>						
 							</c:if>
-							<c:if test="${lastestPrs.hospital_name != hospital.name}">
-								<option value="${hospital.name}">${hospital.name}</option>						
+							<c:if test="${lastestPrs.hospital_id != hospital.id}">
+								<option value="${hospital.id}">${hospital.id}</option>						
 							</c:if>
 						</c:forEach>				
 						<% } else { %>

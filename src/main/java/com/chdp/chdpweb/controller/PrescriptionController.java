@@ -1,6 +1,5 @@
 package com.chdp.chdpweb.controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,15 +9,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -356,7 +350,7 @@ public class PrescriptionController {
 				request.setAttribute("errorMsg", "处方不存在，无法删除！");
 			}
 		}
-		
+
 		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../process/receiveList?hospitalId=" + hospitalIdStr;
 	}
 
@@ -728,18 +722,17 @@ public class PrescriptionController {
 	// 生成出货清单
 	@RequiresRoles(value = { "ADMIN", "SHIP" }, logical = Logical.OR)
 	@RequestMapping(value = "/printShipListXls")
-	public ResponseEntity<byte[]> printShipListXls(HttpServletRequest request, HttpServletResponse response,
+	public String printShipListXls(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) throws IOException {
 		request.setAttribute("nav", "出库流程列表");
 
-		File file = prsService.printShipListXls(hospitalId);
-		if (file == null) {
-			return null;
+		if (prsService.printShipListXls(hospitalId)) {
+			request.setAttribute("successMsg", "出库单生成成功！");
 		} else {
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-			return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file), headers, HttpStatus.CREATED);
+			request.setAttribute("errorMsg", "出库单生成成功出错，请重试！");
 		}
+
+		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../process/shipList?hospitalId=" + hospitalId;
 	}
 
 }

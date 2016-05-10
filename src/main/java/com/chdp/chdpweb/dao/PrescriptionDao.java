@@ -94,7 +94,7 @@ public interface PrescriptionDao {
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.id = (select max(id) from prescription) and p.hospital_id = h.id")
 	Prescription getLastestPrescription();
 
-	@Select("select count(*) from prescription as p, hospital as h where h.name = #{prs.hospital_name} and p.outer_id = #{prs.outer_id} and p.hospital_id = h.id")
+	@Select("select count(*) from prescription as p, hospital as h where h.id = #{prs.hospital_id} and p.outer_id = #{prs.outer_id} and p.hospital_id = h.id")
 	int countPrescriptionWithHospitalInfo(@Param("prs") Prescription prs);
 
 	@Delete("delete from prescription where id = #{prsId}")
