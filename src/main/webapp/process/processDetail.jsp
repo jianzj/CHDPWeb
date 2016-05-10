@@ -102,7 +102,7 @@
 			 		机器名称: <%=node.getMachineName() %><br/>
 			 		煎煮时间: <%=node.getDecoctTime() %><br/>
 			 		浸泡时间: <%=node.getHeatTime() %><br/>
-			 			<% }else if (node.getNodeType() == Constants.SOAK){ %>
+			 			<% }else if (node.getNodeType() == Constants.POUR){ %>
 			 		机器名称: <%=node.getMachineName() %><br/>	
 			 			<% } %>
 			 		<% }else { %>

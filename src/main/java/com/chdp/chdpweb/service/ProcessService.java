@@ -424,8 +424,6 @@ public class ProcessService {
 				processList = this.getProcessChainWithProcessId(temp.getId());
 			}
 			
-			System.out.println(processList.size());
-			
 			for (Process process : processList){
 				Node node = new Node();
 				node.setResolvedBy(process.getUser_name());
@@ -434,7 +432,7 @@ public class ProcessService {
 				node.setNodeTypeName(Utils.getProcessName(process.getProcess_type()));
 				node.setStartTime(process.getBegin());
 				node.setSpecialDisplay(false);
-				if (process.getProcess_type() == Constants.DECOCT || process.getProcess_type() == Constants.SOAK
+				if (process.getProcess_type() == Constants.DECOCT || process.getProcess_type() == Constants.SOAK || process.getProcess_type() == Constants.POUR
 						|| process.getProcess_type() == Constants.CLEAN || process.getProcess_type() == Constants.SHIP){
 					node.setSpecialDisplay(true);
 				}
@@ -447,7 +445,7 @@ public class ProcessService {
 						node.setDecoctTime(Utils.getDecoctTime(node.getStartTime(), node.getEndTime(), prs.getClass_of_medicines()));
 						node.setHeatTime(Utils.getHeatTime(node.getEndTime(), prs.getClass_of_medicines()));
 						node.setMachineName(process.getMachine_name());
-					}else if (process.getProcess_type() == Constants.SOAK){
+					}else if (process.getProcess_type() == Constants.POUR){
 						node.setMachineName(process.getMachine_name());
 					}
 				}
@@ -456,7 +454,8 @@ public class ProcessService {
 			
 			for (Process item1 : processList){
 				for (Node item2 : nodeList){
-					if (item1.getPrevious_process_id() == item2.getNodeId() && item2.getErrorStatus() != 0){
+					
+					if (item1.getPrevious_process_id() == item2.getNodeId() && item1.getError_type() != 0){
 						item2.setErrorStatus(item1.getError_type());
 						item2.setErrorMsg(item1.getError_msg());
 					}
@@ -487,17 +486,17 @@ public class ProcessService {
 					}
 					shipNode.setResolvedBy(userDao.getUserById(order.getCreate_user_id()).getName());
 				}
+				nodeList.add(shipNode);
 			}
-			nodeList.add(shipNode);
+			
 			
 			//统计订单中所有未完成部分
-			for (int i = prs.getProcess(); i < Constants.FINISH ; i++){
+			for (int i = prs.getProcess() + 1; i < Constants.FINISH ; i++){
 				Node node = new Node();
 				node.setStatus(0);
 				node.setNodeTypeName(Utils.getProcessName(i));
 				nodeList.add(node);
 			}
-			
 			return nodeList;
 		} catch (Exception e){
 			return new ArrayList<Node>();
