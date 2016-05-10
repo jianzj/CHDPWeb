@@ -1,6 +1,5 @@
 package com.chdp.chdpweb.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,14 +15,11 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.Hospital;
-import com.chdp.chdpweb.bean.Order;
 import com.chdp.chdpweb.bean.Node;
 import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.service.HospitalService;
-import com.chdp.chdpweb.service.OrderService;
 import com.chdp.chdpweb.service.PrescriptionService;
 import com.chdp.chdpweb.service.ProcessService;
-import com.chdp.chdpweb.bean.Process;
 
 @Controller
 @RequestMapping("/process")
@@ -35,8 +31,6 @@ public class ProcessController {
 	private PrescriptionService prsService;
 	@Autowired
 	private HospitalService hospitalService;
-	@Autowired
-	private OrderService orderService;
 
 	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)
 	@RequestMapping(value = "/receiveList")

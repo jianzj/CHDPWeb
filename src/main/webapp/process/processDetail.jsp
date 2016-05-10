@@ -38,89 +38,87 @@
 	</table>
 </div>
 
-<div class="container">
-	<div class="row bs-wizard" style="border-bottom:0;">
-	<% if (request.getAttribute("nodeList") != null){ %>
-		<% for (Node node : (List<Node>)request.getAttribute("nodeList")){ %>
-			<% if (node.getStatus() == 0){ %>
-			<div class="col-xs-3 bs-wizard-step disabled">
-			  <div class="text-center bs-wizard-stepnum"><%=node.getNodeTypeName() %></div>
-			  <div class="progress"><div class="progress-bar"></div></div>
-			  <a href="#" class="bs-wizard-dot"></a>
-			  <div class="bs-wizard-info text-center list-group">
-			 	<span class="txt-center">
-			 		尚未开始！
-			 	</span>
-			  </div>
-			</div>	
-			<% } else if (node.getStatus() == 1){ %>
-			<div class="col-xs-3 bs-wizard-step disabled">
-			  <div class="text-center bs-wizard-stepnum"><%=node.getNodeTypeName() %></div>
-			  <div class="progress"><div class="progress-bar"></div></div>
-			  <a href="#" class="bs-wizard-dot"></a>
-			  <div class="bs-wizard-info text-center list-group">
-			 	<span class="txt-center">
-			 		<% if (node.getNodeType() == Constants.SHIP){ %>
-			 		<%=node.getOrderStatus() %>
-			 			<% if (node.getResolvedBy() != null){ %>
-			 		开始时间: <%=node.getStartTime() %><br/>
-			 		进行中<br/>
-			 		处理人: <%=node.getResolvedBy() %><br/>
-			 			<% } %>
-			 		<% }else if (node.getSpecialDisplay()) { %>
-			 		开始时间: <%=node.getStartTime() %>
-			 		进行中<br/>
-			 		处理人: <%=node.getResolvedBy() %><br/>
-			 		<% }else{ %>
-			 		等待处理<br/>
-			 		处理人: <%=node.getResolvedBy() %><br/>
-			 		<% } %>
-				 	<% if (node.getErrorStatus() != 0){ %>
-				 	出错: <%=Constants.getErrorName(node.getErrorStatus()) %><br/>
-				 	原因: <%=node.getErrorMsg() %>	
-				 	<% }else{ %>
-				 	正常
-				 	<% } %>
-			 	</span>
-			  </div>
-			</div>				
-			<% } else{ %>
-			<div class="col-xs-3 bs-wizard-step complete">
-			  <div class="text-center bs-wizard-stepnum"><%=node.getNodeTypeName() %></div>
-			  <div class="progress"><div class="progress-bar"></div></div>
-			  <a href="#" class="bs-wizard-dot"></a>
-			  <div class="bs-wizard-info text-center list-group">
-			 	<span class="txt-center">
-			 		<% if (node.getNodeType() == Constants.SHIP){ %>
-			 		<%=node.getOrderStatus() %><br/>
-			 		开始时间: <%=node.getStartTime() %><br/>
-			 		结束时间: <%=node.getEndTime() %><br/>
-			 		<% }else if (node.getSpecialDisplay()){ %>
-			 		开始时间: <%=node.getStartTime() %><br/>
-			 		结束时间: <%=node.getEndTime() %><br/>
-			 			<% if (node.getNodeType() == Constants.DECOCT){ %>
-			 		机器名称: <%=node.getMachineName() %><br/>
-			 		煎煮时间: <%=node.getDecoctTime() %><br/>
-			 		浸泡时间: <%=node.getHeatTime() %><br/>
-			 			<% }else if (node.getNodeType() == Constants.POUR){ %>
-			 		机器名称: <%=node.getMachineName() %><br/>	
-			 			<% } %>
-			 		<% }else { %>
-			 		处理时间: <%=node.getEndTime() %><br/>
-			 		<% } %>
-			 		处理人: <%=node.getResolvedBy() %><br/>
-				 	<% if (node.getErrorStatus() != 0){ %>
-				 	出错: <%=Constants.getErrorName(node.getErrorStatus()) %><br/>
-				 	原因: <%=node.getErrorMsg() %>	
-				 	<% }else{ %>
-				 	正常
-				 	<% } %>
-			 	</span>
-			  </div>
-			</div>				
-			<% } %>
+<div class="row bs-wizard" style="border-bottom:0;">
+<% if (request.getAttribute("nodeList") != null){ %>
+	<% for (Node node : (List<Node>)request.getAttribute("nodeList")){ %>
+		<% if (node.getStatus() == 0){ %>
+		<div class="col-xs-3 bs-wizard-step disabled">
+		  <div class="text-center bs-wizard-stepnum"><%=node.getNodeTypeName() %></div>
+		  <div class="progress"><div class="progress-bar"></div></div>
+		  <a href="#" class="bs-wizard-dot"></a>
+		  <div class="bs-wizard-info text-center list-group">
+		 	<span class="txt-center">
+		 		尚未开始！
+		 	</span>
+		  </div>
+		</div>	
+		<% } else if (node.getStatus() == 1){ %>
+		<div class="col-xs-3 bs-wizard-step disabled">
+		  <div class="text-center bs-wizard-stepnum"><%=node.getNodeTypeName() %></div>
+		  <div class="progress"><div class="progress-bar"></div></div>
+		  <a href="#" class="bs-wizard-dot"></a>
+		  <div class="bs-wizard-info text-center list-group">
+		 	<span class="txt-center">
+		 		<% if (node.getNodeType() == Constants.SHIP){ %>
+		 		<%=node.getOrderStatus() %>
+		 		<% if (node.getResolvedBy() != null){ %>
+		 		开始时间: <%=node.getStartTime() %><br/>
+		 		进行中<br/>
+		 		处理人: <%=node.getResolvedBy() %><br/>
+		 		<% } %>
+		 		<% }else if (node.getSpecialDisplay()) { %>
+		 		开始时间: <%=node.getStartTime() %>
+		 		进行中<br/>
+		 		处理人: <%=node.getResolvedBy() %><br/>
+		 		<% }else{ %>
+		 		等待处理<br/>
+		 		处理人: <%=node.getResolvedBy() %><br/>
+		 		<% } %>
+			 	<% if (node.getErrorStatus() != 0){ %>
+			 	流程回退: <%=Constants.getErrorName(node.getErrorStatus()) %><br/>
+			 	回退原因: <%=node.getErrorMsg() %>	
+			 	<% }else{ %>
+			 	流程正常
+			 	<% } %>
+		 	</span>
+		  </div>
+		</div>				
+		<% } else{ %>
+		<div class="col-xs-3 bs-wizard-step complete">
+		  <div class="text-center bs-wizard-stepnum"><%=node.getNodeTypeName() %></div>
+		  <div class="progress"><div class="progress-bar"></div></div>
+		  <a href="#" class="bs-wizard-dot"></a>
+		  <div class="bs-wizard-info text-center list-group">
+		 	<span class="txt-center">
+		 		<% if (node.getNodeType() == Constants.SHIP){ %>
+		 		<%=node.getOrderStatus() %><br/>
+		 		开始时间: <%=node.getStartTime() %><br/>
+		 		结束时间: <%=node.getEndTime() %><br/>
+		 		<% }else if (node.getSpecialDisplay()){ %>
+		 		开始时间: <%=node.getStartTime() %><br/>
+		 		结束时间: <%=node.getEndTime() %><br/>
+		 		<% if (node.getNodeType() == Constants.DECOCT){ %>
+		 		机器名称: <%=node.getMachineName() %><br/>
+		 		煎煮时间: <%=node.getDecoctTime() %><br/>
+		 		浸泡时间: <%=node.getHeatTime() %><br/>
+		 		<% }else if (node.getNodeType() == Constants.POUR){ %>
+		 		机器名称: <%=node.getMachineName() %><br/>	
+		 		<% } %>
+		 		<% }else { %>
+		 		处理时间: <%=node.getEndTime() %><br/>
+		 		<% } %>
+		 		处理人: <%=node.getResolvedBy() %><br/>
+			 	<% if (node.getErrorStatus() != 0){ %>
+			 	流程回退: <%=Constants.getErrorName(node.getErrorStatus()) %><br/>
+			 	回退原因: <%=node.getErrorMsg() %>	
+			 	<% }else{ %>
+			 	流程正常
+			 	<% } %>
+		 	</span>
+		  </div>
+		</div>				
 		<% } %>
 	<% } %>
-	</div>
+<% } %>
 </div>
 <%@ include file="../foot.jsp"%>
