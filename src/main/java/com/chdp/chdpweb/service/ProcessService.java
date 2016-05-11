@@ -42,7 +42,7 @@ public class ProcessService {
 	private OrderDao orderDao;
 	@Autowired
 	private UserDao userDao;
-	
+
 	public int createProccess(Process newProcess) {
 		try {
 			return proDao.createProcess(newProcess);
@@ -387,6 +387,13 @@ public class ProcessService {
 			switch (prs.getProcess()) {
 			case Constants.RECEIVE:
 				return "正在接方";
+			case Constants.MIX:
+				proc = proDao.getProcessesById(prs.getProcess_id());
+				if (proc.getBegin() == null) {
+					return "等待调配";
+				} else {
+					return "正在调配";
+				}
 			case Constants.SHIP:
 				if (prs.getProcess_id() == -1) {
 					return "包装完成";
@@ -410,21 +417,21 @@ public class ProcessService {
 		}
 
 	}
-	
-	//获取一个订单的所有节点状态
-	public List<Node> getPrsWorkFlowNods(Prescription prs){
-		try{
+
+	// 获取一个订单的所有节点状态
+	public List<Node> getPrsWorkFlowNods(Prescription prs) {
+		try {
 			List<Node> nodeList = new ArrayList<Node>();
-			
+
 			List<Process> processList = new ArrayList<Process>();
-			if (prs.getProcess() < Constants.SHIP){
+			if (prs.getProcess() < Constants.SHIP) {
 				processList = this.getProcessChainWithProcessId(prs.getProcess_id());
 			} else {
 				Process temp = proDao.getProcesswithPrsIdandProcess(prs.getId(), Constants.PACKAGE);
 				processList = this.getProcessChainWithProcessId(temp.getId());
 			}
-			
-			for (Process process : processList){
+
+			for (Process process : processList) {
 				Node node = new Node();
 				node.setResolvedBy(process.getUser_name());
 				node.setNodeId(process.getId());
@@ -434,20 +441,24 @@ public class ProcessService {
 				node.setSpecialDisplay(false);
 				node.setErrorStatus(process.getError_type());
 				node.setErrorMsg(process.getError_msg());
-				if (process.getProcess_type() == Constants.DECOCT || process.getProcess_type() == Constants.SOAK || process.getProcess_type() == Constants.POUR
-						|| process.getProcess_type() == Constants.CLEAN || process.getProcess_type() == Constants.SHIP || process.getProcess_type() == Constants.MIX){
+				if (process.getProcess_type() == Constants.DECOCT || process.getProcess_type() == Constants.SOAK
+						|| process.getProcess_type() == Constants.CLEAN || process.getProcess_type() == Constants.SHIP
+						|| process.getProcess_type() == Constants.MIX) {
 					node.setSpecialDisplay(true);
 				}
-				if (process.getFinish() == null){
+				if (process.getBegin() == null) {
+					node.setStatus(0);
+				} else if (process.getFinish() == null) {
 					node.setStatus(1);
-				}else{
+				} else {
 					node.setStatus(2);
 					node.setEndTime(process.getFinish());
-					if (process.getProcess_type() == Constants.DECOCT){
-						node.setDecoctTime(Utils.getDecoctTime(node.getStartTime(), node.getEndTime(), prs.getClass_of_medicines()));
+					if (process.getProcess_type() == Constants.DECOCT) {
+						node.setDecoctTime(Utils.getDecoctTime(node.getStartTime(), node.getEndTime(),
+								prs.getClass_of_medicines()));
 						node.setHeatTime(Utils.getHeatTime(node.getEndTime(), prs.getClass_of_medicines()));
 						node.setMachineName(process.getMachine_name());
-					}else if (process.getProcess_type() == Constants.POUR){
+					} else if (process.getProcess_type() == Constants.POUR) {
 						node.setMachineName(process.getMachine_name());
 					}
 				}
@@ -455,24 +466,24 @@ public class ProcessService {
 			}
 
 			Node shipNode = new Node();
-			if (prs.getProcess() >= Constants.SHIP){
+			if (prs.getProcess() >= Constants.SHIP) {
 				shipNode.setNodeId(prs.getProcess_id());
 				shipNode.setNodeType(Constants.SHIP);
 				shipNode.setNodeTypeName(Utils.getProcessName(Constants.SHIP));
 				shipNode.setSpecialDisplay(true);
 				shipNode.setErrorStatus(0);
 				shipNode.setStatus(1);
-				if (prs.getProcess() == Constants.FINISH){
+				if (prs.getProcess() == Constants.FINISH) {
 					shipNode.setStatus(2);
 				}
-				if (prs.getProcess_id() == -1){
-					shipNode.setOrderStatus("等待出库");
-				}else{
+				if (prs.getProcess_id() == -1) {
+					shipNode.setOrderStatus("等待打印");
+				} else {
 					Order order = orderDao.getOrderById(prs.getProcess_id());
 					shipNode.setStartTime(order.getCreate_time());
-					if (order.getStatus() == 1){
+					if (order.getStatus() == 1) {
 						shipNode.setOrderStatus("等待出库");
-					}else {
+					} else {
 						shipNode.setOrderStatus("已出库");
 						shipNode.setEndTime(order.getOutbound_time());
 					}
@@ -480,17 +491,16 @@ public class ProcessService {
 				}
 				nodeList.add(shipNode);
 			}
-			
-			
-			//统计订单中所有未完成部分
-			for (int i = prs.getProcess() + 1; i < Constants.FINISH ; i++){
+
+			// 统计订单中所有未完成部分
+			for (int i = prs.getProcess() + 1; i < Constants.FINISH; i++) {
 				Node node = new Node();
 				node.setStatus(0);
 				node.setNodeTypeName(Utils.getProcessName(i));
 				nodeList.add(node);
 			}
 			return nodeList;
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Node>();
 		}
 	}

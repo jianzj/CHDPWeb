@@ -48,7 +48,7 @@
 		  <a href="#" class="bs-wizard-dot"></a>
 		  <div class="bs-wizard-info text-center list-group">
 		 	<span class="txt-center">
-		 		尚未开始！
+		 		<span class="glyphicon glyphicon-flag"></span> 尚未开始
 		 	</span>
 		  </div>
 		</div>	
@@ -60,25 +60,24 @@
 		  <div class="bs-wizard-info text-center list-group">
 		 	<span class="txt-center">
 		 		<% if (node.getNodeType() == Constants.SHIP){ %>
-		 		<%=node.getOrderStatus() %>
-		 		<% if (node.getResolvedBy() != null){ %>
-		 		开始时间: <%=node.getStartTime() %><br/>
-		 		进行中<br/>
-		 		处理人: <%=node.getResolvedBy() %><br/>
-		 		<% } %>
+			 		<span class="glyphicon glyphicon-flag"></span> <%=node.getOrderStatus() %><br/>
+			 		<% if (node.getResolvedBy() != null){ %>
+			 		<span class="glyphicon glyphicon-print"></span> 打印时间: <%=node.getStartTime() %><br/>
+			 		<span class="glyphicon glyphicon-user"></span> 处理人: <%=node.getResolvedBy() %><br/>
+			 		<% } %>
 		 		<% }else if (node.getSpecialDisplay()) { %>
-		 		开始时间: <%=node.getStartTime() %>
-		 		进行中<br/>
-		 		处理人: <%=node.getResolvedBy() %><br/>
+		 		    <span class="glyphicon glyphicon-flag"></span> 正在处理<br/>
+			 		<span class="glyphicon glyphicon-play-circle"></span> 开始时间: <%=node.getStartTime() %><br/>
+			 		<span class="glyphicon glyphicon-user"></span> 处理人: <%=node.getResolvedBy() %><br/>
 		 		<% }else{ %>
-		 		等待处理<br/>
+                    <span class="glyphicon glyphicon-flag"></span> 等待处理<br/>
 		 		<% } %>
 			 	<% if (node.getErrorStatus() != 0){ %>
-			 	流程回退: <%=Constants.getErrorName(node.getErrorStatus()) %><br/>
-			 	回退原因: <%=node.getErrorMsg() %>	
-			 	<% }else{ %>
-			 	流程正常
-			 	<% } %>
+				 	<div class="bs-callout bs-callout-danger">
+				 	<span class="glyphicon glyphicon-repeat"></span> 流程回退: <%=Constants.getErrorName(node.getErrorStatus()) %><br/>
+				 	<span class="glyphicon glyphicon-warning-sign"></span> 回退原因: <%=node.getErrorMsg() %>
+				 	</div>
+				<% } %>
 		 	</span>
 		  </div>
 		</div>				
@@ -90,28 +89,30 @@
 		  <div class="bs-wizard-info text-center list-group">
 		 	<span class="txt-center">
 		 		<% if (node.getNodeType() == Constants.SHIP){ %>
-		 		<%=node.getOrderStatus() %><br/>
-		 		开始时间: <%=node.getStartTime() %><br/>
-		 		结束时间: <%=node.getEndTime() %><br/>
+			 		<span class="glyphicon glyphicon-flag"></span> <%=node.getOrderStatus() %><br/>
+			 		<span class="glyphicon glyphicon-print"></span> 打印时间: <%=node.getStartTime() %><br/>
+			 		<span class="glyphicon glyphicon-time"></span> 出库时间: <%=node.getEndTime() %><br/>
 		 		<% }else if (node.getSpecialDisplay()){ %>
-		 		开始时间: <%=node.getStartTime() %><br/>
-		 		结束时间: <%=node.getEndTime() %><br/>
-		 		<% if (node.getNodeType() == Constants.DECOCT){ %>
-		 		机器名称: <%=node.getMachineName() %><br/>
-		 		煎煮时间: <%=node.getDecoctTime() %><br/>
-		 		浸泡时间: <%=node.getHeatTime() %><br/>
-		 		<% }else if (node.getNodeType() == Constants.POUR){ %>
-		 		机器名称: <%=node.getMachineName() %><br/>	
-		 		<% } %>
+		 		    <span class="glyphicon glyphicon-flag"></span> 处理完成<br/>
+			 		<span class="glyphicon glyphicon-play-circle"></span> 开始时间: <%=node.getStartTime() %><br/>
+			 		<span class="glyphicon glyphicon-off"></span> 结束时间: <%=node.getEndTime() %><br/>
+			 		<% if (node.getNodeType() == Constants.DECOCT){ %>
+				 		<span class="glyphicon glyphicon-scale"></span> 机器名称: <%=node.getMachineName() %><br/>
+				 		<span class="glyphicon glyphicon-time"></span> 煎煮时间: <%=node.getDecoctTime() %><br/>
+                        <span class="glyphicon glyphicon-time"></span> 保温时间: <%=node.getHeatTime() %><br/>
+			 		<% }else if (node.getNodeType() == Constants.POUR){ %>
+                        <span class="glyphicon glyphicon-scale"></span> 机器名称: <%=node.getMachineName() %><br/>	
+				 	<% } %>
 		 		<% }else { %>
-		 		处理时间: <%=node.getEndTime() %><br/>
-		 		<% } %>
-		 		处理人: <%=node.getResolvedBy() %><br/>
-			 	<% if (node.getErrorStatus() != 0){ %>
-			 	流程回退: <%=Constants.getErrorName(node.getErrorStatus()) %><br/>
-			 	回退原因: <%=node.getErrorMsg() %>	
-			 	<% }else{ %>
-			 	流程正常
+		 		    <span class="glyphicon glyphicon-flag"></span> 处理完成<br/>
+			 		<span class="glyphicon glyphicon-time"></span> 处理时间: <%=node.getEndTime() %><br/>
+			 	<% } %>
+			 		<span class="glyphicon glyphicon-user"></span> 处理人: <%=node.getResolvedBy() %><br/>
+				 <% if (node.getErrorStatus() != 0){ %>
+				    <div class="bs-callout bs-callout-danger">
+				 	<span class="glyphicon glyphicon-repeat"></span> 流程回退: <%=Constants.getErrorName(node.getErrorStatus()) %><br/>
+				 	<span class="glyphicon glyphicon-warning-sign"></span> 回退原因: <%=node.getErrorMsg() %>
+				 	</div>
 			 	<% } %>
 		 	</span>
 		  </div>
