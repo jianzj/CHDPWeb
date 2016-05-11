@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import com.chdp.chdpweb.bean.User;
@@ -32,7 +33,7 @@ public class UserController {
 	public String login() {
 		if (SecurityUtils.getSubject().isAuthenticated())
 			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/";
-		
+
 		return "user/login";
 	}
 
@@ -99,54 +100,50 @@ public class UserController {
 	@RequestMapping(value = "/list")
 	public String list(HttpServletRequest request, @RequestParam(name = "pageNum", defaultValue = "1") int pageNum) {
 		request.setAttribute("nav", "用户管理");
-		
+
 		List<User> userList = userService.getUserList(pageNum);
 		request.setAttribute("userList", userList);
-		
+
 		PageInfo<User> page = new PageInfo<User>(userList);
 		request.setAttribute("page", page);
-		
+
 		return "user/userList";
 	}
 
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/delete")
 	public String delete(HttpServletRequest request, @RequestParam(name = "userId") Integer userId,
-			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum) {
-		request.setAttribute("nav", "用户管理");
-
+			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, RedirectAttributes redirectAttributes) {
 		if (userId == null)
-			request.setAttribute("errorMsg", "未知的用户ID");
+			redirectAttributes.addFlashAttribute("errorMsg", "未知的用户ID");
 		else {
 			if (userId == ((User) SecurityUtils.getSubject().getSession().getAttribute("user")).getId())
-				request.setAttribute("errorMsg", "不允许删除当前登录用户");
+				redirectAttributes.addFlashAttribute("errorMsg", "不允许删除当前登录用户");
 			else {
 				if (userService.deleteUser(userId))
-					request.setAttribute("successMsg", "删除用户成功");
+					redirectAttributes.addFlashAttribute("successMsg", "删除用户成功");
 				else
-					request.setAttribute("errorMsg", "删除用户失败");
+					redirectAttributes.addFlashAttribute("errorMsg", "删除用户失败");
 			}
 		}
 
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../user/list?pageNum=" + pageNum;
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../user/list?pageNum=" + pageNum;
 	}
 
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/resetPassword")
 	public String resetPassword(HttpServletRequest request, @RequestParam(name = "userId") Integer userId,
-			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum) {
-		request.setAttribute("nav", "用户管理");
-
+			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, RedirectAttributes redirectAttributes) {
 		if (userId == null)
-			request.setAttribute("errorMsg", "未知的用户ID");
+			redirectAttributes.addFlashAttribute("errorMsg", "未知的用户ID");
 		else {
 			if (userService.resetUserPassword(userId))
-				request.setAttribute("successMsg", "重置用户密码成功");
+				redirectAttributes.addFlashAttribute("successMsg", "重置用户密码成功");
 			else
-				request.setAttribute("errorMsg", "重置用户密码失败");
+				redirectAttributes.addFlashAttribute("errorMsg", "重置用户密码失败");
 		}
 
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../user/list?pageNum=" + pageNum;
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../user/list?pageNum=" + pageNum;
 	}
 
 	@RequiresRoles("ADMIN")
@@ -160,7 +157,7 @@ public class UserController {
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public String addPost(HttpServletRequest request, User user) {
 		request.setAttribute("nav", "用户管理");
-		
+
 		String rePassword = request.getParameter("rePassword");
 		user.setAuthority((request.getParameter("authority-1024") == null ? 0 : 1024)
 				| (request.getParameter("authority-512") == null ? 0 : 512)
@@ -187,7 +184,7 @@ public class UserController {
 			}
 		}
 		request.setAttribute("userAdd", user);
-		
+
 		return "user/addUser";
 	}
 
@@ -195,7 +192,7 @@ public class UserController {
 	@RequestMapping(value = "/modify", method = RequestMethod.GET)
 	public String modify(HttpServletRequest request, @RequestParam(name = "userId") Integer userId) {
 		request.setAttribute("nav", "用户管理");
-		
+
 		if (userId == null)
 			request.setAttribute("errorMsg", "未知的用户ID");
 		else
@@ -208,7 +205,7 @@ public class UserController {
 	@RequestMapping(value = "/modify", method = RequestMethod.POST)
 	public String modifyPost(HttpServletRequest request, @RequestParam(name = "userId") Integer userId) {
 		request.setAttribute("nav", "用户管理");
-		
+
 		if (userId == null)
 			request.setAttribute("errorMsg", "未知的用户ID");
 		else {
@@ -233,7 +230,7 @@ public class UserController {
 
 			request.setAttribute("userModify", user);
 		}
-		
+
 		return "user/modifyUser";
 	}
 }

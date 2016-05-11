@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import com.chdp.chdpweb.Constants;
@@ -43,6 +44,8 @@ public class MachineController {
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/add", method = RequestMethod.GET)
 	public String add(HttpServletRequest request) {
+		request.setAttribute("nav", "机器管理");
+
 		List<Machine> pourMachineList = machineService.getMachineListByType(Constants.FILLING_MACHINE);
 		if (pourMachineList.size() > 0) {
 			request.setAttribute("pourMachineList", pourMachineList);
@@ -85,45 +88,41 @@ public class MachineController {
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/delete")
 	public String delete(HttpServletRequest request, @RequestParam(name = "machineId") Integer machineId,
-			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum) {
-		request.setAttribute("nav", "机器管理");
-
+			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, RedirectAttributes redirectAttributes) {
 		if (machineId == null) {
-			request.setAttribute("errorMsg", "未知的机器ID！");
+			redirectAttributes.addFlashAttribute("errorMsg", "未知的机器ID！");
 		} else if (machineService.existRelatedMachines(machineId, Constants.DECOCTION_MACHINE)) {
-			request.setAttribute("errorMsg", "此机器为灌装机，已有煎煮机与其关联，请先删除或更改煎煮机关联项！");
+			redirectAttributes.addFlashAttribute("errorMsg", "此机器为灌装机，已有煎煮机与其关联，请先删除或更改煎煮机关联项！");
 		} else {
 			if (machineService.isMachineInUse(machineId)) {
-				request.setAttribute("errorMsg", "当前有处方正在使用此机器，请稍后删除！");
+				redirectAttributes.addFlashAttribute("errorMsg", "当前有处方正在使用此机器，请稍后删除！");
 			} else {
 				if (machineService.deleteMachine(machineId)) {
-					request.setAttribute("successMsg", "删除机器成功");
+					redirectAttributes.addFlashAttribute("successMsg", "删除机器成功");
 				} else {
-					request.setAttribute("errorMsg", "删除机器失败，请稍后重试！");
+					redirectAttributes.addFlashAttribute("errorMsg", "删除机器失败，请稍后重试！");
 				}
 			}
 		}
 
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../machine/list?pageNum=" + pageNum;
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../machine/list?pageNum=" + pageNum;
 	}
 
 	// 打印机器标签
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/printMachineLabel")
 	public String printMachineLabel(HttpServletRequest request, @RequestParam(name = "machineId") Integer machineId,
-			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum) {
-		request.setAttribute("nav", "机器管理");
-
+			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, RedirectAttributes redirectAttributes) {
 		if (machineId == null) {
-			request.setAttribute("errorMsg", "未知的机器ID！");
+			redirectAttributes.addFlashAttribute("errorMsg", "未知的机器ID！");
 		} else {
 			Machine machine = machineService.getMachineById(machineId);
 			PrintHelper.startAndSetup();
 			PrintHelper.printMachine(machine.getName(), machine.getUuid());
 			PrintHelper.close();
-			request.setAttribute("successMsg", "打印成功！");
+			redirectAttributes.addFlashAttribute("successMsg", "打印机器标签成功！");
 		}
 
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../machine/list?pageNum=" + pageNum;
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../machine/list?pageNum=" + pageNum;
 	}
 }

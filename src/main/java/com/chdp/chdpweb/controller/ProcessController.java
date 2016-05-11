@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import com.chdp.chdpweb.Constants;
@@ -37,7 +38,7 @@ public class ProcessController {
 	public String listPrsInReceiving(HttpServletRequest request,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
 		request.setAttribute("nav", "接方流程列表");
-		
+
 		List<Prescription> prsList = null;
 		if (hospitalId == 0) {
 			prsList = prsService.listPrsWithProcessNoUser(Constants.RECEIVE);
@@ -50,7 +51,7 @@ public class ProcessController {
 		request.setAttribute("hospitalList", hospitalList);
 		request.setAttribute("hospitalId", hospitalId);
 		request.setAttribute("receiveList", prsList);
-		
+
 		return "process/receiveList";
 	}
 
@@ -59,7 +60,7 @@ public class ProcessController {
 	public String listPrsInPackaging(HttpServletRequest request,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
 		request.setAttribute("nav", "包装流程列表");
-		
+
 		List<Prescription> prsList = null;
 		if (hospitalId == 0) {
 			prsList = prsService.listPrsWithProcessNoUser(Constants.PACKAGE);
@@ -80,7 +81,7 @@ public class ProcessController {
 	public String listPrsInShipping(HttpServletRequest request,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
 		request.setAttribute("nav", "出库流程列表");
-		
+
 		List<Prescription> prsList = prsService.listShipPrescription(Constants.SHIP, hospitalId);
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 
@@ -95,10 +96,10 @@ public class ProcessController {
 	@RequestMapping(value = "/showAllProcs", method = RequestMethod.GET)
 	public String showAllProcesses(HttpServletRequest request,
 			@RequestParam(value = "prsId", defaultValue = "0") int prsId,
-			@RequestParam(value = "from", defaultValue = "CURRENT") String from) {
-
+			@RequestParam(value = "from", defaultValue = "CURRENT") String from,
+			RedirectAttributes redirectAttributes) {
 		if (prsId == 0) {
-			request.setAttribute("errorMsg", "未知处方ID！");
+			redirectAttributes.addFlashAttribute("errorMsg", "未知处方ID！");
 			if (from.equals("CURRENT")) {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/currentList";
 			} else if (from.equals("HISTORY")) {
@@ -109,11 +110,11 @@ public class ProcessController {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
 			} else if (from.equals("ORDER")) {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
-			}else{
+			} else {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/currentList";
 			}
 		}
-		
+
 		Prescription prs = prsService.getPrsNoUser(prsId);
 		List<Node> nodeList = proService.getPrsWorkFlowNods(prs);
 		request.setAttribute("nodeList", nodeList);

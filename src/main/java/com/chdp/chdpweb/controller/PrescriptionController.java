@@ -11,11 +11,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import com.chdp.chdpweb.Constants;
@@ -50,7 +52,7 @@ public class PrescriptionController {
 	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)
 	@RequestMapping(value = "/add", method = RequestMethod.GET)
 	public String add(HttpServletRequest request) {
-		request.setAttribute("nav", "出库流程列表");
+		request.setAttribute("nav", "接方流程列表");
 
 		Prescription lastestPrs = prsService.getLastestPrs();
 		if (lastestPrs != null) {
@@ -66,7 +68,7 @@ public class PrescriptionController {
 	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public String add(HttpServletRequest request, Prescription prs) {
-		request.setAttribute("nav", "出库流程列表");
+		request.setAttribute("nav", "接方流程列表");
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
@@ -118,64 +120,24 @@ public class PrescriptionController {
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
-		// request.setAttribute("hospital", "ALL");
-		List<Prescription> prsList = null;
 
 		if (prsIdStr == null) {
-			request.setAttribute("errorMsg", "未知处方ID，无法修改！");
-			if (from.equals("RECEIVE")) {
-				prsList = prsService.listPrsWithProcessNoUser(Constants.RECEIVE);
-				request.setAttribute("receiveList", prsList);
-				return "process/receiveList";
-			} else if (from.equals("PACKAGE")) {
-				prsList = prsService.listPrsWithProcessNoUser(Constants.PACKAGE);
-				request.setAttribute("packageList", prsList);
-				return "process/packageList";
-			} else if (from.equals("SHIP")) {
-				prsList = prsService.listPrsWithProcessNoUser(Constants.SHIP);
-				request.setAttribute("shipList", prsList);
-				return "process/shipList";
-			} else if (from.equals("CURRENT")) {
-				prsList = prsService.listPrsWithProcessUnfinished(1);
-				// request.setAttribute("hospital", "ALL");
-				request.setAttribute("process", 0);
-				request.setAttribute("currentPrsList", prsList);
-				PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
-				request.setAttribute("page", page);
-				return "prescription/currentPrsList";
-			}
+			request.setAttribute("errorMsg", "未知处方，无法修改！");
+			return "errormsg";
 		}
 
 		int prsId = Integer.parseInt(prsIdStr);
 
-		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
-		if (from.equals("RECEIVE")
-				&& ((currentUser.getAuthority() & 1024) == 0 && (currentUser.getAuthority() & 512) == 0)) {
-			request.setAttribute("errorMsg", "您暂无此操作权限！");
-			prsList = prsService.listPrsWithProcessNoUser(Constants.RECEIVE);
-			request.setAttribute("receiveList", prsList);
-			return "process/receiveList";
-		} else if (from.equals("PACKAGE")
-				&& ((currentUser.getAuthority() & 1024) == 0 && (currentUser.getAuthority() & 2) == 0)) {
-			request.setAttribute("errorMsg", "您暂无此操作权限！");
-			prsList = prsService.listPrsWithProcessNoUser(Constants.PACKAGE);
-			request.setAttribute("packageList", prsList);
-			return "process/packageList";
-		} else if (from.equals("SHIP")
-				&& ((currentUser.getAuthority() & 1024) == 0 && (currentUser.getAuthority() & 1) == 0)) {
-			request.setAttribute("errorMsg", "您暂无此操作权限！");
-			prsList = prsService.listPrsWithProcessNoUser(Constants.SHIP);
-			request.setAttribute("shipList", prsList);
-			return "process/shipList";
-		} else if (from.equals("CURRENT") && ((currentUser.getAuthority() & 1024) == 0)) {
-			request.setAttribute("errorMsg", "您暂无此操作权限！");
-			prsList = prsService.listPrsWithProcessUnfinished(1);
-			// request.setAttribute("hospital", "ALL");
-			request.setAttribute("process", 0);
-			request.setAttribute("currentPrsList", prsList);
-			PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
-			request.setAttribute("page", page);
-			return "prescription/currentPrsList";
+		Subject currentUser = SecurityUtils.getSubject();
+
+		if (from.equals("RECEIVE") && (!currentUser.hasRole("ADMIN") && !currentUser.hasRole("RECEIVE"))) {
+			return "unauthenticated";
+		} else if (from.equals("PACKAGE") && (!currentUser.hasRole("ADMIN") && !currentUser.hasRole("PACKAGE"))) {
+			return "unauthenticated";
+		} else if (from.equals("SHIP") && (!currentUser.hasRole("ADMIN") && !currentUser.hasRole("SHIP"))) {
+			return "unauthenticated";
+		} else if (from.equals("CURRENT") && !currentUser.hasRole("ADMIN")) {
+			return "unauthenticated";
 		}
 
 		Prescription prs = prsService.getPrsNoUser(prsId);
@@ -188,7 +150,6 @@ public class PrescriptionController {
 	@RequiresRoles(value = { "ADMIN", "RECEIVE", "PACKAGE", "SHIP" }, logical = Logical.OR)
 	@RequestMapping(value = "/modify", method = RequestMethod.POST)
 	public String modifyPost(HttpServletRequest request, Prescription prs) {
-
 		String prsIdStr = request.getParameter("prsId");
 		String from = request.getParameter("from");
 
@@ -198,62 +159,24 @@ public class PrescriptionController {
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
-		// request.setAttribute("hospital", "ALL");
-		List<Prescription> prsList = null;
 
 		if (prsIdStr == null) {
 			request.setAttribute("errorMsg", "未知处方ID，无法修改！");
-			if (from.equals("RECEIVE")) {
-				prsList = prsService.listPrsWithProcessNoUser(Constants.RECEIVE);
-				request.setAttribute("receiveList", prsList);
-				return "process/receiveList";
-			} else if (from.equals("PACKAGE")) {
-				prsList = prsService.listPrsWithProcessNoUser(Constants.PACKAGE);
-				request.setAttribute("packageList", prsList);
-				return "process/packageList";
-			} else if (from.equals("SHIP")) {
-				prsList = prsService.listPrsWithProcessNoUser(Constants.SHIP);
-				request.setAttribute("shipList", prsList);
-				return "process/shipList";
-			} else if (from.equals("CURRENT")) {
-				prsList = prsService.listPrsWithProcessUnfinished(1);
-				request.setAttribute("process", 0);
-				request.setAttribute("currentPrsList", prsList);
-				PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
-				request.setAttribute("page", page);
-				return "prescription/currentPrsList";
-			}
+			return "errormsg";
 		}
 
 		int prsId = Integer.parseInt(prsIdStr);
 
-		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
-		if (from.equals("RECEIVE")
-				&& ((currentUser.getAuthority() & 1024) == 0 && (currentUser.getAuthority() & 512) == 0)) {
-			request.setAttribute("errorMsg", "您暂无此操作权限！");
-			prsList = prsService.listPrsWithProcessNoUser(Constants.RECEIVE);
-			request.setAttribute("receiveList", prsList);
-			return "process/receiveList";
-		} else if (from.equals("PACKAGE")
-				&& ((currentUser.getAuthority() & 1024) == 0 && (currentUser.getAuthority() & 2) == 0)) {
-			request.setAttribute("errorMsg", "您暂无此操作权限！");
-			prsList = prsService.listPrsWithProcessNoUser(Constants.PACKAGE);
-			request.setAttribute("packageList", prsList);
-			return "process/packageList";
-		} else if (from.equals("SHIP")
-				&& ((currentUser.getAuthority() & 1024) == 0 && (currentUser.getAuthority() & 1) == 0)) {
-			request.setAttribute("errorMsg", "您暂无此操作权限！");
-			prsList = prsService.listPrsWithProcessNoUser(Constants.SHIP);
-			request.setAttribute("shipList", prsList);
-			return "process/shipList";
-		} else if (from.equals("CURRENT") && ((currentUser.getAuthority() & 1024) == 0)) {
-			request.setAttribute("errorMsg", "您暂无此操作权限！");
-			prsList = prsService.listPrsWithProcessUnfinished(1);
-			request.setAttribute("process", 0);
-			request.setAttribute("currentPrsList", prsList);
-			PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
-			request.setAttribute("page", page);
-			return "prescription/currentPrsList";
+		Subject currentUser = SecurityUtils.getSubject();
+
+		if (from.equals("RECEIVE") && (!currentUser.hasRole("ADMIN") && !currentUser.hasRole("RECEIVE"))) {
+			return "unauthenticated";
+		} else if (from.equals("PACKAGE") && (!currentUser.hasRole("ADMIN") && !currentUser.hasRole("PACKAGE"))) {
+			return "unauthenticated";
+		} else if (from.equals("SHIP") && (!currentUser.hasRole("ADMIN") && !currentUser.hasRole("SHIP"))) {
+			return "unauthenticated";
+		} else if (from.equals("CURRENT") && !currentUser.hasRole("ADMIN")) {
+			return "unauthenticated";
 		}
 
 		Prescription currentPrs = prsService.getPrsNoUser(prsId);
@@ -300,57 +223,41 @@ public class PrescriptionController {
 			}
 		}
 
-		if (from.equals("RECEIVE")) {
-			prsList = prsService.listPrsWithProcessNoUser(Constants.RECEIVE);
-			request.setAttribute("receiveList", prsList);
-			return "process/receiveList";
-		} else if (from.equals("PACKAGE")) {
-			prsList = prsService.listPrsWithProcessNoUser(Constants.PACKAGE);
-			request.setAttribute("packageList", prsList);
-			return "process/packageList";
-		} else if (from.equals("SHIP")) {
-			prsList = prsService.listPrsWithProcessNoUser(Constants.SHIP);
-			request.setAttribute("shipList", prsList);
-			return "process/shipList";
-		} else if (from.equals("CURRENT")) {
-			prsList = prsService.listPrsWithProcessUnfinished(1);
-			request.setAttribute("process", 0);
-			request.setAttribute("currentPrsList", prsList);
-			PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
-			request.setAttribute("page", page);
-			return "prescription/currentPrsList";
-		}
-		return "process/receiveList";
+		request.setAttribute("prsModify", prs);
+		request.setAttribute("from", from);
+		request.setAttribute("prsId", prsId);
+
+		return "prescription/modifyPrs";
 	}
 
 	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)
 	@RequestMapping(value = "/delete")
-	public String delete(HttpServletRequest request) {
+	public String delete(HttpServletRequest request, RedirectAttributes redirectAttributes) {
 		String prsIdStr = request.getParameter("prsId");
 		String hospitalIdStr = request.getParameter("hospitalId");
 
 		if (prsIdStr == null) {
-			request.setAttribute("errorMsg", "未知处方ID，无法删除！");
+			redirectAttributes.addFlashAttribute("errorMsg", "未知处方ID，无法删除！");
 		} else {
 			int prsId = Integer.parseInt(prsIdStr);
 			Prescription prs = prsService.getPrsNoUser(prsId);
 			if (prs != null) {
 				if (prs.getProcess() != Constants.RECEIVE) {
-					request.setAttribute("errorMsg", "处方已经进入流转阶段，无法删除！");
+					redirectAttributes.addFlashAttribute("errorMsg", "处方已经进入流转阶段，无法删除！");
 				} else {
 					if (prsService.deletePrescription(prs.getId())) {
 						proService.deleteProcess(prs.getProcess_id());
-						request.setAttribute("successMsg", "删除处方成功！");
+						redirectAttributes.addFlashAttribute("successMsg", "删除处方成功！");
 					} else {
-						request.setAttribute("errorMsg", "删除处方出错，请稍后重试！");
+						redirectAttributes.addFlashAttribute("errorMsg", "删除处方出错，请稍后重试！");
 					}
 				}
 			} else {
-				request.setAttribute("errorMsg", "处方不存在，无法删除！");
+				redirectAttributes.addFlashAttribute("errorMsg", "处方不存在，无法删除！");
 			}
 		}
 
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../process/receiveList?hospitalId=" + hospitalIdStr;
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../process/receiveList?hospitalId=" + hospitalIdStr;
 	}
 
 	@RequiresRoles("ADMIN")
@@ -359,7 +266,6 @@ public class PrescriptionController {
 			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
 			@RequestParam(name = "hospitalId", defaultValue = "0") int hospitalId,
 			@RequestParam(name = "process", defaultValue = "0") int process) {
-
 		request.setAttribute("nav", "当前处方列表");
 
 		List<Prescription> prsList = null;
@@ -395,7 +301,6 @@ public class PrescriptionController {
 	public String getHistoryList(HttpServletRequest request,
 			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
-
 		request.setAttribute("nav", "历史处方列表");
 
 		String start = request.getParameter("startTime");
@@ -437,7 +342,8 @@ public class PrescriptionController {
 	@RequestMapping(value = "/hospitalDimensionList", method = RequestMethod.GET)
 	public String listHospitalDimension(HttpServletRequest request,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
-
+		request.setAttribute("nav", "医院维度统计");
+		
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
 
@@ -461,13 +367,13 @@ public class PrescriptionController {
 			request.setAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
 			List<Hospital> returnHospitalList = new ArrayList<Hospital>();
-			if (hospitalId == 0){
+			if (hospitalId == 0) {
 				returnHospitalList = hospitalService.getHospitalList();
-			}else{
+			} else {
 				Hospital hospital = hospitalService.getHospitalById(hospitalId);
 				returnHospitalList.add(hospital);
 			}
-			
+
 			List<Prescription> prsList = new ArrayList<Prescription>();
 			for (Hospital hospitalItem : returnHospitalList) {
 				prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalItem.getId(), start, end);
@@ -494,8 +400,7 @@ public class PrescriptionController {
 	public String listOrderDimension(HttpServletRequest request,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
 			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum) {
-
-		request.setAttribute("nav", "出货单维度统计");
+		request.setAttribute("nav", "出库单维度统计");
 
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
@@ -505,13 +410,13 @@ public class PrescriptionController {
 		if (end == null || end.equals("")) {
 			end = Utils.getCurrentTime();
 		}
-		
+
 		request.setAttribute("hospitalId", hospitalId);
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
-		
+
 		start = Utils.formatStartTime(start);
 		end = Utils.formatEndTime(end);
 
@@ -521,12 +426,12 @@ public class PrescriptionController {
 		} else {
 			List<Order> orderList = orderService.listOrderFinished(hospitalId, start, end, pageNum);
 			List<Prescription> prsList = null;
-			for (Order order : orderList){
+			for (Order order : orderList) {
 				prsList = prsService.getPrsListByOrderId(order.getId(), start, end);
 				order.setPrs_num(prsList.size());
 				int packet_num = 0;
 				double price_total = 0;
-				for (Prescription item : prsList){
+				for (Prescription item : prsList) {
 					packet_num += item.getPacket_num();
 					price_total += item.getPrice();
 				}
@@ -549,9 +454,8 @@ public class PrescriptionController {
 	public String listUserDimension(HttpServletRequest request,
 			@RequestParam(value = "userAuth", defaultValue = "0") int userAuth,
 			@RequestParam(value = "pageNum", defaultValue = "1") int pageNum) {
-
 		request.setAttribute("nav", "员工维度统计");
-		
+
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
 
@@ -592,9 +496,6 @@ public class PrescriptionController {
 			@RequestParam(name = "userId", defaultValue = "0") int userId,
 			@RequestParam(value = "orderId", defaultValue = "0") int orderId,
 			@RequestParam(name = "userAuth", defaultValue = "0") int userAuth) {
-
-		request.setAttribute("nav", "处方汇总列表");
-
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
 
@@ -607,7 +508,7 @@ public class PrescriptionController {
 
 		if (from.equals("USER") && userId == 0) {
 			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
-		}else if (from.equals("ORDER") && orderId == 0){
+		} else if (from.equals("ORDER") && orderId == 0) {
 			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
 		}
 
@@ -630,7 +531,7 @@ public class PrescriptionController {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
 			} else if (from.equals("ORDER")) {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
-			}else{
+			} else {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/currentList";
 			}
 		}
@@ -641,7 +542,7 @@ public class PrescriptionController {
 			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalId, pageNum, start, end);
 		} else if (from.equals("USER")) {
 			prsList = prsService.getPrsListByUserId(userId, start, end, pageNum);
-		} else if (from.equals("ORDER")){
+		} else if (from.equals("ORDER")) {
 			prsList = prsService.getPrsListByOrderId(orderId, start, end, pageNum);
 		} else {
 			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalId, pageNum, start, end);
@@ -710,22 +611,23 @@ public class PrescriptionController {
 	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)
 	@RequestMapping(value = "/printReceiveList")
 	public String printReceiveList(HttpServletRequest request,
-			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
+			RedirectAttributes redirectAttributes) {
 		if (prsService.printReceiveList(hospitalId)) {
-			request.setAttribute("successMsg", "打印接方标签成功！");
+			redirectAttributes.addFlashAttribute("successMsg", "打印接方标签成功！");
 		} else {
-			request.setAttribute("errorMsg", "打印解放标签出错，请重试！");
+			redirectAttributes.addFlashAttribute("errorMsg", "打印接方标签出错，请重试！");
 		}
 
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../process/receiveList?hospitalId=" + hospitalId;
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../process/receiveList?hospitalId=" + hospitalId;
 	}
 
 	// 打印包装标签
 	@RequiresRoles(value = { "ADMIN", "PACKAGE" }, logical = Logical.OR)
 	@RequestMapping(value = "/printPackageList")
 	public String printPackageList(HttpServletRequest request,
-			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
-
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
+			RedirectAttributes redirectAttributes) {
 		List<Prescription> prsList = null;
 		if (hospitalId == 0) {
 			prsList = prsService.listPrsWithProcessNoUser(Constants.PACKAGE);
@@ -739,25 +641,24 @@ public class PrescriptionController {
 					prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
 		}
 		PrintHelper.close();
-		request.setAttribute("successMsg", "打印完成！");
+		redirectAttributes.addFlashAttribute("successMsg", "打印包装标签完成！");
 
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../process/packageList?hospitalId=" + hospitalId;
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../process/packageList?hospitalId=" + hospitalId;
 	}
 
 	// 生成出货清单
 	@RequiresRoles(value = { "ADMIN", "SHIP" }, logical = Logical.OR)
 	@RequestMapping(value = "/printShipListXls")
 	public String printShipListXls(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) throws IOException {
-		request.setAttribute("nav", "出库流程列表");
-
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
+			RedirectAttributes redirectAttributes) throws IOException {
 		if (prsService.printShipListXls(hospitalId)) {
-			request.setAttribute("successMsg", "出库单生成成功！");
+			redirectAttributes.addFlashAttribute("successMsg", "出库单生成成功！");
 		} else {
-			request.setAttribute("errorMsg", "出库单生成成功出错，请重试！");
+			redirectAttributes.addFlashAttribute("errorMsg", "出库单生成成功出错，请重试！");
 		}
 
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../process/shipList?hospitalId=" + hospitalId;
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../process/shipList?hospitalId=" + hospitalId;
 	}
 
 }

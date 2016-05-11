@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import com.chdp.chdpweb.bean.Herb;
@@ -67,25 +68,18 @@ public class HerbController {
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/delete")
 	public String delete(HttpServletRequest request, @RequestParam(name = "herbId") Integer herbId,
-			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum) {
-		request.setAttribute("nav", "中药管理");
-
+			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, RedirectAttributes redirectAttributes) {
 		if (herbId == null) {
-			request.setAttribute("errorMsg", "未知的中药ID！");
+			redirectAttributes.addFlashAttribute("errorMsg", "未知的中药ID！");
 		} else {
 			if (herbService.deleteHerb(herbId)) {
-				request.setAttribute("successMsg", "删除中药成功");
+				redirectAttributes.addFlashAttribute("successMsg", "删除中药成功");
 			} else {
-				request.setAttribute("errorMsg", "删除中药失败，请稍后重试！");
+				redirectAttributes.addFlashAttribute("errorMsg", "删除中药失败，请稍后重试！");
 			}
 		}
 
-		List<Herb> herbList = herbService.getHerbList(pageNum);
-		request.setAttribute("herbList", herbList);
-		PageInfo<Herb> page = new PageInfo<Herb>(herbList);
-		request.setAttribute("page", page);
-
-		return InternalResourceViewResolver.FORWARD_URL_PREFIX + "../herb/list?pageNum=" + pageNum;
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../herb/list?pageNum=" + pageNum;
 	}
 
 }

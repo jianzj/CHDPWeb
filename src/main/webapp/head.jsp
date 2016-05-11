@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags"%>
 <%@ page import="org.apache.shiro.SecurityUtils,com.chdp.chdpweb.bean.User"%>
+<%@ taglib prefix=“shiro” uri=http://shiro.apache.org/tags %>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -146,19 +147,28 @@ $(document).ready(function() {
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-3 col-md-2 sidebar">
+                <shiro:hasRole name="ADMIN">
                 <ul class="nav nav-sidebar">
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("当前处方列表")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/prescription/currentList">当前处方列表</a></li>
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("历史处方列表")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/prescription/historyList">历史处方列表</a></li>
                 </ul>
+                </shiro:hasRole>
                 <ul class="nav nav-sidebar">
+                    <shiro:hasAnyRoles name="ADMIN,RECEIVE">
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("接方流程列表")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/process/receiveList">接方流程列表</a></li>
+                    </shiro:hasAnyRoles>
+                    <shiro:hasAnyRoles name="ADMIN,PACKAGE">
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("包装流程列表")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/process/packageList">包装流程列表</a></li>
+                    </shiro:hasAnyRoles>
+                    <shiro:hasAnyRoles name="ADMIN,SHIP">
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("出库流程列表")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/process/shipList">出库流程列表</a></li>
+                    </shiro:hasAnyRoles>
                 </ul>
+                <shiro:hasRole name="ADMIN">
                 <ul class="nav nav-sidebar">
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("医院维度统计")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/prescription/hospitalDimensionList">医院维度统计</a></li>
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("员工维度统计")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/prescription/userDimensionList">员工维度统计</a></li>
-                    <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("出货单维度统计")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/prescription/orderDimensionList">出货单维度统计</a></li>
+                    <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("出库单维度统计")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/prescription/orderDimensionList">出货单维度统计</a></li>
                 </ul>
                 <ul class="nav nav-sidebar">
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("用户管理")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/user/list">用户管理</a></li>
@@ -166,6 +176,7 @@ $(document).ready(function() {
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("机器管理")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/machine/list">机器管理</a></li>
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("中药管理")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/herb/list">中药管理</a></li>
                 </ul>
+                </shiro:hasRole>
             </div>
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
       
