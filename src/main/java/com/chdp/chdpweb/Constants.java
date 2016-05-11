@@ -1,5 +1,7 @@
 package com.chdp.chdpweb;
 
+import org.springframework.web.context.ContextLoader;
+
 public class Constants {
 
 	public static final int PAGE_SIZE = 15;
@@ -99,7 +101,11 @@ public class Constants {
 	public static final int ORDER_BEGIN = 1;
 	public static final int ORDER_FINISH = 2;
 
-	public static final String TEMPPATH = "D:/tmp/";
+	public static final String TEMPFILE = ContextLoader.getCurrentWebApplicationContext().getServletContext()
+			.getRealPath("/") + "/tmpFile/";
+
+	public static final String SHIPFILEPATH = ContextLoader.getCurrentWebApplicationContext().getServletContext()
+			.getRealPath("/") + "/shipFile/";
 
 	public static final String DEFAULT_START = "2010-07-18";
 	public static final String DEFAULT_END = "2099-07-18";

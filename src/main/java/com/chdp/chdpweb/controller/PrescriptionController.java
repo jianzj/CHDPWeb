@@ -653,8 +653,10 @@ public class PrescriptionController {
 	public String printShipListXls(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
 			RedirectAttributes redirectAttributes) throws IOException {
-		if (prsService.printShipListXls(hospitalId)) {
-			redirectAttributes.addFlashAttribute("successMsg", "出库单生成成功！");
+		String filename = prsService.printShipListXls(hospitalId);
+		if (filename != null) {
+			redirectAttributes.addFlashAttribute("successMsg", "出库单生成成功！ <a class='btn btn-primary' href='"
+					+ request.getContextPath() + "/shipFile/" + filename + "' target='_blank'>请点击此处下载</a>");
 		} else {
 			redirectAttributes.addFlashAttribute("errorMsg", "出库单生成成功出错，请重试！");
 		}
