@@ -16,7 +16,7 @@ public class User implements Comparable<User>{
 	private int prs_seven_packet_num;
 	private int prs_ten_packet_num;
 	private int prs_fourteen_packet_num;
-	private int prt_other_packet_num;
+	private int prs_other_packet_num;
 	private int error_num;
 	
 	public int getId() {
@@ -177,11 +177,11 @@ public class User implements Comparable<User>{
 	}
 	
 	public int getPrs_other_packet_num(){
-		return prt_other_packet_num;
+		return prs_other_packet_num;
 	}
 	
 	public void setPrs_other_packet_num(int num){
-		this.prt_other_packet_num = num;
+		this.prs_other_packet_num = num;
 	}
 
 }

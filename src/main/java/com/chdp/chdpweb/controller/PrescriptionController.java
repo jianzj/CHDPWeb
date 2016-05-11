@@ -575,7 +575,9 @@ public class PrescriptionController {
 		} else {
 			List<User> userList = prsService.getUserListForPrsSummary(userAuth, start, end, pageNum);
 			Collections.sort(userList);
-			request.setAttribute("finalUserList", userList);
+			request.setAttribute("returnUserList", userList);
+			PageInfo<User> page = new PageInfo<User>(userList);
+			request.setAttribute("page", page);
 		}
 
 		return "prescription/userDimension";
@@ -638,7 +640,7 @@ public class PrescriptionController {
 		if (from.equals("HOSPITAL")) {
 			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalId, pageNum, start, end);
 		} else if (from.equals("USER")) {
-			prsList = prsService.listPrsByUser(userAuth, userId, start, end);
+			prsList = prsService.getPrsListByUserId(userId, start, end, pageNum);
 		} else if (from.equals("ORDER")){
 			prsList = prsService.getPrsListByOrderId(orderId, start, end, pageNum);
 		} else {

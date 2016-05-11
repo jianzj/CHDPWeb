@@ -423,15 +423,6 @@ public class PrescriptionService {
 		}
 	}
 
-	// 用户维度
-	public int countErrorProByUser(int userId, String start, String end) {
-		try {
-			return prsDao.countProcsErrorByUser(userId, start, end);
-		} catch (Exception e) {
-			return 0;
-		}
-	}
-
 	public List<Prescription> listPrswithUser(int userId, int processType, String start, String end) {
 		try {
 			return prsDao.listPrsByUser(userId, processType, start, end);
@@ -473,82 +464,6 @@ public class PrescriptionService {
 			return pro.getId();
 		} catch (Exception e) {
 			return -1;
-		}
-	}
-
-	// 获得用户维度的处方列表
-	public List<User> getUserListForPrsSummary(int userAuth, String start, String end, int pageNum) {
-		try {
-			List<User> userList = null;
-			if (userAuth == 0) {
-				userList = userDao.getUserList();
-			} else {
-				userList = userDao.getUserListWithAuth(userAuth);
-			}
-			
-			for (User user : userList){
-				int prsNum = 0;
-				int fivePacketNum = 0;
-				int sevenPacketNum = 0;
-				int tenPacketNum = 0;
-				int fourteenPacketNum = 0;
-				int otherPacketNum = 0;
-				int errorNum = 0;
-				
-				
-			}
-			
-			List<User> finalUserList = new ArrayList<User>();
-			Iterator<User> itr = userList.iterator();
-			User user = null;
-			while (itr.hasNext()) {
-				user = itr.next();
-				int prsNum = 0;
-				int errorNum = 0;
-				if (userAuth == 0) {
-					List<Integer> tempPrsIdList = prsDao.listDealPrsIdByUser_NoShip(user.getId(), start, end);
-					if ((user.getAuthority() & 1) != 0) {
-						List<Integer> tempPrsIdList02 = prsDao.listDealPrsIdByUserr_Ship(user.getId(), start, end);
-						tempPrsIdList = Utils.mergeTwoPrsIdList(tempPrsIdList, tempPrsIdList02);
-					}
-					prsNum = tempPrsIdList.size();
-				} else {
-					int process_type = Utils.getProcessTypebyUserAuth(userAuth);
-					if (process_type == Constants.SHIP) {
-						prsNum = prsDao.countPrsDealByUser_Ship(user.getId(), start, end);
-					} else {
-						prsNum = prsDao.countPrsDealByUserAndProcess_NoShip(user.getId(), process_type, start, end);
-					}
-				}
-				if (userAuth == 0) {
-					Integer temp = prsDao.countProcsErrorByUser(user.getId(), start, end);
-					if (temp == null) {
-						errorNum = 0;
-					} else {
-						errorNum = temp;
-					}
-				} else {
-					// int process_type =
-					// Utils.getProcessTypebyUserAuth(userAuth);
-					// Integer temp =
-					// prsDao.countProcsErrorByUse_Process(process_type,user.getId(),
-					// start, end);
-					Integer temp = prsDao.countProcsErrorByUser(user.getId(), start, end);
-					if (temp == null) {
-						errorNum = 0;
-					} else {
-						errorNum = temp;
-					}
-				}
-				user.setDone_prs_num(prsNum);
-				user.setError_num(errorNum);
-				user.setPosition(user.getAuthority_str());
-				finalUserList.add(user);
-			}
-
-			return finalUserList;
-		} catch (Exception e) {
-			return new ArrayList<User>();
 		}
 	}
 
@@ -819,4 +734,90 @@ public class PrescriptionService {
 			return new ArrayList<Prescription>();
 		}
 	}
+	
+	//根据用户Id查询此用户已经完成的所有处方数量
+	public List<Prescription> getPrsListByUserId(int userId, String start, String end){
+		try{
+			List<Prescription> prsList = prsDao.getPrsListFromProcessByUserId(userId, start, end);
+			List<Prescription> prsByOrderList = prsDao.getPrsListFromOrderByUserId(userId, start, end);
+			for (Prescription prs : prsByOrderList){
+				if (prsList.contains(prs)){
+					prsList.add(prs);
+				}
+			}
+			return prsList;
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	//根据用户Id查询此用户已经完成的所有处方数量
+	public List<Prescription> getPrsListByUserId(int userId, String start, String end, int pageNum){
+		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+		try{
+			List<Prescription> prsList = prsDao.getPrsListFromProcessByUserId(userId, start, end);
+			List<Prescription> prsByOrderList = prsDao.getPrsListFromOrderByUserId(userId, start, end);
+			for (Prescription prs : prsByOrderList){
+				if (prsList.contains(prs)){
+					prsList.add(prs);
+				}
+			}
+			return prsList;
+		} catch (Exception e){
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	// 根据用户Id统计用户在一个时间段内处理处方的情况
+	public List<User> getUserListForPrsSummary(int userAuth, String start, String end, int pageNum) {
+		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+		try {
+			List<User> userList = null;
+			if (userAuth == 0) {
+				userList = userDao.getUserList();
+			} else {
+				userList = userDao.getUserListWithAuth(userAuth);
+			}
+			
+			for (User user : userList){
+				int fivePacketNum = 0;
+				int sevenPacketNum = 0;
+				int tenPacketNum = 0;
+				int fourteenPacketNum = 0;
+				int otherPacketNum = 0;
+
+				List<Prescription> prsList = this.getPrsListByUserId(user.getId(), start, end);
+				user.setDone_prs_num(prsList.size());
+				for (Prescription prs : prsList){
+					int packet_num = prs.getPacket_num();
+					if (packet_num == 5){
+						fivePacketNum  += 1;
+					}else if (packet_num == 7){
+						sevenPacketNum += 1;
+					}else if (packet_num == 10){
+						tenPacketNum += 1;
+					}else if (packet_num == 14){
+						fourteenPacketNum += 1;
+					}else{
+						otherPacketNum += 1;
+					}
+				}
+				user.setPrs_five_packet_num(fivePacketNum);
+				user.setPrs_seven_packet_num(sevenPacketNum);
+				user.setPrs_ten_packet_num(tenPacketNum);
+				user.setPrs_fourteen_packet_num(fourteenPacketNum);
+				user.setPrs_other_packet_num(otherPacketNum);
+				Integer errorNum = prsDao.getErrorProcessByUserId(user.getId(), start, end);
+				if (errorNum != null){
+					user.setError_num(errorNum);
+				}else{
+					user.setError_num(0);
+				}
+			}
+			return userList;
+		} catch (Exception e) {
+			return new ArrayList<User>();
+		}
+	}
+
 }

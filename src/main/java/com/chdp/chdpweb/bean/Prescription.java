@@ -272,4 +272,11 @@ public class Prescription {
 	public void setPhase_name(String phase_name){
 		this.phase_name = phase_name;
 	}
+	
+	public boolean equals(Prescription prs){
+		if (this.id == prs.getId()){
+			return true;
+		}
+		return false;
+	}
 }

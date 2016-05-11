@@ -67,6 +67,9 @@
 	<% if (request.getAttribute("userId") != null){ %>
 		<% request.setAttribute("userId", (Integer)request.getAttribute("userId")); %>
 	<% } %>
+	<% if (request.getAttribute("userAuth") != null){ %>
+		<% request.setAttribute("userAuth", (Integer)request.getAttribute("userAuth")); %>
+	<% } %>
 	<% if (request.getAttribute("orderId") != null){ %>
 		<% request.setAttribute("orderId", (Integer)request.getAttribute("orderId")); %>
 	<% } %>

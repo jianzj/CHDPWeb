@@ -111,22 +111,19 @@
 			</tr>
 		</thead>
 		<tbody>
-			<c:forEach var="user" items="${finalUserList}">
+			<c:forEach var="user" items="${returnUserList}">
 				<tr>
 					<td><c:out value="${user.usercode}" /></td>
 					<td><c:out value="${user.name}" /></td>
 					<td><c:out value="${user.done_prs_num}" /></td>
+					<td><c:out value="${user.prs_five_packet_num}" /></td>
+					<td><c:out value="${user.prs_seven_packet_num}" /></td>
+					<td><c:out value="${user.prs_ten_packet_num}" /></td>
+					<td><c:out value="${user.prs_fourteen_packet_num}" /></td>
+					<td><c:out value="${user.prs_other_packet_num}" /></td>
 					<td><c:out value="${user.error_num}" /></td>
-					<% if(request.getAttribute("startTime") == null || ((String)request.getAttribute("startTime")).equals("")){ %>
-					<td><%=Constants.DEFAULT_START %></td>
-					<% }else{ %>
 					<td><c:out value="${startTime}" /></td>
-					<% } %>
-					<% if (request.getAttribute("endTime") == null || ((String)request.getAttribute("endTime")).equals(Constants.DEFAULT_END)){ %>
-					<td><%=Utils.getCurrentTime() %></td>
-					<% }else{ %>
 					<td><c:out value="${endTime}" /></td>
-					<% } %>
 					<c:if test="${user.done_prs_num > 0}">
 					<td width="100">
 						<div class="btn-group" role="group" aria-label="...">
@@ -145,5 +142,18 @@
 			</c:forEach>
 		</tbody>
 	</table>
+</div>
+<div class="text-right">
+	<% if (request.getAttribute("userAuth") != null){ %>
+		<% request.setAttribute("userAuth", (Integer)request.getAttribute("userAuth")); %>
+	<% } %>
+	<% if (request.getAttribute("startTime") != null){ %>
+		<% request.setAttribute("startTime", (String)request.getAttribute("startTime")); %>
+	<% } %>
+	<% if (request.getAttribute("endTime") != null){ %>
+		<% request.setAttribute("endTime", (String)request.getAttribute("endTime")); %>
+	<% }%>
+	<c:set var="pageUrl" value="prescription/userDimensionList" />
+	<%@ include file="../common/nav.jsp"%>
 </div>
 <%@ include file="../foot.jsp"%>

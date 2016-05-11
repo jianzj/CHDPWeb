@@ -139,7 +139,7 @@ public interface PrescriptionDao {
 	@Update("update prescription set finish_time = #{prs.finish_time}, process = #{prs.process}, process_id = #{prs.process_id} where id = #{prs.id}")
 	int markPrsFinished(@Param("prs") Prescription prs);
 
-	// 用户维度统计:计算处理的Prs, Process < 10;
+	// 用户维度统计:计算处理的Prs, Process < 10; 
 	@Select("select count(distinct p.id) from prescription as p, process as pro, user as u where p.process = 11 and u.id = #{userId} and pro.user_id = u.id "
 			+ "and pro.prescription_id = p.id and p.create_time >= #{start} and p.finish_time <= #{end}")
 	int countPrsDealByUser_NoShip(@Param("userId") int userId, @Param("start") String start, @Param("end") String end);
@@ -178,11 +178,6 @@ public interface PrescriptionDao {
 	List<Prescription> listPrsByUser(@Param("userId") int userId, @Param("process_type") int process_type,
 			@Param("start") String start, @Param("end") String end);
 
-	// 用户维度统计:计算出错的Process
-	@Select("select count(distinct p1.prescription_id) from process as p1, process as p2 where p2.user_id = #{userId} and "
-			+ "p1.previous_process_id = p2.id and p1.error_type != 0 and p1.begin >= #{start} and p1.finish <= #{end} group by p2.user_id")
-	Integer countProcsErrorByUser(@Param("userId") int userId, @Param("start") String start, @Param("end") String end);
-
 	// Errors
 	@Select("select count(distinct p1.prescription_id) from process as p1, process as p2 where p2.user_id = #{userId} and p1.process_type = #{process_type} "
 			+ "p1.previous_process_id = p2.id and p1.error_type != 0 and p1.begin != null and p1.begin >= #{start} and p1.finish != null and p1.finish <= #{end} group by p2.user_id")
@@ -208,4 +203,21 @@ public interface PrescriptionDao {
 				"h.id = #{hospitalId} and p.process_id = #{orderId} and p.hospital_id = h.id " +
 				"and create_time >= #{startTime} and finish_time <= #{endTime}")
 	List<Prescription> getPrsListByOrderId(@Param("orderId") int orderId, @Param("hospitalId") int hospitalId, @Param("startTime") String startTime, @Param("endTime") String endTime);
+	
+	// List all finished prescriptions where one user worked for it, checked for process table.
+	@Select("select distinct p.*, h.name as hospital_name from prescription as p, process as pro, hospital as h where " +
+				"p.process = " + Constants.FINISH + " and pro.user_id = #{userId} and pro.prescription_id = p.id " +
+				"and p.hospital_id = h.id and p.create_time >= #{startTime} and p.finish_time <= #{endTime}")
+	List<Prescription> getPrsListFromProcessByUserId(@Param("userId") int userId, @Param("startTime") String startTime, @Param("endTime") String endTime);
+	
+	// List all finished prescriptions where one user worked for it, checked for order table.
+	@Select("select distinct p.*, h.name as hospital_name from prescription as p, CHDP.order as o, hospital as h where " +
+				"p.process = " + Constants.FINISH + " and (o.create_user_id = #{userId} or o.outbound_user_id = #{userId}) " +
+				"and p.process_id = o.id and p.hospital_id = h.id")
+	List<Prescription> getPrsListFromOrderByUserId(@Param("userId") int userId, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+	// 用户维度统计:计算出错的Process
+	@Select("select count(distinct p1.prescription_id) from process as p1, process as p2 where p2.user_id = #{userId} and "
+			+ "p1.previous_process_id = p2.id and p1.error_type != 0 and p2.begin >= #{start} and p2.finish <= #{end} group by p2.user_id")
+	Integer getErrorProcessByUserId(@Param("userId") int userId, @Param("start") String start, @Param("end") String end);
 }
