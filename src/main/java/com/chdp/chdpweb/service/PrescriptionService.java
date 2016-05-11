@@ -1007,7 +1007,7 @@ public class PrescriptionService {
 			titleRow.getCell(1).setCellValue(timeInterval);
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			String currentTime = df.format(new Date());
-			titleRow.getCell(3).setCellValue(currentTime);
+			titleRow.getCell(7).setCellValue(currentTime);
 			
 			templateSt.shiftRows(3, templateSt.getLastRowNum(), hospitalList.size());
 			int index = 3;
@@ -1024,20 +1024,21 @@ public class PrescriptionService {
 				insertRow.createCell(0).setCellValue(hospitalItem.getName());
 				insertRow.getCell(0).setCellStyle(itemRow.getCell(0).getCellStyle());
 				
-				insertRow.createCell(1).setCellValue(hospitalItem.getOrderNum());
-				insertRow.getCell(1).setCellStyle(itemRow.getCell(1).getCellStyle());
 				
-				insertRow.createCell(2).setCellValue(hospitalItem.getFinishedPrsNum());
-				insertRow.getCell(2).setCellStyle(itemRow.getCell(2).getCellStyle());
+				insertRow.createCell(3).setCellValue(hospitalItem.getOrderNum());
+				insertRow.getCell(3).setCellStyle(itemRow.getCell(1).getCellStyle());
 				
-				insertRow.createCell(3).setCellValue(hospitalItem.getTotalPacketNum());
-				insertRow.getCell(3).setCellStyle(itemRow.getCell(3).getCellStyle());
+				insertRow.createCell(4).setCellValue(hospitalItem.getFinishedPrsNum());
+				insertRow.getCell(4).setCellStyle(itemRow.getCell(2).getCellStyle());
 				
-				insertRow.createCell(4).setCellValue(hospitalItem.getTotalPrice());
-				insertRow.getCell(4).setCellStyle(itemRow.getCell(4).getCellStyle());
+				insertRow.createCell(5).setCellValue(hospitalItem.getTotalPacketNum());
+				insertRow.getCell(5).setCellStyle(itemRow.getCell(3).getCellStyle());
 				
-				insertRow.createCell(5).setCellValue("");
-				insertRow.getCell(5).setCellStyle(itemRow.getCell(5).getCellStyle());
+				insertRow.createCell(6).setCellValue(hospitalItem.getTotalPrice());
+				insertRow.getCell(6).setCellStyle(itemRow.getCell(4).getCellStyle());
+				
+				insertRow.createCell(7).setCellValue("");
+				insertRow.getCell(7).setCellStyle(itemRow.getCell(5).getCellStyle());
 				
 				totalPrice += hospitalItem.getTotalPrice();
 				totalOrder += hospitalItem.getOrderNum();
@@ -1046,17 +1047,19 @@ public class PrescriptionService {
 				index += 1;
 			}
 
-			HSSFRow lastRow = templateSt.getRow(templateSt.getLastRowNum());
+			HSSFRow lastRow = templateSt.getRow(templateSt.getLastRowNum() - 1);
+			lastRow.setHeightInPoints(25);
+			lastRow = templateSt.getRow(templateSt.getLastRowNum());
 			lastRow.getCell(1).setCellValue(hospitalList.size());
-			lastRow.getCell(2).setCellValue(totalOrder);
-			lastRow.getCell(3).setCellValue(totalPrs);
-			lastRow.getCell(4).setCellValue(totalPacket);
-			lastRow.getCell(5).setCellValue(totalPrice);
+			lastRow.getCell(3).setCellValue(totalOrder);
+			lastRow.getCell(4).setCellValue(totalPrs);
+			lastRow.getCell(5).setCellValue(totalPacket);
+			lastRow.getCell(6).setCellValue(totalPrice);
 			lastRow.setHeightInPoints(25);
 
 			df = new SimpleDateFormat("yyyyMMddHHmmss");
 			String timeStr = df.format(new Date());
-			String newPath = Constants.TEMPPATH + "医院维度统计单" + "-" + timeStr + ".xls";
+			String newPath = Constants.TEMPFILE + "医院维度统计单" + "-" + timeStr + ".xls";
 			File newHospitalDimensionList = new File(newPath);
 			try {
 				newHospitalDimensionList.createNewFile();
@@ -1167,7 +1170,7 @@ public class PrescriptionService {
 
 			df = new SimpleDateFormat("yyyyMMddHHmmss");
 			String timeStr = df.format(new Date());
-			String newPath = Constants.TEMPPATH + "用户维度统计单" + "-" + timeStr + ".xls";
+			String newPath = Constants.TEMPFILE + "用户维度统计单" + "-" + timeStr + ".xls";
 			File newUserDimensionList = new File(newPath);
 			try {
 				newUserDimensionList.createNewFile();
@@ -1261,7 +1264,7 @@ public class PrescriptionService {
 
 			df = new SimpleDateFormat("yyyyMMddHHmmss");
 			String timeStr = df.format(new Date());
-			String newPath = Constants.TEMPPATH + "出库单维度统计单" + "-" + timeStr + ".xls";
+			String newPath = Constants.TEMPFILE + "出库单维度统计单" + "-" + timeStr + ".xls";
 			File newOrderDimensionList = new File(newPath);
 			try {
 				newOrderDimensionList.createNewFile();
@@ -1292,7 +1295,7 @@ public class PrescriptionService {
 		try{
 			Order orderItem = orderDao.getOrderById(orderId);
 			List<Prescription> prsList = this.getPrsListByOrderId(orderId, start, end);
-			if (generatePrsListXls(orderItem.getHospital_id(), orderItem.getUuid(), prsList)){
+			if (generatePrsListXls(orderItem.getHospital_id(), orderItem.getUuid(), prsList) != null){
 				return true;
 			}else {
 				return false;
