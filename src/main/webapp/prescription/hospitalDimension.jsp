@@ -49,8 +49,6 @@
 				<th>已完成处方</th>
 				<th>贴数</th>
 				<th>总计</th>
-				<th>始于</th>
-				<th>止于</th>
 				<th>操作</th>
 			</tr>
 		</thead>
@@ -62,8 +60,6 @@
 					<td><c:out value="${hosp2.finishedPrsNum}" /></td>
 					<td><c:out value="${hosp2.totalPacketNum}" /></td>
 					<td><c:out value="${hosp2.totalPrice}" /></td>
-					<td><c:out value="${startTime}" /></td>
-					<td><c:out value="${endTime}" /></td>
 					<c:if test="${hosp2.finishedPrsNum > 0}">
 					<td width="100">
 						<div class="btn-group" role="group" aria-label="...">

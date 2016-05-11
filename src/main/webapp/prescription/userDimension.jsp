@@ -105,8 +105,6 @@
 				<th>14帖</th>
 				<th>其他贴数</th>
 				<th>出错</th>
-				<th>始于</th>
-				<th>止于</th>
 				<th>操作</th>
 			</tr>
 		</thead>
@@ -122,8 +120,6 @@
 					<td><c:out value="${user.prs_fourteen_packet_num}" /></td>
 					<td><c:out value="${user.prs_other_packet_num}" /></td>
 					<td><c:out value="${user.error_num}" /></td>
-					<td><c:out value="${startTime}" /></td>
-					<td><c:out value="${endTime}" /></td>
 					<c:if test="${user.done_prs_num > 0}">
 					<td width="100">
 						<div class="btn-group" role="group" aria-label="...">
