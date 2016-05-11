@@ -100,4 +100,14 @@ public class HospitalService {
 			return null;
 		}
 	}
+	
+	/** -----------------------------------------------------------------**/
+	//获取在一定时间内属于一个医院的订单数
+	public int getOrderNumByHospitalId(int hospitalId, String start, String end){
+		try{
+			return hospitalDao.getOrderNumByHospitalId(hospitalId, start, end);
+		} catch (Exception e){
+			return 0;
+		}
+	}
 }

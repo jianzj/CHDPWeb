@@ -342,7 +342,8 @@ public class PrescriptionController {
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/hospitalDimensionList", method = RequestMethod.GET)
 	public String listHospitalDimension(HttpServletRequest request,
-			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
+			@RequestParam(value = "pageNum", defaultValue = "1") int pageNum) {
 		request.setAttribute("nav", "医院维度统计");
 
 		String start = request.getParameter("startTime");
@@ -366,31 +367,13 @@ public class PrescriptionController {
 
 		if (!Utils.validStartEndTime(start, end)) {
 			request.setAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
+			request.setAttribute("page", new PageInfo<Hospital>(new ArrayList<Hospital>()));
 		} else {
-			List<Hospital> returnHospitalList = new ArrayList<Hospital>();
-			if (hospitalId == 0) {
-				returnHospitalList = hospitalService.getHospitalList();
-			} else {
-				Hospital hospital = hospitalService.getHospitalById(hospitalId);
-				returnHospitalList.add(hospital);
-			}
-
-			List<Prescription> prsList = new ArrayList<Prescription>();
-			for (Hospital hospitalItem : returnHospitalList) {
-				prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalItem.getId(), start, end);
-				int packetNum = 0;
-				int totalPrice = 0;
-				hospitalItem.setFinishedPrsNum(prsList.size());
-				for (Prescription item : prsList) {
-					packetNum += item.getPacket_num();
-					totalPrice += item.getPrice();
-				}
-				hospitalItem.setTotalPacketNum(packetNum);
-				hospitalItem.setTotalPrice(totalPrice);
-			}
-
+			List<Hospital> returnHospitalList = prsService.getHospitalListByHospitalId(hospitalId, start, end, pageNum);
 			Collections.sort(returnHospitalList);
 			request.setAttribute("displayHospitalList", returnHospitalList);
+			PageInfo<Hospital> page = new PageInfo<Hospital>(returnHospitalList);
+			request.setAttribute("page", page);
 		}
 
 		return "prescription/hospitalDimension";
@@ -425,22 +408,7 @@ public class PrescriptionController {
 			request.setAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 			request.setAttribute("page", new PageInfo<Order>(new ArrayList<Order>()));
 		} else {
-			List<Order> orderList = orderService.listOrderFinished(hospitalId, start, end, pageNum);
-			List<Prescription> prsList = null;
-			for (Order order : orderList) {
-				prsList = prsService.getPrsListByOrderId(order.getId(), start, end);
-				order.setPrs_num(prsList.size());
-				int packet_num = 0;
-				double price_total = 0;
-				for (Prescription item : prsList) {
-					packet_num += item.getPacket_num();
-					price_total += item.getPrice();
-				}
-				order.setPacket_num(packet_num);
-				order.setPrice_total(price_total);
-				order.setCreate_user_name(userService.getUserById(order.getCreate_user_id()).getName());
-				order.setOutbound_user_name(userService.getUserById(order.getOutbound_user_id()).getName());
-			}
+			List<Order> orderList = prsService.getOrderListByHospitalId(hospitalId, start, end, pageNum);
 			Collections.sort(orderList);
 			PageInfo<Order> page = new PageInfo<Order>(orderList);
 			request.setAttribute("page", page);
@@ -662,4 +630,145 @@ public class PrescriptionController {
 		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../process/shipList?hospitalId=" + hospitalId;
 	}
 
+	/** ------------------------------------------------------------------**/
+	@RequiresRoles("ADMIN")
+	@RequestMapping(value = "/printHospitalDimensionXls")
+	public String printHospitalDimensionXls(HttpServletRequest request, HttpServletResponse resposne,
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
+			RedirectAttributes redirectAttributes) throws IOException {
+		String start = request.getParameter("startTime");
+		String end = request.getParameter("endTime");
+		if (start == null || start.equals("")) {
+			start = Utils.getOneMonthAgoTime();
+		}
+		if (end == null || end.equals("")) {
+			end = Utils.getCurrentTime();
+		}
+		String startTime = Utils.formatStartTime(start);
+		String endTime = Utils.formatEndTime(end);
+
+		if (!Utils.validStartEndTime(startTime, endTime)) {
+			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
+		} else {
+			List<Hospital> hospitalList = prsService.getHospitalListByHospitalId(hospitalId, start, end);
+			if (hospitalList.size() != 0){
+				Collections.sort(hospitalList);
+				if (prsService.generateHospitalDimensionXls(hospitalList, start, end)){
+					redirectAttributes.addFlashAttribute("successMsg", "医院统计清单导出成功！");
+				}else{
+					redirectAttributes.addFlashAttribute("errorMsg", "医院统计清单导出出错，请重试！");
+				}
+			} else {
+				redirectAttributes.addFlashAttribute("errorMsg", "尚无可打印统计信息！");
+			}
+		}
+		
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/hospitalDimensionList?hospitalId=" + hospitalId + 
+				"&startTime=" + start + "&endTime=" + end;
+	}
+	
+	@RequiresRoles("ADMIN")
+	@RequestMapping(value = "/printUserDimensionXls")
+	public String printUserDimensionXls(HttpServletRequest request, HttpServletResponse resposne,
+			@RequestParam(value = "userAuth", defaultValue = "0") int userAuth,
+			RedirectAttributes redirectAttributes) throws IOException {
+		String start = request.getParameter("startTime");
+		String end = request.getParameter("endTime");
+		if (start == null || start.equals("")) {
+			start = Utils.getOneMonthAgoTime();
+		}
+		if (end == null || end.equals("")) {
+			end = Utils.getCurrentTime();
+		}
+		String startTime = Utils.formatStartTime(start);
+		String endTime = Utils.formatEndTime(end);
+
+		if (!Utils.validStartEndTime(startTime, endTime)) {
+			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
+		} else {
+			List<User> userList = prsService.getUserListForPrsSummary(userAuth, start, end);
+			if (userList.size() != 0){
+				Collections.sort(userList);
+				if (prsService.generateUserDimensionXls(userList, start, end)){
+					redirectAttributes.addFlashAttribute("successMsg", "用户统计清单导出成功！");
+				}else{
+					redirectAttributes.addFlashAttribute("errorMsg", "用户统计清单导出出错，请重试！");
+				}
+			} else {
+				redirectAttributes.addFlashAttribute("errorMsg", "尚无可打印统计信息！");
+			}
+		}
+		
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/userDimensionList?userAuth=" + userAuth + 
+				"&startTime=" + start + "&endTime=" + end;
+	}
+	
+	@RequiresRoles("ADMIN")
+	@RequestMapping(value = "/printOrderDimensionXls")
+	public String printOrderDimensionXls(HttpServletRequest request, HttpServletResponse resposne,
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
+			RedirectAttributes redirectAttributes) throws IOException {
+		String start = request.getParameter("startTime");
+		String end = request.getParameter("endTime");
+		if (start == null || start.equals("")) {
+			start = Utils.getOneMonthAgoTime();
+		}
+		if (end == null || end.equals("")) {
+			end = Utils.getCurrentTime();
+		}
+		String startTime = Utils.formatStartTime(start);
+		String endTime = Utils.formatEndTime(end);
+
+		if (!Utils.validStartEndTime(startTime, endTime)) {
+			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
+		} else {
+			List<Order> orderList = prsService.getOrderListByHospitalId(hospitalId, start, end);
+			if (orderList.size() != 0){
+				Collections.sort(orderList);
+				if (prsService.generateOrderDimensionXls(orderList, start, end)){
+					redirectAttributes.addFlashAttribute("successMsg", "出货单统计清单导出成功！");
+				}else{
+					redirectAttributes.addFlashAttribute("errorMsg", "出货单统计清单导出出错，请重试！");
+				}
+			} else {
+				redirectAttributes.addFlashAttribute("errorMsg", "尚无可打印统计信息！");
+			}
+		}
+		
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/orderDimensionList?hospitalId=" + hospitalId + 
+				"&startTime=" + start + "&endTime=" + end;
+	}
+	
+	@RequiresRoles("ADMIN")
+	@RequestMapping(value = "/regenerateShipListXls")
+	public String regenerateShipListXls(HttpServletRequest request, HttpServletResponse resposne,
+			@RequestParam(value = "orderId", defaultValue = "0") int orderId,
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
+			RedirectAttributes redirectAttributes) throws IOException {
+		String start = request.getParameter("startTime");
+		String end = request.getParameter("endTime");
+		if (start == null || start.equals("")) {
+			start = Utils.getOneMonthAgoTime();
+		}
+		if (end == null || end.equals("")) {
+			end = Utils.getCurrentTime();
+		}
+		String startTime = Utils.formatStartTime(start);
+		String endTime = Utils.formatEndTime(end);
+		
+		if (orderId == 0){
+			redirectAttributes.addFlashAttribute("errorMsg", "未知出库单Id，无法打印!");
+		} else if (!Utils.validStartEndTime(startTime, endTime)) {
+			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
+		} else {
+			if (prsService.regenerateShipListXls(orderId, startTime, endTime)){
+				redirectAttributes.addFlashAttribute("successMsg", "导出出库单成功！");
+			}else{
+				redirectAttributes.addFlashAttribute("errorMsg", "导出出库单失败，请重试！");
+			}
+		}
+		
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/orderDimensionList?hospitalId=" + hospitalId + 
+				"&startTime=" + start + "&endTime=" + end;
+	}
 }

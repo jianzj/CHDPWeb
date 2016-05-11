@@ -81,6 +81,7 @@
          <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+         <a type="button" class="btn btn-success" style="" onClick="exportList(${userAuth}, '${startTime}', '${endTime}')">导出用户统计清单</a>
 	</span>
 </h3>
 </form>
@@ -152,4 +153,22 @@
 	<c:set var="pageUrl" value="prescription/userDimensionList" />
 	<%@ include file="../common/nav.jsp"%>
 </div>
+<div class="modal fade" id="assureDlg" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<div class="modal-body" id="assureMsg"></div>
+			<div class="modal-footer">
+				<a type="button" class="btn btn-success" id="assureBtn">确认</a> <a type="button" class="btn btn-default"
+					data-dismiss="modal">取消</a>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+    var exportList = function(userAuth, startTime, endTime){
+    	$("#assureMsg").html("确认导出用户维度统计单?");
+        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printUserDimensionXls?userAuth="+userAuth+"&startTime="+startTime+"&endTime="+endTime);
+        $("#assureDlg").modal("show");
+    };
+</script>
 <%@ include file="../foot.jsp"%>

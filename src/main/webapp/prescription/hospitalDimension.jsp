@@ -5,7 +5,6 @@
 <%@ include file="../head.jsp"%>
 
 <form class="form-inline" action="<%=request.getContextPath()%>/prescription/hospitalDimensionList" method="GET">
-
 <h3 class="sub-header">
 	医院维度统计
 	<span>
@@ -29,7 +28,9 @@
          <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+         <a type="button" class="btn btn-success" style="" onClick="exportList(${hospitalId}, '${startTime}', '${endTime}')">导出医院统计清单</a>
 	</span>
+	
 </h3>
 </form>
 <div>
@@ -45,7 +46,8 @@
 		<thead>
 			<tr>
 				<th>医院</th>
-				<th>已完成处方</th>
+				<th>出库单数</th>
+				<th>处方数</th>
 				<th>贴数</th>
 				<th>总计</th>
 				<th>操作</th>
@@ -55,6 +57,7 @@
 			<c:forEach var="hosp2" items="${displayHospitalList}">
 				<tr>
 					<td><c:out value="${hosp2.name}" /></td>
+					<td><c:out value="${hosp2.orderNum}" /></td>
 					<td><c:out value="${hosp2.finishedPrsNum}" /></td>
 					<td><c:out value="${hosp2.totalPacketNum}" /></td>
 					<td><c:out value="${hosp2.totalPrice}" /></td>
@@ -90,4 +93,23 @@
     <c:set var="pageUrl" value="prescription/hospitalDimensionList" />
     <%@ include file="../common/nav.jsp"%>
 </div>
+
+<div class="modal fade" id="assureDlg" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<div class="modal-body" id="assureMsg"></div>
+			<div class="modal-footer">
+				<a type="button" class="btn btn-success" id="assureBtn">确认</a> <a type="button" class="btn btn-default"
+					data-dismiss="modal">取消</a>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+    var exportList = function(hospitalId, startTime, endTime){
+    	$("#assureMsg").html("确认导出医院维度统计单?");
+        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printHospitalDimensionXls?hospitalId="+hospitalId+"&startTime="+startTime+"&endTime="+endTime);
+        $("#assureDlg").modal("show");
+    };
+</script>
 <%@ include file="../foot.jsp"%>

@@ -2,7 +2,7 @@ package com.chdp.chdpweb;
 
 public class Constants {
 
-	public static final int PAGE_SIZE = 1;
+	public static final int PAGE_SIZE = 3;
 	public static final String DEFAULT_PASSWORD = "123456";
 
 	// These params are for Machine
@@ -99,7 +99,7 @@ public class Constants {
 	public static final int ORDER_BEGIN = 1;
 	public static final int ORDER_FINISH = 2;
 
-	public static final String TEMPPATH = "D:/tmp/";
+	public static final String TEMPPATH = "/Users/zhao_jian/tmp/";
 
 	public static final String DEFAULT_START = "2010-07-18";
 	public static final String DEFAULT_END = "2099-07-18";

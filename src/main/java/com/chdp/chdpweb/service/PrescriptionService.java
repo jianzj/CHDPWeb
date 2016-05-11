@@ -817,4 +817,486 @@ public class PrescriptionService {
 		}
 	}
 
+	public List<User> getUserListForPrsSummary(int userAuth, String start, String end) {
+		try {
+			List<User> userList = null;
+			if (userAuth == 0) {
+				userList = userDao.getUserList();
+			} else {
+				userList = userDao.getUserListWithAuth(userAuth);
+			}
+
+			for (User user : userList) {
+				int fivePacketNum = 0;
+				int sevenPacketNum = 0;
+				int tenPacketNum = 0;
+				int fourteenPacketNum = 0;
+				int otherPacketNum = 0;
+
+				List<Prescription> prsList = this.getPrsListByUserId(user.getId(), start, end);
+				user.setDone_prs_num(prsList.size());
+				for (Prescription prs : prsList) {
+					int packet_num = prs.getPacket_num();
+					if (packet_num == 5) {
+						fivePacketNum += 1;
+					} else if (packet_num == 7) {
+						sevenPacketNum += 1;
+					} else if (packet_num == 10) {
+						tenPacketNum += 1;
+					} else if (packet_num == 14) {
+						fourteenPacketNum += 1;
+					} else {
+						otherPacketNum += 1;
+					}
+				}
+				user.setPrs_five_packet_num(fivePacketNum);
+				user.setPrs_seven_packet_num(sevenPacketNum);
+				user.setPrs_ten_packet_num(tenPacketNum);
+				user.setPrs_fourteen_packet_num(fourteenPacketNum);
+				user.setPrs_other_packet_num(otherPacketNum);
+				Integer errorNum = prsDao.getErrorProcessByUserId(user.getId(), start, end);
+				if (errorNum != null) {
+					user.setError_num(errorNum);
+				} else {
+					user.setError_num(0);
+				}
+			}
+			return userList;
+		} catch (Exception e) {
+			return new ArrayList<User>();
+		}
+	}
+
+	//用于医院维度，获取医院在一段时间内处方处理的统计信息
+	public List<Hospital> getHospitalListByHospitalId(int hospitalId, String start, String end, int pageNum){
+		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+		try{
+			List<Hospital> hospitalList = new ArrayList<Hospital>();
+			if (hospitalId == 0){
+				hospitalList = hospitalDao.getHospitalList();
+			}else{
+				hospitalList.add(hospitalDao.getHospitalwithID(hospitalId));
+			}
+			List<Prescription> prsList = new ArrayList<Prescription>();
+			for (Hospital hospitalItem : hospitalList) {
+				prsList = prsDao.getPrescriptionsByParamswithTime(Constants.FINISH, hospitalItem.getId(), start, end);
+				int packetNum = 0;
+				double totalPrice = 0;
+				hospitalItem.setFinishedPrsNum(prsList.size());
+				for (Prescription item : prsList) {
+					packetNum += item.getPacket_num();
+					totalPrice += item.getPrice();
+				}
+				hospitalItem.setTotalPacketNum(packetNum);
+				hospitalItem.setTotalPrice(totalPrice);
+				hospitalItem.setOrderNum(hospitalDao.getOrderNumByHospitalId(hospitalItem.getId(), start, end));
+			}
+			return hospitalList;
+		} catch (Exception e){
+			return new ArrayList<Hospital>(); 
+		}
+	}
+	
+	//用于医院维度，获取医院在一段时间内处方处理的统计信息
+	public List<Hospital> getHospitalListByHospitalId(int hospitalId, String start, String end){
+		try{
+			List<Hospital> hospitalList = new ArrayList<Hospital>();
+			if (hospitalId == 0){
+				hospitalList = hospitalDao.getHospitalList();
+			}else{
+				hospitalList.add(hospitalDao.getHospitalwithID(hospitalId));
+			}
+			List<Prescription> prsList = new ArrayList<Prescription>();
+			for (Hospital hospitalItem : hospitalList) {
+				prsList = prsDao.getPrescriptionsByParamswithTime(Constants.FINISH, hospitalItem.getId(), start, end);
+				int packetNum = 0;
+				double totalPrice = 0;
+				hospitalItem.setFinishedPrsNum(prsList.size());
+				for (Prescription item : prsList) {
+					packetNum += item.getPacket_num();
+					totalPrice += item.getPrice();
+				}
+				hospitalItem.setTotalPacketNum(packetNum);
+				hospitalItem.setTotalPrice(totalPrice);
+				hospitalItem.setOrderNum(hospitalDao.getOrderNumByHospitalId(hospitalItem.getId(), start, end));
+			}
+			return hospitalList;
+		} catch (Exception e){
+			return new ArrayList<Hospital>(); 
+		}
+	}
+	
+	//用于出货单维度，获取医院在一段时间内处方处理的统计信息
+	public List<Order> getOrderListByHospitalId(int hospitalId, String start, String end, int pageNum){
+		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+		try{
+			List<Order> orderList = new ArrayList<Order>();
+			if (hospitalId == 0){
+				orderList = orderDao.listOrderAllHospital(start, end, Constants.ORDER_FINISH);
+			}else {
+				orderList = orderDao.listOrder(hospitalId, start, end, Constants.ORDER_FINISH);
+			}
+			
+			List<Prescription> prsList = null;
+			for (Order order : orderList) {
+				prsList = this.getPrsListByOrderId(order.getId(), start, end);
+				order.setPrs_num(prsList.size());
+				int packet_num = 0;
+				double price_total = 0;
+				for (Prescription item : prsList) {
+					packet_num += item.getPacket_num();
+					price_total += item.getPrice();
+				}
+				order.setPacket_num(packet_num);
+				order.setPrice_total(price_total);
+				order.setCreate_user_name(userDao.getUserById(order.getCreate_user_id()).getName());
+				order.setOutbound_user_name(userDao.getUserById(order.getOutbound_user_id()).getName());
+			}
+			return orderList;
+		} catch (Exception e){
+			return new ArrayList<Order>();
+		}
+	}
+	
+	//用于出货单维度，获取医院在一段时间内处方处理的统计信息
+	public List<Order> getOrderListByHospitalId(int hospitalId, String start, String end){
+		try{
+			List<Order> orderList = new ArrayList<Order>();
+			if (hospitalId == 0){
+				orderList = orderDao.listOrderAllHospital(start, end, Constants.ORDER_FINISH);
+			}else {
+				orderList = orderDao.listOrder(hospitalId, start, end, Constants.ORDER_FINISH);
+			}
+			
+			List<Prescription> prsList = null;
+			for (Order order : orderList) {
+				prsList = this.getPrsListByOrderId(order.getId(), start, end);
+				order.setPrs_num(prsList.size());
+				int packet_num = 0;
+				double price_total = 0;
+				for (Prescription item : prsList) {
+					packet_num += item.getPacket_num();
+					price_total += item.getPrice();
+				}
+				order.setPacket_num(packet_num);
+				order.setPrice_total(price_total);
+				order.setCreate_user_name(userDao.getUserById(order.getCreate_user_id()).getName());
+				order.setOutbound_user_name(userDao.getUserById(order.getOutbound_user_id()).getName());
+			}
+			return orderList;
+		} catch (Exception e){
+			return new ArrayList<Order>();
+		}
+	}
+	
+	// 导出医院统计单Excel
+	public boolean generateHospitalDimensionXls(List<Hospital> hospitalList, String start, String end) {
+		try {
+			Resource tempResource = new ClassPathResource("hospitalStatTemplate.xls");
+
+			FileInputStream fis = new FileInputStream(tempResource.getFile());
+			HSSFWorkbook templateWb = new HSSFWorkbook(fis);
+			HSSFSheet templateSt = templateWb.getSheetAt(0);
+
+			HSSFRow titleRow = templateSt.getRow(1);
+			HSSFRow itemRow = templateSt.getRow(2);
+
+			String timeInterval = start + " 至 " + end;
+			titleRow.getCell(1).setCellValue(timeInterval);
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			String currentTime = df.format(new Date());
+			titleRow.getCell(3).setCellValue(currentTime);
+			
+			templateSt.shiftRows(3, templateSt.getLastRowNum(), hospitalList.size());
+			int index = 3;
+			
+			double totalPrice = 0;
+			int totalOrder = 0;
+			int totalPacket = 0;
+			int totalPrs = 0;
+			
+			for (Hospital hospitalItem : hospitalList){
+				HSSFRow insertRow = templateSt.createRow(index);
+				insertRow.setHeightInPoints(25);
+				
+				insertRow.createCell(0).setCellValue(hospitalItem.getName());
+				insertRow.getCell(0).setCellStyle(itemRow.getCell(0).getCellStyle());
+				
+				insertRow.createCell(1).setCellValue(hospitalItem.getOrderNum());
+				insertRow.getCell(1).setCellStyle(itemRow.getCell(1).getCellStyle());
+				
+				insertRow.createCell(2).setCellValue(hospitalItem.getFinishedPrsNum());
+				insertRow.getCell(2).setCellStyle(itemRow.getCell(2).getCellStyle());
+				
+				insertRow.createCell(3).setCellValue(hospitalItem.getTotalPacketNum());
+				insertRow.getCell(3).setCellStyle(itemRow.getCell(3).getCellStyle());
+				
+				insertRow.createCell(4).setCellValue(hospitalItem.getTotalPrice());
+				insertRow.getCell(4).setCellStyle(itemRow.getCell(4).getCellStyle());
+				
+				insertRow.createCell(5).setCellValue("");
+				insertRow.getCell(5).setCellStyle(itemRow.getCell(5).getCellStyle());
+				
+				totalPrice += hospitalItem.getTotalPrice();
+				totalOrder += hospitalItem.getOrderNum();
+				totalPacket += hospitalItem.getTotalPacketNum();
+				totalPrs += hospitalItem.getFinishedPrsNum();
+				index += 1;
+			}
+
+			HSSFRow lastRow = templateSt.getRow(templateSt.getLastRowNum());
+			lastRow.getCell(1).setCellValue(hospitalList.size());
+			lastRow.getCell(2).setCellValue(totalOrder);
+			lastRow.getCell(3).setCellValue(totalPrs);
+			lastRow.getCell(4).setCellValue(totalPacket);
+			lastRow.getCell(5).setCellValue(totalPrice);
+			lastRow.setHeightInPoints(25);
+
+			df = new SimpleDateFormat("yyyyMMddHHmmss");
+			String timeStr = df.format(new Date());
+			String newPath = Constants.TEMPPATH + "医院维度统计单" + "-" + timeStr + ".xls";
+			File newHospitalDimensionList = new File(newPath);
+			try {
+				newHospitalDimensionList.createNewFile();
+			} catch (Exception e) {
+				templateWb.close();
+				fis.close();
+				return false;
+			}
+
+			FileOutputStream fileOut = new FileOutputStream(newHospitalDimensionList);
+			templateWb.write(fileOut);
+			fileOut.flush();
+			fileOut.close();
+			fis.close();
+			templateWb.close();
+
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	// 导出用户统计单Excel
+	public boolean generateUserDimensionXls(List<User> userList, String start, String end) {
+		try {
+			Resource tempResource = new ClassPathResource("userStatTemplate.xls");
+
+			FileInputStream fis = new FileInputStream(tempResource.getFile());
+			HSSFWorkbook templateWb = new HSSFWorkbook(fis);
+			HSSFSheet templateSt = templateWb.getSheetAt(0);
+
+			HSSFRow titleRow = templateSt.getRow(1);
+			HSSFRow itemRow = templateSt.getRow(2);
+
+			String timeInterval = start + " 至 " + end;
+			titleRow.getCell(1).setCellValue(timeInterval);
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			String currentTime = df.format(new Date());
+			titleRow.getCell(7).setCellValue(currentTime);
+			
+			templateSt.shiftRows(3, templateSt.getLastRowNum(), userList.size());
+			int index = 3;
+			
+			int prsNum = 0;
+			int five_prsNum = 0;
+			int seven_prsNum = 0;
+			int ten_prsNum = 0;
+			int fourteen_prsNum = 0;
+			int other_prsNum = 0;
+			int errorNum = 0;
+			
+			for (User userItem : userList){
+				HSSFRow insertRow = templateSt.createRow(index);
+				insertRow.setHeightInPoints(25);
+				
+				insertRow.createCell(0).setCellValue(userItem.getUsercode());
+				insertRow.getCell(0).setCellStyle(itemRow.getCell(0).getCellStyle());
+				
+				insertRow.createCell(1).setCellValue(userItem.getName());
+				insertRow.getCell(1).setCellStyle(itemRow.getCell(1).getCellStyle());
+				
+				insertRow.createCell(2).setCellValue(userItem.getDone_prs_num());
+				insertRow.getCell(2).setCellStyle(itemRow.getCell(2).getCellStyle());
+				prsNum += userItem.getDone_prs_num();
+				
+				insertRow.createCell(3).setCellValue(userItem.getPrs_five_packet_num());
+				insertRow.getCell(3).setCellStyle(itemRow.getCell(3).getCellStyle());
+				five_prsNum += userItem.getPrs_five_packet_num();
+				
+				insertRow.createCell(4).setCellValue(userItem.getPrs_seven_packet_num());
+				insertRow.getCell(4).setCellStyle(itemRow.getCell(4).getCellStyle());
+				seven_prsNum += userItem.getPrs_seven_packet_num();
+				
+				insertRow.createCell(5).setCellValue(userItem.getPrs_ten_packet_num());
+				insertRow.getCell(5).setCellStyle(itemRow.getCell(5).getCellStyle());
+				ten_prsNum += userItem.getPrs_ten_packet_num();
+				
+				insertRow.createCell(6).setCellValue(userItem.getPrs_fourteen_packet_num());
+				insertRow.getCell(6).setCellStyle(itemRow.getCell(6).getCellStyle());
+				fourteen_prsNum += userItem.getPrs_fourteen_packet_num();
+				
+				insertRow.createCell(7).setCellValue(userItem.getPrs_other_packet_num());
+				insertRow.getCell(7).setCellStyle(itemRow.getCell(7).getCellStyle());
+				other_prsNum += userItem.getPrs_other_packet_num();
+				
+				insertRow.createCell(8).setCellValue(userItem.getError_num());
+				insertRow.getCell(8).setCellStyle(itemRow.getCell(8).getCellStyle());
+				errorNum += userItem.getError_num();
+				
+				insertRow.createCell(9).setCellValue("");
+				insertRow.getCell(9).setCellStyle(itemRow.getCell(9).getCellStyle());
+
+				index += 1;
+			}
+
+			HSSFRow lastRow = templateSt.getRow(templateSt.getLastRowNum() - 1);
+			lastRow.setHeightInPoints(25);
+			
+			lastRow = templateSt.getRow(templateSt.getLastRowNum());
+			lastRow.getCell(2).setCellValue(prsNum);
+			lastRow.getCell(3).setCellValue(five_prsNum);
+			lastRow.getCell(4).setCellValue(seven_prsNum);
+			lastRow.getCell(5).setCellValue(ten_prsNum);
+			lastRow.getCell(6).setCellValue(fourteen_prsNum);
+			lastRow.getCell(7).setCellValue(other_prsNum);
+			lastRow.getCell(8).setCellValue(errorNum);
+			lastRow.setHeightInPoints(25);
+
+			df = new SimpleDateFormat("yyyyMMddHHmmss");
+			String timeStr = df.format(new Date());
+			String newPath = Constants.TEMPPATH + "用户维度统计单" + "-" + timeStr + ".xls";
+			File newUserDimensionList = new File(newPath);
+			try {
+				newUserDimensionList.createNewFile();
+			} catch (Exception e) {
+				templateWb.close();
+				fis.close();
+				return false;
+			}
+
+			FileOutputStream fileOut = new FileOutputStream(newUserDimensionList);
+			templateWb.write(fileOut);
+			fileOut.flush();
+			fileOut.close();
+			fis.close();
+			templateWb.close();
+
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	// 导出出货单统计单Excel
+	public boolean generateOrderDimensionXls(List<Order> orderList, String start, String end) {
+		try {
+			Resource tempResource = new ClassPathResource("orderStatTemplate.xls");
+
+			FileInputStream fis = new FileInputStream(tempResource.getFile());
+			HSSFWorkbook templateWb = new HSSFWorkbook(fis);
+			HSSFSheet templateSt = templateWb.getSheetAt(0);
+
+			HSSFRow titleRow = templateSt.getRow(1);
+			HSSFRow itemRow = templateSt.getRow(2);
+
+			String timeInterval = start + " 至 " + end;
+			titleRow.getCell(1).setCellValue(timeInterval);
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			String currentTime = df.format(new Date());
+			titleRow.getCell(7).setCellValue(currentTime);
+			titleRow.getCell(7).setCellStyle(titleRow.getCell(6).getCellStyle());
+			
+			templateSt.shiftRows(3, templateSt.getLastRowNum(), orderList.size());
+			int index = 3;
+			
+			int prsNum = 0;
+			int packetNum = 0;
+			double priceNum = 0;
+			
+			for (Order order : orderList){
+				HSSFRow insertRow = templateSt.createRow(index);
+				insertRow.setHeightInPoints(25);
+				
+				insertRow.createCell(0).setCellValue(order.getUuid());
+				insertRow.getCell(0).setCellStyle(itemRow.getCell(0).getCellStyle());
+				
+				insertRow.createCell(1).setCellValue(order.getHospital_name());
+				insertRow.getCell(1).setCellStyle(itemRow.getCell(1).getCellStyle());
+				
+				insertRow.createCell(2).setCellValue(order.getCreate_user_name());
+				insertRow.getCell(2).setCellStyle(itemRow.getCell(2).getCellStyle());
+				
+				insertRow.createCell(3).setCellValue(order.getOutbound_user_name());
+				insertRow.getCell(3).setCellStyle(itemRow.getCell(3).getCellStyle());
+				
+				insertRow.createCell(4).setCellValue(order.getPrs_num());
+				insertRow.getCell(4).setCellStyle(itemRow.getCell(4).getCellStyle());
+				prsNum += order.getPrs_num();
+				
+				insertRow.createCell(5).setCellValue(order.getPacket_num());
+				insertRow.getCell(5).setCellStyle(itemRow.getCell(5).getCellStyle());
+				packetNum += order.getPacket_num();
+				
+				insertRow.createCell(6).setCellValue(order.getPrice_total());
+				insertRow.getCell(6).setCellStyle(itemRow.getCell(6).getCellStyle());
+				priceNum += order.getPrice_total();
+				
+				insertRow.createCell(7).setCellValue("");
+				insertRow.getCell(7).setCellStyle(itemRow.getCell(7).getCellStyle());
+			
+				index += 1;
+			}
+
+			HSSFRow lastRow = templateSt.getRow(templateSt.getLastRowNum() - 1);
+			lastRow.setHeightInPoints(25);
+			
+			lastRow = templateSt.getRow(templateSt.getLastRowNum());
+			lastRow.getCell(4).setCellValue(prsNum);
+			lastRow.getCell(5).setCellValue(packetNum);
+			lastRow.getCell(6).setCellValue(priceNum);
+			lastRow.setHeightInPoints(25);
+
+			df = new SimpleDateFormat("yyyyMMddHHmmss");
+			String timeStr = df.format(new Date());
+			String newPath = Constants.TEMPPATH + "出库单维度统计单" + "-" + timeStr + ".xls";
+			File newOrderDimensionList = new File(newPath);
+			try {
+				newOrderDimensionList.createNewFile();
+			} catch (Exception e) {
+				templateWb.close();
+				fis.close();
+				return false;
+			}
+
+			FileOutputStream fileOut = new FileOutputStream(newOrderDimensionList);
+			templateWb.write(fileOut);
+			fileOut.flush();
+			fileOut.close();
+			fis.close();
+			templateWb.close();
+
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	//用于重新打印出库单
+	public boolean regenerateShipListXls(int orderId, String start, String end){
+		if (orderId == 0)
+			return false;
+		
+		try{
+			Order orderItem = orderDao.getOrderById(orderId);
+			List<Prescription> prsList = this.getPrsListByOrderId(orderId, start, end);
+			if (generatePrsListXls(orderItem.getHospital_id(), orderItem.getUuid(), prsList)){
+				return true;
+			}else {
+				return false;
+			}
+		} catch (Exception e){
+			return false;
+		}
+	}
 }

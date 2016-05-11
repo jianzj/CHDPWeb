@@ -29,6 +29,7 @@
          <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+         <a type="button" class="btn btn-success" style="" onClick="exportList(${hospitalId}, '${startTime}', '${endTime}')">导出出货单统计清单</a>
 	</span>
 </h3>
 </form>
@@ -65,9 +66,12 @@
 					<td><c:out value="${order.packet_num}" /></td>
 					<td><c:out value="${order.price_total}" /></td>
 					<c:if test="${order.prs_num > 0}">
-					<td width="100">
+					<td width="200">
 						<div class="btn-group" role="group" aria-label="...">
 						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&orderId=${order.id}&userId=&hospitalId=&from=ORDER">处方详情</a>
+						</div>
+						<div class="btn-group" role="group" aria-label="...">
+						    <a type="button" class="btn btn-success" style="" onClick="generateOrderList(${order.id}, ${hospitalId}, '${startTime}', '${endTime}')">打印出库单</a>
 						</div>
 					</td>
 					</c:if>
@@ -96,4 +100,29 @@
 	<c:set var="pageUrl" value="prescription/orderDimensionList" />
 	<%@ include file="../common/nav.jsp"%>
 </div>
+
+<div class="modal fade" id="assureDlg" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<div class="modal-body" id="assureMsg"></div>
+			<div class="modal-footer">
+				<a type="button" class="btn btn-success" id="assureBtn">确认</a> <a type="button" class="btn btn-default"
+					data-dismiss="modal">取消</a>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+    var exportList = function(hospitalId, startTime, endTime){
+    	$("#assureMsg").html("确认导出出货单维度统计单?");
+        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printOrderDimensionXls?hospitalId="+hospitalId+"&startTime="+startTime+"&endTime="+endTime);
+        $("#assureDlg").modal("show");
+    };
+    
+    var generateOrderList = function(orderId, hospitalId, startTime, endTime){
+    	$("#assureMsg").html("确认重新打印此出库单单?");
+        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/regenerateShipListXls?orderId="+orderId+"&shospitalId="+hospitalId+"&startTime="+startTime+"&endTime="+endTime);
+        $("#assureDlg").modal("show");
+    };
+</script>
 <%@ include file="../foot.jsp"%>

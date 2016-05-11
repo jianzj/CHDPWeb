@@ -10,6 +10,7 @@ public class Hospital implements Comparable<Hospital> {
 	private int finishedPrsNum;
 	private int totalPacketNum;
 	private double totalPrice;
+	private int orderNum;
 	
 	public int getId(){
 		return id;
@@ -59,6 +60,14 @@ public class Hospital implements Comparable<Hospital> {
 		this.totalPrice = price;
 	}
 
+	public int getOrderNum(){
+		return orderNum;
+	}
+	
+	public void setOrderNum(int num){
+		this.orderNum = num;
+	}
+	
 	public int compareTo(Hospital hosp1) {
 		if (this.getFinishedPrsNum() > hosp1.getFinishedPrsNum()){
 			return -1;

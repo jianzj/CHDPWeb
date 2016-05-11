@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.Hospital;
 
 @Repository
@@ -42,4 +43,8 @@ public interface HospitalDao {
 	@Select("select h.id as id, h.name as name, h.description as description from hospital as h, prescription as p " +
 	        "where h.id = p.hospital_id")
 	Hospital getHospitalwithAutoNext();
+	
+	@Select("select count(o.id) from CHDP.order as o where o.status = " + Constants.ORDER_FINISH + " and "
+				+ "o.hospital_id = #{hospitalId} and o.create_time >= #{startTime} and o.outbound_time <= #{endTime}")
+	int getOrderNumByHospitalId(@Param("hospitalId") int hospitalId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 }
