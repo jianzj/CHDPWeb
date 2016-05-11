@@ -56,6 +56,30 @@ public class UserAppController {
 		}
 	}
 
+	@RequestMapping(value = "/changePassword", method = RequestMethod.POST)
+	@ResponseBody
+	public AppResult changePassword(HttpServletRequest request) {
+		String oldPassword = request.getParameter("oldPassword");
+		String newPassword = request.getParameter("newPassword");
+
+		AppResult result = new AppResult();
+
+		if (!userService.checkPassword(oldPassword)) {
+			result.setErrorMsg("当前密码错误");
+			result.setSuccess(false);
+		} else {
+			if (userService.changePassword(newPassword)) {
+				result.setErrorMsg("密码修改成功");
+				result.setSuccess(true);
+			} else {
+				result.setErrorMsg("密码修改失败");
+				result.setSuccess(false);
+			}
+		}
+
+		return result;
+	}
+
 	@RequestMapping("/logout")
 	@ResponseBody
 	public AppResult logout() {
