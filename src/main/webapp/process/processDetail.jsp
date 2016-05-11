@@ -13,7 +13,7 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>ID</th>
+				<th>编号</th>
 				<th>医院</th>
 				<th>医院编号</th>
 				<th>姓名</th>
@@ -25,7 +25,7 @@
 		<tbody>
 			<c:if test="${not empty currentPrs}">
 				<tr>
-					<td><c:out value="${currentPrs.id}" /></td>
+					<td><c:out value="${currentPrs.uuid}" /></td>
 					<td><c:out value="${currentPrs.hospital_name}" /></td>
 					<td><c:out value="${currentPrs.outer_id}" /></td>
 					<td><c:out value="${currentPrs.patient_name}" /></td>

@@ -14,7 +14,7 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>ID</th>
+				<th>编号</th>
 				<th>机器类型</th>
 				<th>机器名称</th>
 				<th>关联灌装机</th>
@@ -25,7 +25,7 @@
 		<tbody>
 			<c:forEach var="machine" items="${machineList}">
 				<tr>
-					<td><c:out value="${machine.id}" /></td>
+					<td><c:out value="${machine.uuid}" /></td>
 					<c:if test="${machine.type == 1}">
 						<td><c:out value="煎煮机" /></td>
 					</c:if>

@@ -44,7 +44,6 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>ID</th>
 				<th>医院</th>
 				<th>已完成处方</th>
 				<th>贴数</th>
@@ -55,7 +54,6 @@
 		<tbody>
 			<c:forEach var="hosp2" items="${displayHospitalList}">
 				<tr>
-					<td><c:out value="${hosp2.id}" /></td>
 					<td><c:out value="${hosp2.name}" /></td>
 					<td><c:out value="${hosp2.finishedPrsNum}" /></td>
 					<td><c:out value="${hosp2.totalPacketNum}" /></td>

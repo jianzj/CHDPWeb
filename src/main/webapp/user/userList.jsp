@@ -14,7 +14,6 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>ID</th>
 				<th>工号</th>
 				<th>姓名</th>
 				<th>权限</th>
@@ -24,7 +23,6 @@
 		<tbody>
 			<c:forEach var="user" items="${userList}">
 				<tr>
-					<td><c:out value="${user.id}" /></td>
 					<td><c:out value="${user.usercode}" /></td>
 					<td><c:out value="${user.name}" /></td>
 					<td><c:out value="${user.authority_str}" /></td>

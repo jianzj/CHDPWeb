@@ -14,7 +14,6 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>ID</th>
 				<th>中药类型</th>
 				<th>中药名称</th>
 				<th>中药描述</th>
@@ -24,7 +23,6 @@
 		<tbody>
 			<c:forEach var="herb" items="${herbList}">
 				<tr>
-					<td><c:out value="${herb.id}" /></td>
 					<c:if test="${herb.type == 1}">
 						<td><c:out value="先煎" /></td>
 					</c:if>

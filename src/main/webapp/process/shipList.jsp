@@ -31,7 +31,7 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>ID</th>
+				<th>编号</th>
 				<th>医院</th>
 				<th>医院编号</th>
 				<th>姓名</th>
@@ -44,7 +44,7 @@
 		<tbody>
 			<c:forEach var="prs" items="${shipList}">
 				<tr>
-					<td><c:out value="${prs.id}" /></td>
+					<td><c:out value="${prs.uuid}" /></td>
 					<td><c:out value="${prs.hospital_name}" /></td>
 					<td><c:out value="${prs.outer_id}" /></td>
 					<td><c:out value="${prs.patient_name}" /></td>

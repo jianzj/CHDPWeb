@@ -14,7 +14,6 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>ID</th>
 				<th>医院名称</th>
 				<th>医院描述</th>
 				<th>操作</th>
@@ -23,7 +22,6 @@
 		<tbody>
 			<c:forEach var="hospital" items="${hospitalList}">
 				<tr>
-					<td><c:out value="${hospital.id}" /></td>
 					<td><c:out value="${hospital.name}" /></td>
 					<td><c:out value="${hospital.description}" /></td>
 					<td width="100">
