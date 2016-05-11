@@ -21,6 +21,8 @@
                 /css/** = anon
                 /fonts/** = anon
                 /images/** = anon
+                /shipFile/** = anon
+                /tmpFile/** = anon
                 /js/** = anon
                 /templates/** = anon
                 /** = authc
