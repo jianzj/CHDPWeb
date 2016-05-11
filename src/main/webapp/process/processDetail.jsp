@@ -40,84 +40,92 @@
 
 <div class="row bs-wizard" style="border-bottom:0;">
 <% if (request.getAttribute("nodeList") != null){ %>
+    <% int step = 0; %>
 	<% for (Node node : (List<Node>)request.getAttribute("nodeList")){ %>
 		<% if (node.getStatus() == 0){ %>
-		<div class="col-xs-3 bs-wizard-step disabled">
-		  <div class="text-center bs-wizard-stepnum"><%=node.getNodeTypeName() %></div>
+		<div class="col-xs-3 bs-wizard-step disabled"<% if(step%4==0){ %> style="clear:both"<%} %>>
+		  <div class="text-center bs-wizard-stepnum"><strong><%=node.getNodeTypeName() %></strong></div>
 		  <div class="progress"><div class="progress-bar"></div></div>
 		  <a href="#" class="bs-wizard-dot"></a>
-		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="txt-center">
-		 		<span class="glyphicon glyphicon-flag"></span> 尚未开始
-		 	</span>
-		  </div>
+            <div class="bs-wizard-info text-center list-group">
+                <div class="bs-callout bs-callout-default">
+					<h4 class="txt-center">
+						<span class="glyphicon glyphicon-flag"></span> 尚未开始
+					</h4>
+                </div>
+            </div>
 		</div>	
 		<% } else if (node.getStatus() == 1){ %>
-		<div class="col-xs-3 bs-wizard-step disabled">
-		  <div class="text-center bs-wizard-stepnum"><%=node.getNodeTypeName() %></div>
+		<div class="col-xs-3 bs-wizard-step disabled"<% if(step%4==0){ %> style="clear:both"<%} %>>
+		  <div class="text-center bs-wizard-stepnum"><strong><%=node.getNodeTypeName() %></strong></div>
 		  <div class="progress"><div class="progress-bar"></div></div>
 		  <a href="#" class="bs-wizard-dot"></a>
 		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="txt-center">
-		 		<% if (node.getNodeType() == Constants.SHIP){ %>
-			 		<span class="glyphicon glyphicon-flag"></span> <%=node.getOrderStatus() %><br/>
+		 	<div class="txt-center">
+		 	    <div class="bs-callout bs-callout-info">
+                <% if (node.getNodeType() == Constants.SHIP){ %>
+			 		<h4><span class="glyphicon glyphicon-flag"></span> <%=node.getOrderStatus() %></h4>
 			 		<% if (node.getResolvedBy() != null){ %>
-			 		<span class="glyphicon glyphicon-print"></span> 打印时间: <%=node.getStartTime() %><br/>
-			 		<span class="glyphicon glyphicon-user"></span> 处理人: <%=node.getResolvedBy() %><br/>
+			 		<p><span class="glyphicon glyphicon-print"></span> 打印: <%=node.getStartTime() %></p>
+			 		<p><span class="glyphicon glyphicon-user"></span> 处理人: <%=node.getResolvedBy() %></p>
 			 		<% } %>
 		 		<% }else if (node.getSpecialDisplay()) { %>
-		 		    <span class="glyphicon glyphicon-flag"></span> 正在处理<br/>
-			 		<span class="glyphicon glyphicon-play-circle"></span> 开始时间: <%=node.getStartTime() %><br/>
-			 		<span class="glyphicon glyphicon-user"></span> 处理人: <%=node.getResolvedBy() %><br/>
+		 		    <h4><span class="glyphicon glyphicon-flag"></span> 正在处理</h4>
+			 		<p><span class="glyphicon glyphicon-play-circle"></span> 开始: <%=node.getStartTime() %></p>
+			 		<p><span class="glyphicon glyphicon-user"></span> 处理人: <%=node.getResolvedBy() %></p>
 		 		<% }else{ %>
-                    <span class="glyphicon glyphicon-flag"></span> 等待处理<br/>
+                    <h4><span class="glyphicon glyphicon-flag"></span> 等待处理</h4>
 		 		<% } %>
-			 	<% if (node.getErrorStatus() != 0){ %>
-				 	<div class="bs-callout bs-callout-danger">
-				 	<span class="glyphicon glyphicon-repeat"></span> 流程回退: <%=Constants.getErrorName(node.getErrorStatus()) %><br/>
-				 	<span class="glyphicon glyphicon-warning-sign"></span> 回退原因: <%=node.getErrorMsg() %>
-				 	</div>
-				<% } %>
-		 	</span>
+		 		</div>
+		 	</div>
 		  </div>
 		</div>				
 		<% } else{ %>
-		<div class="col-xs-3 bs-wizard-step complete">
-		  <div class="text-center bs-wizard-stepnum"><%=node.getNodeTypeName() %></div>
+		<div class="col-xs-3 bs-wizard-step complete"<% if(step%4==0){ %> style="clear:both"<%} %>>
+		  <div class="text-center bs-wizard-stepnum"><strong><%=node.getNodeTypeName() %></strong></div>
 		  <div class="progress"><div class="progress-bar"></div></div>
 		  <a href="#" class="bs-wizard-dot"></a>
 		  <div class="bs-wizard-info text-center list-group">
-		 	<span class="txt-center">
+		 	<div class="txt-center">
+		 	    <% if (node.getErrorStatus() != 0){ %>
+                    <div class="bs-callout bs-callout-danger">
+                    <h4><span class="glyphicon glyphicon-repeat"></span> 出错: <%=Constants.getErrorName(node.getErrorStatus()) %></h4>
+                    <p><span class="glyphicon glyphicon-time"></span> 时间: <%=node.getEndTime() %></p>
+                    <p><span class="glyphicon glyphicon-user"></span> 处理人: <%=node.getResolvedBy() %></p>
+                    <p><span class="glyphicon glyphicon-warning-sign"></span> 原因: <%=node.getErrorMsg() %></p>
+                    </div>
+                <% } else { %>
+                    <div class="bs-callout bs-callout-success">
 		 		<% if (node.getNodeType() == Constants.SHIP){ %>
-			 		<span class="glyphicon glyphicon-flag"></span> <%=node.getOrderStatus() %><br/>
-			 		<span class="glyphicon glyphicon-print"></span> 打印时间: <%=node.getStartTime() %><br/>
-			 		<span class="glyphicon glyphicon-time"></span> 出库时间: <%=node.getEndTime() %><br/>
+			 	    <h4><span class="glyphicon glyphicon-flag"></span> <%=node.getOrderStatus() %></h4>
+			 	    <p><span class="glyphicon glyphicon-print"></span> 打印: <%=node.getStartTime() %></p>
+			 	    <p><span class="glyphicon glyphicon-time"></span> 出库: <%=node.getEndTime() %></p>
 		 		<% }else if (node.getSpecialDisplay()){ %>
-		 		    <span class="glyphicon glyphicon-flag"></span> 处理完成<br/>
-			 		<span class="glyphicon glyphicon-play-circle"></span> 开始时间: <%=node.getStartTime() %><br/>
-			 		<span class="glyphicon glyphicon-off"></span> 结束时间: <%=node.getEndTime() %><br/>
+		 		    <h4><span class="glyphicon glyphicon-flag"></span> 处理完成</h4>
 			 		<% if (node.getNodeType() == Constants.DECOCT){ %>
-				 		<span class="glyphicon glyphicon-scale"></span> 机器名称: <%=node.getMachineName() %><br/>
-				 		<span class="glyphicon glyphicon-time"></span> 煎煮时间: <%=node.getDecoctTime() %><br/>
-                        <span class="glyphicon glyphicon-time"></span> 保温时间: <%=node.getHeatTime() %><br/>
+				 		<p><span class="glyphicon glyphicon-time"></span> 煎煮: <%=node.getDecoctTime() %></p>
+                        <p><span class="glyphicon glyphicon-time"></span> 保温: <%=node.getHeatTime() %></p>
+                        <p><span class="glyphicon glyphicon-scale"></span> 煎煮机: <%=node.getMachineName() %></p>
 			 		<% }else if (node.getNodeType() == Constants.POUR){ %>
-                        <span class="glyphicon glyphicon-scale"></span> 机器名称: <%=node.getMachineName() %><br/>	
+			 		    <p><span class="glyphicon glyphicon-play-circle"></span> 开始: <%=node.getStartTime() %></p>
+                        <p><span class="glyphicon glyphicon-off"></span> 结束: <%=node.getEndTime() %></p>
+                        <p><span class="glyphicon glyphicon-scale"></span> 灌装机: <%=node.getMachineName() %></p>
+				 	<% }else{ %>
+				 	    <p><span class="glyphicon glyphicon-play-circle"></span> 开始: <%=node.getStartTime() %></p>
+                        <p><span class="glyphicon glyphicon-off"></span> 结束: <%=node.getEndTime() %></p>
 				 	<% } %>
 		 		<% }else { %>
-		 		    <span class="glyphicon glyphicon-flag"></span> 处理完成<br/>
-			 		<span class="glyphicon glyphicon-time"></span> 处理时间: <%=node.getEndTime() %><br/>
+		 		    <h4><span class="glyphicon glyphicon-flag"></span> 处理完成</h4>
+			 		<p><span class="glyphicon glyphicon-time"></span> 时间: <%=node.getEndTime() %></p>
 			 	<% } %>
-			 		<span class="glyphicon glyphicon-user"></span> 处理人: <%=node.getResolvedBy() %><br/>
-				 <% if (node.getErrorStatus() != 0){ %>
-				    <div class="bs-callout bs-callout-danger">
-				 	<span class="glyphicon glyphicon-repeat"></span> 流程回退: <%=Constants.getErrorName(node.getErrorStatus()) %><br/>
-				 	<span class="glyphicon glyphicon-warning-sign"></span> 回退原因: <%=node.getErrorMsg() %>
-				 	</div>
-			 	<% } %>
-		 	</span>
+			 		<p><span class="glyphicon glyphicon-user"></span> 处理人: <%=node.getResolvedBy() %></p>
+			        </div>
+			    <% } %>
+		 	</div>
 		  </div>
 		</div>				
 		<% } %>
+		<% step++; %>
 	<% } %>
 <% } %>
 </div>

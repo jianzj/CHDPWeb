@@ -557,9 +557,10 @@ public class PrescriptionService {
 	}
 
 	// 出库单生成逻辑，带事务控制
-	public boolean printShipListXls(int hospitalId) {
+	public String printShipListXls(int hospitalId) {
+		String filename = null;
 		if (hospitalId == 0)
-			return false;
+			return null;
 
 		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
 		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
@@ -584,25 +585,26 @@ public class PrescriptionService {
 				prs.setProcess_id(newOrder.getId());
 				if (!updatePrescriptionProcess(prs)) {
 					transactionManager.rollback(status);
-					return false;
+					return null;
 				}
 			}
 
-			if (!generatePrsListXls(hospitalId, uuid, prsList)) {
+			filename = generatePrsListXls(hospitalId, uuid, prsList);
+			if (filename == null) {
 				transactionManager.rollback(status);
-				return false;
+				return null;
 			}
 		} catch (Exception e) {
 			transactionManager.rollback(status);
-			return false;
+			return null;
 		}
 
 		transactionManager.commit(status);
-		return true;
+		return filename;
 	}
 
 	// 生成Excel出库单
-	private boolean generatePrsListXls(int hospitalId, String orderUuid, List<Prescription> prsList) {
+	private String generatePrsListXls(int hospitalId, String orderUuid, List<Prescription> prsList) {
 		try {
 			Resource tempResource = new ClassPathResource("shipTemplate.xls");
 
@@ -687,14 +689,14 @@ public class PrescriptionService {
 					templateWb.addPicture(baos.toByteArray(), HSSFWorkbook.PICTURE_TYPE_JPEG));
 			picture.resize();
 
-			String newPath = Constants.TEMPPATH + hospital.getName() + "-" + orderUuid + ".xls";
+			String newPath = Constants.SHIPFILEPATH + hospital.getName() + "-" + orderUuid + ".xls";
 			File newShipList = new File(newPath);
 			try {
 				newShipList.createNewFile();
 			} catch (Exception e) {
 				templateWb.close();
 				fis.close();
-				return false;
+				return null;
 			}
 
 			FileOutputStream fileOut = new FileOutputStream(newShipList);
@@ -704,9 +706,9 @@ public class PrescriptionService {
 			fis.close();
 			templateWb.close();
 
-			return true;
+			return hospital.getName() + "-" + orderUuid + ".xls";
 		} catch (Exception e) {
-			return false;
+			return null;
 		}
 	}
 

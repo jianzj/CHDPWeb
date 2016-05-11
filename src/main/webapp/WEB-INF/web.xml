@@ -67,8 +67,13 @@
     <session-config>
         <session-timeout>-1</session-timeout>
     </session-config>
-    
+
     <welcome-file-list>
         <welcome-file>/index.jsp</welcome-file>
     </welcome-file-list>
+
+    <mime-mapping>
+        <extension>xls</extension>
+        <mime-type>application/xls</mime-type>
+    </mime-mapping>
 </web-app>  
