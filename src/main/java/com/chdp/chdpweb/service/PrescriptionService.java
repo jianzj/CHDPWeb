@@ -273,9 +273,8 @@ public class PrescriptionService {
 
 	public List<Prescription> listPrsWithHospital(int hospitalId) {
 		try {
-			List<Prescription> prsList = prsDao.getPrescriptionByHospitalName(hospitalId);
+			List<Prescription> prsList = prsDao.getPrescriptionByHospitalId(hospitalId);
 			return prsList;
-			// return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -284,9 +283,8 @@ public class PrescriptionService {
 	public List<Prescription> listPrsWithHospital(int hospitalId, int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
-			List<Prescription> prsList = prsDao.getPrescriptionByHospitalName(hospitalId);
+			List<Prescription> prsList = prsDao.getPrescriptionByHospitalId(hospitalId);
 			return prsList;
-			// return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -307,7 +305,6 @@ public class PrescriptionService {
 		try {
 			List<Prescription> prsList = prsDao.getPrescriptionsByParams(process, hospitalId);
 			return prsList;
-			// return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -607,7 +604,7 @@ public class PrescriptionService {
 	// 生成Excel出库单
 	private boolean generatePrsListXls(int hospitalId, String orderUuid, List<Prescription> prsList) {
 		try {
-			Resource tempResource = new ClassPathResource("template.xls");
+			Resource tempResource = new ClassPathResource("shipTemplate.xls");
 
 			FileInputStream fis = new FileInputStream(tempResource.getFile());
 			HSSFWorkbook templateWb = new HSSFWorkbook(fis);
@@ -712,62 +709,62 @@ public class PrescriptionService {
 			return false;
 		}
 	}
-	
-	/** ------------------------------------------------------------------**/
-	 //根据出库单ID获取所属的处方List
-	public List<Prescription> getPrsListByOrderId(int orderId, String start, String end){
-		try{
+
+	/** ------------------------------------------------------------------ **/
+	// 根据出库单ID获取所属的处方List
+	public List<Prescription> getPrsListByOrderId(int orderId, String start, String end) {
+		try {
 			Order order = orderDao.getOrderById(orderId);
 			return prsDao.getPrsListByOrderId(order.getId(), order.getHospital_id(), start, end);
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
-	 //根据出库单ID获取所属的处方List, 用于分页
-	public List<Prescription> getPrsListByOrderId(int orderId, String start, String end, int pageNum){
+
+	// 根据出库单ID获取所属的处方List, 用于分页
+	public List<Prescription> getPrsListByOrderId(int orderId, String start, String end, int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
-		try{
+		try {
 			Order order = orderDao.getOrderById(orderId);
 			return prsDao.getPrsListByOrderId(order.getId(), order.getHospital_id(), start, end);
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
-	//根据用户Id查询此用户已经完成的所有处方数量
-	public List<Prescription> getPrsListByUserId(int userId, String start, String end){
-		try{
+
+	// 根据用户Id查询此用户已经完成的所有处方数量
+	public List<Prescription> getPrsListByUserId(int userId, String start, String end) {
+		try {
 			List<Prescription> prsList = prsDao.getPrsListFromProcessByUserId(userId, start, end);
 			List<Prescription> prsByOrderList = prsDao.getPrsListFromOrderByUserId(userId, start, end);
-			for (Prescription prs : prsByOrderList){
-				if (prsList.contains(prs)){
+			for (Prescription prs : prsByOrderList) {
+				if (prsList.contains(prs)) {
 					prsList.add(prs);
 				}
 			}
 			return prsList;
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
-	//根据用户Id查询此用户已经完成的所有处方数量
-	public List<Prescription> getPrsListByUserId(int userId, String start, String end, int pageNum){
+
+	// 根据用户Id查询此用户已经完成的所有处方数量
+	public List<Prescription> getPrsListByUserId(int userId, String start, String end, int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
-		try{
+		try {
 			List<Prescription> prsList = prsDao.getPrsListFromProcessByUserId(userId, start, end);
 			List<Prescription> prsByOrderList = prsDao.getPrsListFromOrderByUserId(userId, start, end);
-			for (Prescription prs : prsByOrderList){
-				if (prsList.contains(prs)){
+			for (Prescription prs : prsByOrderList) {
+				if (prsList.contains(prs)) {
 					prsList.add(prs);
 				}
 			}
 			return prsList;
-		} catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
+
 	// 根据用户Id统计用户在一个时间段内处理处方的情况
 	public List<User> getUserListForPrsSummary(int userAuth, String start, String end, int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
@@ -778,8 +775,8 @@ public class PrescriptionService {
 			} else {
 				userList = userDao.getUserListWithAuth(userAuth);
 			}
-			
-			for (User user : userList){
+
+			for (User user : userList) {
 				int fivePacketNum = 0;
 				int sevenPacketNum = 0;
 				int tenPacketNum = 0;
@@ -788,17 +785,17 @@ public class PrescriptionService {
 
 				List<Prescription> prsList = this.getPrsListByUserId(user.getId(), start, end);
 				user.setDone_prs_num(prsList.size());
-				for (Prescription prs : prsList){
+				for (Prescription prs : prsList) {
 					int packet_num = prs.getPacket_num();
-					if (packet_num == 5){
-						fivePacketNum  += 1;
-					}else if (packet_num == 7){
+					if (packet_num == 5) {
+						fivePacketNum += 1;
+					} else if (packet_num == 7) {
 						sevenPacketNum += 1;
-					}else if (packet_num == 10){
+					} else if (packet_num == 10) {
 						tenPacketNum += 1;
-					}else if (packet_num == 14){
+					} else if (packet_num == 14) {
 						fourteenPacketNum += 1;
-					}else{
+					} else {
 						otherPacketNum += 1;
 					}
 				}
@@ -808,9 +805,9 @@ public class PrescriptionService {
 				user.setPrs_fourteen_packet_num(fourteenPacketNum);
 				user.setPrs_other_packet_num(otherPacketNum);
 				Integer errorNum = prsDao.getErrorProcessByUserId(user.getId(), start, end);
-				if (errorNum != null){
+				if (errorNum != null) {
 					user.setError_num(errorNum);
-				}else{
+				} else {
 					user.setError_num(0);
 				}
 			}

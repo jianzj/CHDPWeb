@@ -83,4 +83,17 @@
 		</tbody>
 	</table>
 </div>
+<div class="text-right">
+    <% if (request.getAttribute("hospitalId") != null){ %>
+        <% request.setAttribute("hospitalId", (Integer)request.getAttribute("hospitalId")); %>
+    <% } %>
+    <% if (request.getAttribute("startTime") != null){ %>
+        <% request.setAttribute("startTime", (String)request.getAttribute("startTime")); %>
+    <% } %>
+    <% if (request.getAttribute("endTime") != null){ %>
+        <% request.setAttribute("endTime", (String)request.getAttribute("endTime")); %>
+    <% }%>
+    <c:set var="pageUrl" value="prescription/hospitalDimensionList" />
+    <%@ include file="../common/nav.jsp"%>
+</div>
 <%@ include file="../foot.jsp"%>

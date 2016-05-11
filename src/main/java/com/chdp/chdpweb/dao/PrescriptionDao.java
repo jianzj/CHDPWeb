@@ -35,11 +35,13 @@ public interface PrescriptionDao {
 			+ "pr.process_type = 8 and pr.machine_id = m.id and m.uuid = #{uuid} )")
 	Prescription getPrescriptionByPourMachineUuid(@Param("uuid") String uuid);
 
-	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.process = #{process} and p.hospital_id = h.id")
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where "
+			+ "p.process = #{process} and p.hospital_id = h.id")
 	List<Prescription> getPrescriptionsByProcess(@Param("process") int process);
 
 	// Used to find out finished prescriptions by hospital and time.
-	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.process = #{process} and p.hospital_id = h.id and p.create_time >= #{start} and p.finish_time <= #{end}")
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where "
+			+ "p.process = #{process} and p.hospital_id = h.id and p.create_time >= #{start} and p.finish_time <= #{end}")
 	List<Prescription> getPrescriptionsByProcessAndTime(@Param("process") int process, @Param("start") String start,
 			@Param("end") String end);
 
@@ -49,12 +51,13 @@ public interface PrescriptionDao {
 	List<Prescription> getPrescriptionsByParamswithTime(@Param("process") int process,
 			@Param("hospitalId") int hospitalId, @Param("start") String start, @Param("end") String end);
 
-	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id")
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where "
+			+ "p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id")
 	List<Prescription> getPrescriptionsByParams(@Param("process") int process, @Param("hospitalId") int hospitalId);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
 			+ "where h.id = #{hospitalId} and h.id = p.hospital_id and p.process < 11")
-	List<Prescription> getPrescriptionByHospitalName(@Param("hospitalId") int hospitalId);
+	List<Prescription> getPrescriptionByHospitalId(@Param("hospitalId") int hospitalId);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
 			+ "where p.process < 11 and p.hospital_id = h.id ")

@@ -290,6 +290,7 @@ public class PrescriptionController {
 		List<Hospital> hospitalList = hospitalService.getHospitalList();
 		request.setAttribute("hospitalList", hospitalList);
 		request.setAttribute("currentPrsList", prsList);
+
 		PageInfo<Prescription> page = new PageInfo<Prescription>(prsList);
 		request.setAttribute("page", page);
 
@@ -343,7 +344,7 @@ public class PrescriptionController {
 	public String listHospitalDimension(HttpServletRequest request,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
 		request.setAttribute("nav", "医院维度统计");
-		
+
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
 
