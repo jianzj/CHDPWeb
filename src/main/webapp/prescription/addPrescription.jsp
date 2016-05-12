@@ -97,7 +97,7 @@
 				      </span>
 				      <input type="number" class="form-control" name="packet_num_other"  value="<% if(n!=5&&n!=7&&n!=10&&n!=14) out.print(n); %>">
 				    </div>
-					<% }else {%>
+					<% }else if (request.getAttribute("prsAdd")!=null) {%>
 					<label><input name="packet_num" type="radio" value="5" <%if(((Prescription)request.getAttribute("prsAdd")).getPacket_num() == 5) out.print("checked"); %>>5帖10包</label>　　
                     <label><input name="packet_num" type="radio" value="7" <%if(((Prescription)request.getAttribute("prsAdd")).getPacket_num() == 7) out.print("checked"); %>>7帖14包</label>　　
                     <label><input name="packet_num" type="radio" value="10" <%if(((Prescription)request.getAttribute("prsAdd")).getPacket_num() == 10) out.print("checked"); %>>10帖20包</label>　　
@@ -107,6 +107,17 @@
                         <label><input name="packet_num" type="radio" value="-1" <% int n = ((Prescription)request.getAttribute("prsAdd")).getPacket_num(); if(n!=5&&n!=7&&n!=10&&n!=14) out.print("checked"); %>>其它</label>
                       </span>
                       <input type="number" class="form-control" name="packet_num_other"  value="<% if(n!=5&&n!=7&&n!=10&&n!=14) out.print(n); %>">
+                    </div>
+					<% }else{ %>
+					<label><input name="packet_num" type="radio" value="5" checked>5帖10包</label>　　
+                    <label><input name="packet_num" type="radio" value="7">7帖14包</label>　　
+                    <label><input name="packet_num" type="radio" value="10">10帖20包</label>　　
+                    <label><input name="packet_num" type="radio" value="14">14帖28包</label>　　
+                    <div class="input-group" style="margin-top:10px;">
+                      <span class="input-group-addon">
+                        <label><input name="packet_num" type="radio" value="-1">其它</label>
+                      </span>
+                      <input type="number" class="form-control" name="packet_num_other">
                     </div>
 					<% } %>
 				</div>
