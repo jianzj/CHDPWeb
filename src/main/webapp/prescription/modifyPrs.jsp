@@ -17,16 +17,16 @@
 	<form class="form-horizontal" action="<%=request.getContextPath()%>/prescription/modify?prsId=${prsModify.id}&from=${from}" method="POST">
 		<fieldset>
 			<div class="form-group">
-				<label for="hospital_name" class="control-label col-sm-4">医院</label>
+				<label for="hospital_id" class="control-label col-sm-4">医院</label>
 				<div class="col-sm-4 required">
 					<% if(request.getAttribute("hospitalList") != null){ %>
-					<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital_name" name="hospital_name">
+					<select class="selectpicker" data-live-search="true" data-width="fit" id="hospital_id" name="hospital_id">
 						<c:forEach var='item' items="${hospitalList}">
-								<c:if test="${prsModify.hospital_name == item.name}">
-									<option value="${item.name}" selected>${item.name}</option>						
+								<c:if test="${prsModify.hospital_id == item.id}">
+									<option value="${item.id}" selected>${item.name}</option>						
 								</c:if>
-								<c:if test="${prsModify.hospital_name != item.name}">
-									<option value="${item.name}">${item.name}</option>						
+								<c:if test="${prsModify.hospital_id != item.id}">
+									<option value="${item.id}">${item.name}</option>						
 								</c:if>
 						</c:forEach>
 					</select>
@@ -67,7 +67,7 @@
                       <span class="input-group-addon">
                         <label><input name="packet_num" type="radio" value="-1" <% int n = ((Prescription)request.getAttribute("prsModify")).getPacket_num(); if(n!=5&&n!=7&&n!=10&&n!=14) out.print("checked"); %>>其它</label>
                       </span>
-                      <input type="number" class="form-control" name="packet_num_other"  value="<% if(n!=5&&n!=7&&n!=10&&n!=14) out.print(n); %>">
+                      <input type="number" step="1" class="form-control" name="packet_num_other"  value="<% if(n!=5&&n!=7&&n!=10&&n!=14) out.print(n); %>">
                     </div>
 				</div>
 			</div>

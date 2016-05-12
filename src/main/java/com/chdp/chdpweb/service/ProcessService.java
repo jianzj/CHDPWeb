@@ -446,7 +446,7 @@ public class ProcessService {
 						|| process.getProcess_type() == Constants.MIX) {
 					node.setSpecialDisplay(true);
 				}
-				if (process.getBegin() == null) {
+				if (process.getBegin() == null && process.getFinish() == null) {
 					node.setStatus(0);
 				} else if (process.getFinish() == null) {
 					node.setStatus(1);

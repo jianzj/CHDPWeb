@@ -200,15 +200,14 @@ public class PrescriptionController {
 			request.setAttribute("prsId", prsId);
 			return "prescription/modifyPrs";
 		} else {
-			if ((!prsService.equalHospitalInfo(currentPrs, prs)) && prsService.validPrescriptionHospitalInfo(prs)) {
-				request.setAttribute("errorMsg", "您输入的医院名称已经存在，请校验后重新输入！");
+			if (prsService.validPrescriptionHospitalInfo(prs)) {
+				request.setAttribute("errorMsg", "与此处方相同医院名称，相同订单编号的处方已经存在，请检查输入！");
 				request.setAttribute("prsModify", prs);
 				request.setAttribute("from", from);
 				request.setAttribute("prsId", prsId);
 				return "prescription/modifyPrs";
 			} else {
 				prs.setId(prsId);
-				prs.setHospital_id(hospitalService.getHospitalIdByName(prs.getHospital_name()));
 				if (prsService.updatePrsInReceive(prs)) {
 					request.setAttribute("successMsg", "修改处方成功！");
 				} else {

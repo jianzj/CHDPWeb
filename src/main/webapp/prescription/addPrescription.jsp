@@ -35,12 +35,12 @@
 								<option value="${hospital.id}" selected>${hospital.name}</option>						
 							</c:if>
 							<c:if test="${lastestPrs.hospital_id != hospital.id}">
-								<option value="${hospital.id}">${hospital.id}</option>						
+								<option value="${hospital.id}">${hospital.name}</option>						
 							</c:if>
 						</c:forEach>				
 						<% } else { %>
 						<c:forEach var='hospital' items="${hospitalList}">
-							<option value="${hospital.name}">${hospital.name}</option>
+							<option value="${hospital.id}">${hospital.name}</option>
 						</c:forEach>
 						<% } %>
 					</select>
@@ -95,7 +95,7 @@
 				      <span class="input-group-addon">
 				        <label><input name="packet_num" type="radio" value="-1" <% int n = ((Prescription)request.getAttribute("lastestPrs")).getPacket_num(); if(n!=5&&n!=7&&n!=10&&n!=14) out.print("checked"); %>>其它</label>
 				      </span>
-				      <input type="number" class="form-control" name="packet_num_other"  value="<% if(n!=5&&n!=7&&n!=10&&n!=14) out.print(n); %>">
+				      <input type="number" step="1" class="form-control" name="packet_num_other"  value="<% if(n!=5&&n!=7&&n!=10&&n!=14) out.print(n); %>">
 				    </div>
 					<% }else if (request.getAttribute("prsAdd")!=null) {%>
 					<label><input name="packet_num" type="radio" value="5" <%if(((Prescription)request.getAttribute("prsAdd")).getPacket_num() == 5) out.print("checked"); %>>5帖10包</label>　　
@@ -106,7 +106,7 @@
                       <span class="input-group-addon">
                         <label><input name="packet_num" type="radio" value="-1" <% int n = ((Prescription)request.getAttribute("prsAdd")).getPacket_num(); if(n!=5&&n!=7&&n!=10&&n!=14) out.print("checked"); %>>其它</label>
                       </span>
-                      <input type="number" class="form-control" name="packet_num_other"  value="<% if(n!=5&&n!=7&&n!=10&&n!=14) out.print(n); %>">
+                      <input type="number" step="1" class="form-control" name="packet_num_other"  value="<% if(n!=5&&n!=7&&n!=10&&n!=14) out.print(n); %>">
                     </div>
 					<% }else{ %>
 					<label><input name="packet_num" type="radio" value="5" checked>5帖10包</label>　　
@@ -117,7 +117,7 @@
                       <span class="input-group-addon">
                         <label><input name="packet_num" type="radio" value="-1">其它</label>
                       </span>
-                      <input type="number" class="form-control" name="packet_num_other">
+                      <input type="number" step="1" class="form-control" name="packet_num_other">
                     </div>
 					<% } %>
 				</div>
