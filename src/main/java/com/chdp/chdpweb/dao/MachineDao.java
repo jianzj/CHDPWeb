@@ -13,10 +13,10 @@ public interface MachineDao {
 	@Insert("insert machine(uuid, type, pour_machine_id, name, description) values(#{machine.uuid}, #{machine.type}, #{machine.pour_machine_id}, #{machine.name}, #{machine.description})")
 	int createMachine(@Param("machine") Machine machine);
 
-	@Select("select * from machine where type = #{type} order by convert( name using gbk )")
+	@Select("select * from machine where type = #{type} order by type,convert( name using gbk )")
 	List<Machine> getMachinesByType(@Param("type") int type);
 
-	@Select("select m.*, pm.name as pour_machine_name from machine as m left join machine as pm on m.pour_machine_id = pm.id order by convert( m.name using gbk )")
+	@Select("select m.*, pm.name as pour_machine_name from machine as m left join machine as pm on m.pour_machine_id = pm.id order by m.type,convert( m.name using gbk )")
 	List<Machine> getMachines();
 
 	@Select("select * from machine where name = #{name}")

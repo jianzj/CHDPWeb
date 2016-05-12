@@ -13,10 +13,10 @@ public interface HerbDao {
 	@Insert("insert herb(type, name, description) values(#{herb.type}, #{herb.name}, #{herb.description})")
 	int createHerb(@Param("herb") Herb herb);
 
-	@Select("select * from herb order by convert( name using gbk )")
+	@Select("select * from herb order by type,convert( name using gbk )")
 	List<Herb> getHerbs();
 
-	@Select("select * from herb where type = #{type}")
+	@Select("select * from herb where type = #{type} order by convert( name using gbk )")
 	List<Herb> getHerbsByType(@Param("type") int type);
 
 	@Select("select * from herb where name = #{name}")
