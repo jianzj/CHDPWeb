@@ -32,13 +32,7 @@ public interface ProcessDao {
 	@Update("update process set error_type = #{proc.error_type}, error_msg = #{proc.error_msg} where id = #{proc.id}")
 	int addErrorMsgToProcess(@Param("proc") Process proc);
 
-	// @Select("select count(*) from process where prescription_id = #{prs_id}")
-	// int countProcesswithPrsId(@Param("prs_id") int prs_id);
-
-	// @Select("select * from process where prescription_id = #{prs_id}")
-	// Process getSingleProcessByPrsId(@Param("prs_id") int prs_id);
-
-	@Select("select * from process where prescription_id = #{prs_id}")
+	@Select("select * from process where prescription_id = #{prs_id} order by begin desc")
 	List<Process> getProcessesByPrsID(@Param("prs_id") int prs_id);
 
 	@Select("select id from process where process_type = #{process.process_type} and "

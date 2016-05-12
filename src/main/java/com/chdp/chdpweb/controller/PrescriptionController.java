@@ -479,7 +479,9 @@ public class PrescriptionController {
 			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
 		} else if (from.equals("ORDER") && orderId == 0) {
 			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
-		}
+		} else if (from.equals("CURRENT_ORDER") && orderId == 0) {
+			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "order/currentOrders";
+		} 
 
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
@@ -500,7 +502,9 @@ public class PrescriptionController {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
 			} else if (from.equals("ORDER")) {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
-			} else {
+			} else if (from.equals("CURRENT_ORDER")) {
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "order/currentOrders";
+			}else {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/currentList";
 			}
 		}
@@ -513,7 +517,9 @@ public class PrescriptionController {
 			prsList = prsService.getPrsListByUserId(userId, start, end, pageNum);
 		} else if (from.equals("ORDER")) {
 			prsList = prsService.getPrsListByOrderId(orderId, start, end, pageNum);
-		} else {
+		} else if (from.equals("CURRENT_ORDER")) {
+			prsList = prsService.getPrsListByOrderIdUnfinished(orderId, pageNum);
+		}else {
 			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalId, pageNum, start, end);
 		}
 
@@ -758,18 +764,25 @@ public class PrescriptionController {
 		String startTime = Utils.formatStartTime(start);
 		String endTime = Utils.formatEndTime(end);
 		
+		String from = request.getParameter("from");
+		if (from == null){
+			from = "CURRENT";
+		}
+		
 		if (orderId == 0){
 			redirectAttributes.addFlashAttribute("errorMsg", "未知出库单Id，无法打印!");
 		} else if (!Utils.validStartEndTime(startTime, endTime)) {
 			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
-			if (prsService.regenerateShipListXls(orderId, startTime, endTime)){
+			if (prsService.regenerateShipListXls(orderId, startTime, endTime, from)){
 				redirectAttributes.addFlashAttribute("successMsg", "导出出库单成功！");
 			}else{
 				redirectAttributes.addFlashAttribute("errorMsg", "导出出库单失败，请重试！");
 			}
 		}
-		
+		if (request.getParameter("from") != null && request.getParameter("from").equals("CURRENT_ORDER")){
+			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../order/currentOrders?hospitalId=" + hospitalId;
+		}
 		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/orderDimensionList?hospitalId=" + hospitalId + 
 				"&startTime=" + start + "&endTime=" + end;
 	}

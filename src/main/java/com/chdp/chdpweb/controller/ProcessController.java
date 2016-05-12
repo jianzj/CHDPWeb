@@ -110,6 +110,8 @@ public class ProcessController {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/userDimensionList";
 			} else if (from.equals("ORDER")) {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
+			} else if (from.equals("CURRENT_ORDER")){
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "order/currentOrders";
 			} else {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/currentList";
 			}

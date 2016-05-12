@@ -36,31 +36,31 @@ public interface PrescriptionDao {
 	Prescription getPrescriptionByPourMachineUuid(@Param("uuid") String uuid);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where "
-			+ "p.process = #{process} and p.hospital_id = h.id")
+			+ "p.process = #{process} and p.hospital_id = h.id order by p.create_time desc")
 	List<Prescription> getPrescriptionsByProcess(@Param("process") int process);
 
 	// Used to find out finished prescriptions by hospital and time.
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where "
-			+ "p.process = #{process} and p.hospital_id = h.id and p.create_time >= #{start} and p.finish_time <= #{end}")
+			+ "p.process = #{process} and p.hospital_id = h.id and p.create_time >= #{start} and p.finish_time <= #{end} order by p.create_time desc")
 	List<Prescription> getPrescriptionsByProcessAndTime(@Param("process") int process, @Param("start") String start,
 			@Param("end") String end);
 
 	// Used to find out finished prescriptions by hospital and time.
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id and p.create_time >= #{start} and p.finish_time <= #{end}")
+			+ "where p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id and p.create_time >= #{start} and p.finish_time <= #{end} order by p.create_time desc")
 	List<Prescription> getPrescriptionsByParamswithTime(@Param("process") int process,
 			@Param("hospitalId") int hospitalId, @Param("start") String start, @Param("end") String end);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where "
-			+ "p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id")
+			+ "p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id order by p.create_time desc")
 	List<Prescription> getPrescriptionsByParams(@Param("process") int process, @Param("hospitalId") int hospitalId);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where h.id = #{hospitalId} and h.id = p.hospital_id and p.process < 11")
+			+ "where h.id = #{hospitalId} and h.id = p.hospital_id and p.process < 11 order by p.create_time desc")
 	List<Prescription> getPrescriptionByHospitalId(@Param("hospitalId") int hospitalId);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where p.process < 11 and p.hospital_id = h.id ")
+			+ "where p.process < 11 and p.hospital_id = h.id order by p.create_time desc")
 	List<Prescription> getPrescriptionsUnfinished();
 
 	// 获取在一段时间内指定一家医院完成的处方
@@ -71,7 +71,7 @@ public interface PrescriptionDao {
 
 	// Cut Lines
 
-	@Select("select * from prescription where hospital_id = #{hospital_id} and process = #{process}")
+	@Select("select * from prescription where hospital_id = #{hospital_id} and process = #{process} order by create_time desc")
 	List<Prescription> getPrescriptionByHospitalwithProcess(@Param("hospital_id") int hospital_id,
 			@Param("process") int process);
 
@@ -104,14 +104,14 @@ public interface PrescriptionDao {
 	int deletePrescription(@Param("prsId") int prsId);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where p.process = #{process} and p.process_id = -1 and p.hospital_id = h.id")
+			+ "where p.process = #{process} and p.process_id = -1 and p.hospital_id = h.id order by p.create_time desc")
 	List<Prescription> getPrsListWithProcess_Ship(@Param("process") int process);
 
 	// New added
 	// Used for receiveList/ to get PrsList with Process type. No user_name
 	// included.
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where p.process = #{process} and p.hospital_id = h.id")
+			+ "where p.process = #{process} and p.hospital_id = h.id order by p.create_time desc")
 	List<Prescription> getPrsListWithProcess(@Param("process") int process);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
@@ -121,14 +121,14 @@ public interface PrescriptionDao {
 	// Used for receiveList/ to get PrsList with Process type. No user_name
 	// included.
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where p.process = #{process} and p.process_id = -1 and h.id = #{hospitalId} and p.hospital_id = h.id")
+			+ "where p.process = #{process} and p.process_id = -1 and h.id = #{hospitalId} and p.hospital_id = h.id order by p.create_time desc")
 	List<Prescription> listShipPrescription(@Param("process") int process,
 			@Param("hospitalId") int hospitalId);
 
 	// Used for receiveList/ to get PrsList with Process type. No user_name
 	// included.
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id")
+			+ "where p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id order by p.create_time desc")
 	List<Prescription> getPrsListWithProAndHospital(@Param("process") int process, @Param("hospitalId") int hospitalId);
 
 	@Select("select h.id from prescription as p, hospital as h "
@@ -177,7 +177,7 @@ public interface PrescriptionDao {
 
 	// 用户维度统计:PrsList
 	@Select("select p.*, h.name as hospital_name from prescription as p, process as pro, user as u, hospital as h where p.process = 11 and u.id = #{userId} and pro.process_type = #{process_type} "
-			+ "and p.hospital_id = h.id and pro.prescription_id = p.id and pro.user_id = u.id and p.create_time >= #{start} and p.finish_time <= #{end}")
+			+ "and p.hospital_id = h.id and pro.prescription_id = p.id and pro.user_id = u.id and p.create_time >= #{start} and p.finish_time <= #{end} order by p.create_time desc")
 	List<Prescription> listPrsByUser(@Param("userId") int userId, @Param("process_type") int process_type,
 			@Param("start") String start, @Param("end") String end);
 
@@ -187,7 +187,7 @@ public interface PrescriptionDao {
 	Integer countProcsErrorByUse_Process(@Param("process_type") int process_type, @Param("userId") int userId,
 			@Param("start") String start, @Param("end") String end);
 
-	@Select("select * from prescription where hospital_id = #{hospital_id}")
+	@Select("select * from prescription where hospital_id = #{hospital_id} order by create_time desc")
 	List<Prescription> getPrescriptionByHospital(@Param("hospital_id") int hospital_id);
 
 	@Update("update prescription set class_of_medicines = #{prs.class_of_medicines}, process = #{prs.process}, process_id = #{prs.process_id}, "
@@ -204,19 +204,25 @@ public interface PrescriptionDao {
 	// List all finished prescriptions by orderId
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h  where p.process = " + Constants.FINISH + " and " +
 				"h.id = #{hospitalId} and p.process_id = #{orderId} and p.hospital_id = h.id " +
-				"and create_time >= #{startTime} and finish_time <= #{endTime}")
+				"and create_time >= #{startTime} and finish_time <= #{endTime} order by p.create_time desc")
 	List<Prescription> getPrsListByOrderId(@Param("orderId") int orderId, @Param("hospitalId") int hospitalId, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+	// List all unfinished prescriptions by orderId
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h  where p.process = " + Constants.SHIP + " and " +
+				"p.process_id = #{orderId} and p.hospital_id = h.id order by p.create_time desc")
+	List<Prescription> getPrsListByOrderIdUnfinished(@Param("orderId") int orderId);
+	
 	
 	// List all finished prescriptions where one user worked for it, checked for process table.
 	@Select("select distinct p.*, h.name as hospital_name from prescription as p, process as pro, hospital as h where " +
 				"p.process = " + Constants.FINISH + " and pro.user_id = #{userId} and pro.prescription_id = p.id " +
-				"and p.hospital_id = h.id and p.create_time >= #{startTime} and p.finish_time <= #{endTime}")
+				"and p.hospital_id = h.id and p.create_time >= #{startTime} and p.finish_time <= #{endTime} order by p.create_time desc")
 	List<Prescription> getPrsListFromProcessByUserId(@Param("userId") int userId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 	
 	// List all finished prescriptions where one user worked for it, checked for order table.
 	@Select("select distinct p.*, h.name as hospital_name from prescription as p, CHDP.order as o, hospital as h where " +
 				"p.process = " + Constants.FINISH + " and (o.create_user_id = #{userId} or o.outbound_user_id = #{userId}) " +
-				"and p.process_id = o.id and p.hospital_id = h.id")
+				"and p.process_id = o.id and p.hospital_id = h.id order by p.create_time desc")
 	List<Prescription> getPrsListFromOrderByUserId(@Param("userId") int userId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
 	// 用户维度统计:计算出错的Process

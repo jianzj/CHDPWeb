@@ -24,7 +24,9 @@
 				<th>姓名</th>
 				<th>贴数</th>
 				<th>当前状态</th>
+				<% if (request.getAttribute("from") != null && !((String)request.getAttribute("from")).equals("CURRENT_ORDER")){ %>
 				<th>结束时间</th>
+				<% } %>
 				<th>操作</th>
 			</tr>
 		</thead>
@@ -35,8 +37,12 @@
 					<td><c:out value="${prs.outer_id}" /></td>
 					<td><c:out value="${prs.patient_name}" /></td>
 					<td><c:out value="${prs.packet_num}" /></td>
-					<td>完成</td>
+					<% if (request.getAttribute("from") != null && ((String)request.getAttribute("from")).equals("CURRENT_ORDER")){ %>
+					<td>等待出库</td>
+				    <% }else { %>
+				    <td>完成</td>
 					<td><c:out value="${prs.finish_time}"/></td>
+				    <% } %>
 					<td width="100">
 						<div class="btn-group" role="group" aria-label="...">
 							<% if (request.getParameter("pageNum") == null){ %>

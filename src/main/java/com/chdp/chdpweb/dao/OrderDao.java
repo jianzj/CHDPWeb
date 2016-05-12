@@ -55,4 +55,11 @@ public interface OrderDao {
 
 	@Select("select count(*) from CHDP.order as o, prescription as p where o.id = #{orderId} and p.process_id = o.id")
 	int countPrsNumWithOrder(@Param("orderId") int orderId);
+	
+	/** ---------------------------------------------------**/
+	@Select("select o.*, h.name as hospital_name from CHDP.order as o, hospital as h where o.status = 1 and o.hospital_id = h.id order by o.create_time desc")
+	public List<Order> getOrderListUnfinished();
+	
+	@Select("select o.*, h.name as hospital_name from CHDP.order as o, hospital as h where o.status = 1 and h.id = #{hospitalId} and o.hospital_id = h.id order by o.create_time desc")
+	public List<Order> getOrderListByHospitalIdUnfinished(@Param("hospitalId") int hospitalId);
 }

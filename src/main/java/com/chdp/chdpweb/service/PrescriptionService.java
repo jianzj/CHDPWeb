@@ -735,6 +735,27 @@ public class PrescriptionService {
 		}
 	}
 
+	// 根据出库单ID获取所属的处方List, 用于分页
+	public List<Prescription> getPrsListByOrderIdUnfinished(int orderId) {
+		try {
+			Order order = orderDao.getOrderById(orderId);
+			return prsDao.getPrsListByOrderIdUnfinished(orderId);
+		} catch (Exception e) {
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	// 根据出库单ID获取所属的处方List, 用于分页
+	public List<Prescription> getPrsListByOrderIdUnfinished(int orderId, int pageNum) {
+		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+		try {
+			Order order = orderDao.getOrderById(orderId);
+			return prsDao.getPrsListByOrderIdUnfinished(orderId);
+		} catch (Exception e) {
+			return new ArrayList<Prescription>();
+		}
+	}
+
 	// 根据用户Id查询此用户已经完成的所有处方数量
 	public List<Prescription> getPrsListByUserId(int userId, String start, String end) {
 		try {
@@ -1288,13 +1309,18 @@ public class PrescriptionService {
 	}
 	
 	//用于重新打印出库单
-	public boolean regenerateShipListXls(int orderId, String start, String end){
+	public boolean regenerateShipListXls(int orderId, String start, String end, String from){
 		if (orderId == 0)
 			return false;
-		
 		try{
 			Order orderItem = orderDao.getOrderById(orderId);
-			List<Prescription> prsList = this.getPrsListByOrderId(orderId, start, end);
+			List<Prescription> prsList = new ArrayList<Prescription>();
+			if (from.equals("CURRENT_ORDER")){
+				prsList = this.getPrsListByOrderIdUnfinished(orderItem.getId());
+			}else {
+				prsList = this.getPrsListByOrderId(orderId, start, end);
+			}
+			System.out.println(prsList.size());
 			if (generatePrsListXls(orderItem.getHospital_id(), orderItem.getUuid(), prsList) != null){
 				return true;
 			}else {

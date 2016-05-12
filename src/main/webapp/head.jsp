@@ -308,6 +308,7 @@ $(document).ready(function() {
                 <ul class="nav nav-sidebar">
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("当前处方列表")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/prescription/currentList">当前处方列表</a></li>
                     <li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("历史处方列表")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/prescription/historyList">历史处方列表</a></li>
+                	<li <%if(request.getAttribute("nav") != null && request.getAttribute("nav").equals("当前出库单列表")) out.print("class=\"active\""); %>><a href="<%=request.getContextPath()%>/order/currentOrders">当前出库单列表</a></li>
                 </ul>
                 </shiro:hasRole>
                 <ul class="nav nav-sidebar">

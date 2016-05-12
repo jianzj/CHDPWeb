@@ -14,10 +14,12 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import com.chdp.chdpweb.Constants;
 import com.chdp.chdpweb.bean.AppResult;
 import com.chdp.chdpweb.bean.Order;
+import com.chdp.chdpweb.bean.Prescription;
 import com.chdp.chdpweb.bean.User;
 import com.chdp.chdpweb.common.Utils;
 import com.chdp.chdpweb.dao.OrderDao;
 import com.chdp.chdpweb.dao.PrescriptionDao;
+import com.chdp.chdpweb.dao.UserDao;
 import com.github.pagehelper.PageHelper;
 
 @Repository
@@ -25,6 +27,8 @@ public class OrderService {
 
     @Autowired
     private OrderDao orderDao;
+    @Autowired
+    private UserDao userDao;
     
     @Autowired
     private DataSourceTransactionManager transactionManager;
@@ -131,6 +135,66 @@ public class OrderService {
     		return orderDao.countPrsNumWithOrder(orderId);
     	} catch (Exception e){
     		return 0;
+    	}
+    }
+    
+    /** ------------------------------------------------------------------**/
+    //获取所有当前正在进行的出货单
+    public List<Order> getOrderListByHospitalId(int hospitalId){
+    	try{
+    		List<Order> orderList = new ArrayList<Order>();
+    		if (hospitalId == 0){
+    			orderList = orderDao.getOrderListUnfinished();
+    		}else {
+    			orderList = orderDao.getOrderListByHospitalIdUnfinished(hospitalId);
+    		}
+    		List<Prescription> prsList = null;
+			for (Order order : orderList) {
+				prsList = prsDao.getPrsListByOrderIdUnfinished(order.getId());
+				order.setPrs_num(prsList.size());
+				int packet_num = 0;
+				double price_total = 0;
+				for (Prescription item : prsList) {
+					packet_num += item.getPacket_num();
+					price_total += item.getPrice();
+				}
+				order.setPacket_num(packet_num);
+				order.setPrice_total(price_total);
+				order.setCreate_user_name(userDao.getUserById(order.getCreate_user_id()).getName());
+			}
+    		return orderList;
+    	} catch (Exception e){
+    		return new ArrayList<Order>();
+    	}
+    }
+    
+    //获取所有当前正在进行的出货单
+    public List<Order> getOrderListByHospitalId(int hospitalId, int pageNum){
+    	PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+    	try{
+    		List<Order> orderList = new ArrayList<Order>();
+    		if (hospitalId == 0){
+    			orderList = orderDao.getOrderListUnfinished();
+    		}else {
+    			orderList = orderDao.getOrderListByHospitalIdUnfinished(hospitalId);
+    		}
+    		List<Prescription> prsList = null;
+			for (Order order : orderList) {
+				prsList = prsDao.getPrsListByOrderIdUnfinished(order.getId());
+				order.setPrs_num(prsList.size());
+				int packet_num = 0;
+				double price_total = 0;
+				for (Prescription item : prsList) {
+					packet_num += item.getPacket_num();
+					price_total += item.getPrice();
+				}
+				order.setPacket_num(packet_num);
+				order.setPrice_total(price_total);
+				order.setCreate_user_name(userDao.getUserById(order.getCreate_user_id()).getName());
+			}
+    		return orderList;
+    	} catch (Exception e){
+    		return new ArrayList<Order>();
     	}
     }
 }
