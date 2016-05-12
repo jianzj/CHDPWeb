@@ -28,10 +28,8 @@ import com.chdp.chdpweb.bean.User;
 import com.chdp.chdpweb.common.Utils;
 import com.chdp.chdpweb.printer.PrintHelper;
 import com.chdp.chdpweb.service.HospitalService;
-import com.chdp.chdpweb.service.OrderService;
 import com.chdp.chdpweb.service.PrescriptionService;
 import com.chdp.chdpweb.service.ProcessService;
-import com.chdp.chdpweb.service.UserService;
 import com.github.pagehelper.PageInfo;
 
 @Controller
@@ -44,10 +42,6 @@ public class PrescriptionController {
 	private HospitalService hospitalService;
 	@Autowired
 	private ProcessService proService;
-	@Autowired
-	private OrderService orderService;
-	@Autowired
-	private UserService userService;
 
 	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)
 	@RequestMapping(value = "/add", method = RequestMethod.GET)
@@ -632,7 +626,6 @@ public class PrescriptionController {
 		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../process/shipList?hospitalId=" + hospitalId;
 	}
 
-	/** ------------------------------------------------------------------**/
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/printHospitalDimensionXls")
 	public String printHospitalDimensionXls(HttpServletRequest request, HttpServletResponse resposne,
@@ -653,27 +646,27 @@ public class PrescriptionController {
 			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
 			List<Hospital> hospitalList = prsService.getHospitalListByHospitalId(hospitalId, start, end);
-			if (hospitalList.size() != 0){
+			if (hospitalList.size() != 0) {
 				Collections.sort(hospitalList);
-				if (prsService.generateHospitalDimensionXls(hospitalList, start, end)){
-					redirectAttributes.addFlashAttribute("successMsg", "医院统计清单导出成功！");
-				}else{
+				String filename = prsService.generateHospitalDimensionXls(hospitalList, start, end);
+				if (filename != null) {
+					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/" + filename;
+				} else {
 					redirectAttributes.addFlashAttribute("errorMsg", "医院统计清单导出出错，请重试！");
 				}
 			} else {
 				redirectAttributes.addFlashAttribute("errorMsg", "尚无可打印统计信息！");
 			}
 		}
-		
-		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/hospitalDimensionList?hospitalId=" + hospitalId + 
-				"&startTime=" + start + "&endTime=" + end;
+
+		return "errormsg";
 	}
-	
+
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/printUserDimensionXls")
 	public String printUserDimensionXls(HttpServletRequest request, HttpServletResponse resposne,
-			@RequestParam(value = "userAuth", defaultValue = "0") int userAuth,
-			RedirectAttributes redirectAttributes) throws IOException {
+			@RequestParam(value = "userAuth", defaultValue = "0") int userAuth, RedirectAttributes redirectAttributes)
+			throws IOException {
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
 		if (start == null || start.equals("")) {
@@ -689,22 +682,22 @@ public class PrescriptionController {
 			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
 			List<User> userList = prsService.getUserListForPrsSummary(userAuth, start, end);
-			if (userList.size() != 0){
+			if (userList.size() != 0) {
 				Collections.sort(userList);
-				if (prsService.generateUserDimensionXls(userList, start, end)){
-					redirectAttributes.addFlashAttribute("successMsg", "用户统计清单导出成功！");
-				}else{
+				String filename = prsService.generateUserDimensionXls(userList, start, end);
+				if (filename != null) {
+					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/" + filename;
+				} else {
 					redirectAttributes.addFlashAttribute("errorMsg", "用户统计清单导出出错，请重试！");
 				}
 			} else {
 				redirectAttributes.addFlashAttribute("errorMsg", "尚无可打印统计信息！");
 			}
 		}
-		
-		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/userDimensionList?userAuth=" + userAuth + 
-				"&startTime=" + start + "&endTime=" + end;
+
+		return "errormsg";
 	}
-	
+
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/printOrderDimensionXls")
 	public String printOrderDimensionXls(HttpServletRequest request, HttpServletResponse resposne,
@@ -725,22 +718,22 @@ public class PrescriptionController {
 			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
 			List<Order> orderList = prsService.getOrderListByHospitalId(hospitalId, start, end);
-			if (orderList.size() != 0){
+			if (orderList.size() != 0) {
 				Collections.sort(orderList);
-				if (prsService.generateOrderDimensionXls(orderList, start, end)){
-					redirectAttributes.addFlashAttribute("successMsg", "出货单统计清单导出成功！");
-				}else{
+				String filename = prsService.generateOrderDimensionXls(orderList, start, end);
+				if (filename != null) {
+					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/" + filename;
+				} else {
 					redirectAttributes.addFlashAttribute("errorMsg", "出货单统计清单导出出错，请重试！");
 				}
 			} else {
 				redirectAttributes.addFlashAttribute("errorMsg", "尚无可打印统计信息！");
 			}
 		}
-		
-		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/orderDimensionList?hospitalId=" + hospitalId + 
-				"&startTime=" + start + "&endTime=" + end;
+
+		return "errormsg";
 	}
-	
+
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/regenerateShipListXls")
 	public String regenerateShipListXls(HttpServletRequest request, HttpServletResponse resposne,
@@ -757,20 +750,20 @@ public class PrescriptionController {
 		}
 		String startTime = Utils.formatStartTime(start);
 		String endTime = Utils.formatEndTime(end);
-		
-		if (orderId == 0){
-			redirectAttributes.addFlashAttribute("errorMsg", "未知出库单Id，无法打印!");
+
+		if (orderId == 0) {
+			redirectAttributes.addFlashAttribute("errorMsg", "未知出库单，无法打印!");
 		} else if (!Utils.validStartEndTime(startTime, endTime)) {
 			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
-			if (prsService.regenerateShipListXls(orderId, startTime, endTime)){
-				redirectAttributes.addFlashAttribute("successMsg", "导出出库单成功！");
-			}else{
+			String filename = prsService.regenerateShipListXls(orderId, startTime, endTime);
+			if (filename!=null) {
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../shipFile/" + filename;
+			} else {
 				redirectAttributes.addFlashAttribute("errorMsg", "导出出库单失败，请重试！");
 			}
 		}
-		
-		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/orderDimensionList?hospitalId=" + hospitalId + 
-				"&startTime=" + start + "&endTime=" + end;
+
+		return "errormsg";
 	}
 }
