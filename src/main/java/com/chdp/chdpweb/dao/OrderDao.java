@@ -11,7 +11,6 @@ import org.apache.ibatis.annotations.Update;
 import com.chdp.chdpweb.bean.Order;
 
 public interface OrderDao {
-
 	@Insert("insert CHDP.order(uuid, hospital_id, create_time) values(#{order.uuid}, #{order.hospital_id}, #{order.create_time})")
 	int createOrder(@Param("order") Order order);
 
@@ -41,12 +40,12 @@ public interface OrderDao {
 	Order getOrderByUuid(@Param("uuid") String uuid);
 
 	@Select("select o.*, h.name as hospital_name from CHDP.order as o, hospital as h where o.status = #{order_status} and "
-			+ "h.id = #{hospitalId} and o.hospital_id = h.id and o.create_time >= #{start} and o.create_time <= #{end}")
+			+ "h.id = #{hospitalId} and o.hospital_id = h.id and o.create_time >= #{start} and o.create_time <= #{end} order by o.create_time")
 	List<Order> listOrder(@Param("hospitalId") int hospitalId, @Param("start") String start, @Param("end") String end,
 			@Param("order_status") int order_status);
 
 	@Select("select o.*, h.name as hospital_name from CHDP.order as o, hospital as h where o.status = #{order_status} and "
-			+ "o.hospital_id = h.id and o.create_time >= #{start} and o.create_time <= #{end}")
+			+ "o.hospital_id = h.id and o.create_time >= #{start} and o.create_time <= #{end} order by o.create_time")
 	List<Order> listOrderAllHospital(@Param("start") String start, @Param("end") String end,
 			@Param("order_status") int order_status);
 
