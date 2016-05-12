@@ -1,6 +1,7 @@
 package com.chdp.chdpweb.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -655,7 +656,7 @@ public class PrescriptionController {
 				Collections.sort(hospitalList);
 				String filename = prsService.generateHospitalDimensionXls(hospitalList, start, end);
 				if (filename != null) {
-					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/" + filename;
+					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/" + URLEncoder.encode(filename,"UTF-8");
 				} else {
 					redirectAttributes.addFlashAttribute("errorMsg", "医院统计清单导出出错，请重试！");
 				}
@@ -691,7 +692,7 @@ public class PrescriptionController {
 				Collections.sort(userList);
 				String filename = prsService.generateUserDimensionXls(userList, start, end);
 				if (filename != null) {
-					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/" + filename;
+					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/" + URLEncoder.encode(filename,"UTF-8");
 				} else {
 					redirectAttributes.addFlashAttribute("errorMsg", "用户统计清单导出出错，请重试！");
 				}
@@ -727,7 +728,7 @@ public class PrescriptionController {
 				Collections.sort(orderList);
 				String filename = prsService.generateOrderDimensionXls(orderList, start, end);
 				if (filename != null) {
-					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/" + filename;
+					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/" + URLEncoder.encode(filename,"UTF-8");
 				} else {
 					redirectAttributes.addFlashAttribute("errorMsg", "出货单统计清单导出出错，请重试！");
 				}
@@ -763,7 +764,7 @@ public class PrescriptionController {
 		} else {
 			String filename = prsService.regenerateShipListXls(orderId, startTime, endTime);
 			if (filename!=null) {
-				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../shipFile/" + filename;
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../shipFile/" + URLEncoder.encode(filename,"UTF-8");
 			} else {
 				redirectAttributes.addFlashAttribute("errorMsg", "导出出库单失败，请重试！");
 			}
