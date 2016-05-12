@@ -30,9 +30,9 @@ public interface PrescriptionDao {
 	Prescription getPrescriptionByUUID(@Param("uuid") String uuid);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where p.process = 8 and p.hospital_id = h.id and p.process_id = ("
+			+ "where p.process = 8 and p.hospital_id = h.id and p.process_id in ("
 			+ "select pr.id from process as pr, machine as m where "
-			+ "pr.process_type = 8 and pr.machine_id = m.id and m.uuid = #{uuid} )")
+			+ "pr.process_type = 8 and pr.finish is null and pr.machine_id = m.id and m.uuid = #{uuid}) limit 1")
 	Prescription getPrescriptionByPourMachineUuid(@Param("uuid") String uuid);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where "

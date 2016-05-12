@@ -64,10 +64,7 @@ public class MachineController {
 			if (machine.getType() == 1 && machine.getPour_machine_id() == 0) {
 				request.setAttribute("errorMsg", "您未选择关联的灌装机，请重新输入！");
 			} else {
-				// 生成UUID，形如20160502213800386, 当前日期+三位随机数
-				int randomNum = (int) (Math.random() * 900) + 100;
-				String uuid = Utils.getCurrentDateAndTime() + String.valueOf(randomNum);
-				machine.setUuid(uuid);
+				machine.setUuid(Utils.generateUuid());
 				if (machineService.addMachine(machine)) {
 					request.setAttribute("successMsg", "添加机器成功！");
 				} else {

@@ -5,6 +5,7 @@
 <h3 class="sub-header">出库流程列表
 	<span>
 		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospitalId" name="hospitalId">
+			<option value=0>未选择医院</option>
 			<c:forEach var='hosp' items="${hospitalList}">
 				<c:if test="${hospitalId == hosp.id}">
 					<option value="${hosp.id}" selected>${hosp.name}</option>
@@ -15,7 +16,7 @@
 			</c:forEach>
 		</select>
 		<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-		<a type="button" class="btn btn-success" style="" onClick="printList(${hospitalId})">生成出库清单</a>
+		<a id="generateBtn" type="button" class="btn btn-success" style="" onClick="printList(${hospitalId})">生成出库清单</a>
 	</span>
 	</h3>
 </form>
@@ -79,5 +80,20 @@
         $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printShipListXls?hospitalId="+hospitalId);
         $("#assureDlg").modal("show");
     };
+</script>
+<script>
+if ($("#hospitalId").val() == 0) {
+    $("#generateBtn").hide();
+} else {
+    $("#generateBtn").show();
+}
+
+$("#hospitalId").change(function(){
+	if ($("#hospitalId").val() == 0) {
+	    $("#generateBtn").hide();
+	} else {
+	    $("#generateBtn").show();
+	}
+}); 
 </script>
 <%@ include file="../foot.jsp"%>
