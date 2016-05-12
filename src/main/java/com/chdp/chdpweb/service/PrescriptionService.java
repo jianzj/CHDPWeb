@@ -21,6 +21,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.Picture;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -1023,8 +1024,8 @@ public class PrescriptionService {
 
 				insertRow.createCell(0).setCellValue(hospitalItem.getName());
 				insertRow.getCell(0).setCellStyle(itemRow.getCell(0).getCellStyle());
-
-				insertRow.createCell(3).setCellValue(hospitalItem.getOrderNum());
+				templateSt.addMergedRegion(new CellRangeAddress(index, index, 0, 2));
+								insertRow.createCell(3).setCellValue(hospitalItem.getOrderNum());
 				insertRow.getCell(3).setCellStyle(itemRow.getCell(1).getCellStyle());
 
 				insertRow.createCell(4).setCellValue(hospitalItem.getFinishedPrsNum());
@@ -1209,7 +1210,6 @@ public class PrescriptionService {
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			String currentTime = df.format(new Date());
 			titleRow.getCell(7).setCellValue(currentTime);
-			titleRow.getCell(7).setCellStyle(titleRow.getCell(6).getCellStyle());
 
 			templateSt.shiftRows(3, templateSt.getLastRowNum(), orderList.size());
 			int index = 3;
