@@ -8,7 +8,6 @@ public class User implements Comparable<User>{
 	private int authority;
 	@SuppressWarnings("unused")
 	private String authority_str;
-	private String last_outer_id;
 	
 	private String position;
 	private int done_prs_num;
@@ -57,14 +56,6 @@ public class User implements Comparable<User>{
 
 	public void setAuthority(int authority) {
 		this.authority = authority;
-	}
-
-	public String getLast_outer_id() {
-		return last_outer_id;
-	}
-
-	public void setLast_outer_id(String last_outer_id) {
-		this.last_outer_id = last_outer_id;
 	}
 
 	public String getAuthority_str() {

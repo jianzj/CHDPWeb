@@ -99,7 +99,7 @@
 
     var generateOrderList = function(orderId, hospitalId){
     	$("#assureMsg").html("确认重新打印此出库单单?");
-        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/regenerateShipListXls?orderId="+orderId+"&shospitalId="+hospitalId+"&from=CURRENT_ORDER");
+        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/regenerateShipListXls?orderId="+orderId+"&shospitalId="+hospitalId);
         $("#assureDlg").modal("show");
     };
 </script>

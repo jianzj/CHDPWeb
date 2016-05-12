@@ -22,13 +22,13 @@ public interface UserDao {
 	@Update("update user set password = #{user.password} where id = #{user.id}")
 	int changePassword(@Param("user") User user);
 
-	@Select("select * from user")
+	@Select("select * from user order by usercode")
 	List<User> getUserList();
 	
-	@Select("select * from user where authority < 1024")
+	@Select("select * from user where authority < 1024 order by usercode")
 	List<User> getUserListWithoutAdmin();
 
-	@Select("select * from user where authority & #{userAuth} != 0")
+	@Select("select * from user where authority & #{userAuth} != 0 order by usercode")
 	List<User> getUserListWithAuth(@Param("userAuth") int userAuth);
 	
 	@Delete("delete from user where id = #{userId}")

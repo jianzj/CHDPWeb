@@ -13,8 +13,7 @@ import com.chdp.chdpweb.bean.Hospital;
 
 @Repository
 public interface HospitalDao {
-
-	@Select("select * from hospital")
+	@Select("select * from hospital order by convert( name using gbk )")
 	List<Hospital> getHospitalList();
 	
 	@Insert("insert hospital(name, description) values(#{hospital.name}, #{hospital.description})")
