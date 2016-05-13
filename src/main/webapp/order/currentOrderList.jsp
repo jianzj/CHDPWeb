@@ -4,7 +4,6 @@
 <%@ include file="../head.jsp"%>
 
 <form class="form-inline" action="<%=request.getContextPath()%>/order/currentOrders" method="GET">
-
 <h3 class="sub-header">
 	当前出库单列表
 	<span>
@@ -36,7 +35,7 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>出货单编号</th>
+				<th>出库单编号</th>
 				<th>医院</th>
 				<th>创建人</th>
 				<th>处方数</th>
@@ -60,7 +59,7 @@
 						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=&endTime=&orderId=${order.id}&userId=&hospitalId=&from=CURRENT_ORDER">处方详情</a>
 						</div>
 						<div class="btn-group" role="group" aria-label="...">
-						    <a type="button" class="btn btn-success" style="" onClick="generateOrderList(${order.id}, ${hospitalId})">打印出库单</a>
+						    <a type="button" class="btn btn-success" href="<%=request.getContextPath()%>/prescription/regenerateShipListXls?orderId=${order.id}&shospitalId=${hospitalId}" target="_blank">下载出库单</a>
 						</div>
 					</td>
 					</c:if>
@@ -83,24 +82,9 @@
 	<c:set var="pageUrl" value="order/currentOrders" />
 	<%@ include file="../common/nav.jsp"%>
 </div>
-
-<div class="modal fade" id="assureDlg" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-sm" role="document">
-		<div class="modal-content">
-			<div class="modal-body" id="assureMsg"></div>
-			<div class="modal-footer">
-				<a type="button" class="btn btn-success" id="assureBtn" target="_blank">确认</a> <a type="button" class="btn btn-default"
-					data-dismiss="modal">取消</a>
-			</div>
-		</div>
-	</div>
-</div>
 <script>
-
-    var generateOrderList = function(orderId, hospitalId){
-    	$("#assureMsg").html("确认重新打印此出库单单?");
-        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/regenerateShipListXls?orderId="+orderId+"&shospitalId="+hospitalId);
-        $("#assureDlg").modal("show");
-    };
+$(".selectpicker").change(function(){
+    $(".form-inline").submit();
+}); 
 </script>
 <%@ include file="../foot.jsp"%>

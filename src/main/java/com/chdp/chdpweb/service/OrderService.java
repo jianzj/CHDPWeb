@@ -139,7 +139,7 @@ public class OrderService {
     }
     
     /** ------------------------------------------------------------------**/
-    //获取所有当前正在进行的出货单
+    //获取所有当前正在进行的出库单
     public List<Order> getOrderListByHospitalId(int hospitalId){
     	try{
     		List<Order> orderList = new ArrayList<Order>();
@@ -168,7 +168,7 @@ public class OrderService {
     	}
     }
     
-    //获取所有当前正在进行的出货单
+    //获取所有当前正在进行的出库单
     public List<Order> getOrderListByHospitalId(int hospitalId, int pageNum){
     	PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
     	try{

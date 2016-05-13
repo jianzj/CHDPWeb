@@ -64,7 +64,7 @@
 					<c:if test="${hosp2.finishedPrsNum > 0}">
 					<td width="100">
 						<div class="btn-group" role="group" aria-label="...">
-						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&userId=&hospitalId=${hosp2.id}&from=HOSPITAL">处方详情</a>
+						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&userId=&hospitalId=${hosp2.id}&from=HOSPITAL" target="_blank">处方详情</a>
 						</div>
 					</td>
 					</c:if>
@@ -93,16 +93,9 @@
     <c:set var="pageUrl" value="prescription/hospitalDimensionList" />
     <%@ include file="../common/nav.jsp"%>
 </div>
-
-<div class="modal fade" id="assureDlg" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-sm" role="document">
-		<div class="modal-content">
-			<div class="modal-body" id="assureMsg"></div>
-			<div class="modal-footer">
-				<a type="button" class="btn btn-success" id="assureBtn" target="_blank">确认</a> <a type="button" class="btn btn-default"
-					data-dismiss="modal">取消</a>
-			</div>
-		</div>
-	</div>
-</div>
+<script>
+$(".selectpicker").change(function(){
+    $(".form-inline").submit();
+}); 
+</script>
 <%@ include file="../foot.jsp"%>

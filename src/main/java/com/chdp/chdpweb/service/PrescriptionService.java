@@ -948,7 +948,7 @@ public class PrescriptionService {
 		}
 	}
 
-	// 用于出货单维度，获取医院在一段时间内处方处理的统计信息
+	// 用于出库单维度，获取医院在一段时间内处方处理的统计信息
 	public List<Order> getOrderListByHospitalId(int hospitalId, String start, String end, int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
@@ -980,7 +980,7 @@ public class PrescriptionService {
 		}
 	}
 
-	// 用于出货单维度，获取医院在一段时间内处方处理的统计信息
+	// 用于出库单维度，获取医院在一段时间内处方处理的统计信息
 	public List<Order> getOrderListByHospitalId(int hospitalId, String start, String end) {
 		try {
 			List<Order> orderList = new ArrayList<Order>();
@@ -1212,7 +1212,7 @@ public class PrescriptionService {
 		}
 	}
 
-	// 导出出货单统计单Excel
+	// 导出出库单统计单Excel
 	public String generateOrderDimensionXls(List<Order> orderList, String start, String end) {
 		try {
 			Resource tempResource = new ClassPathResource("orderStatTemplate.xls");

@@ -5,7 +5,6 @@
 <h3 class="sub-header">出库流程列表
 	<span>
 		<select class="selectpicker" data-live-search="true" data-width="fit" id="hospitalId" name="hospitalId">
-			<option value=0>未选择医院</option>
 			<c:forEach var='hosp' items="${hospitalList}">
 				<c:if test="${hospitalId == hosp.id}">
 					<option value="${hosp.id}" selected>${hosp.name}</option>
@@ -94,6 +93,11 @@ $("#hospitalId").change(function(){
 	} else {
 	    $("#generateBtn").show();
 	}
+}); 
+</script>
+<script>
+$(".selectpicker").change(function(){
+    $(".form-inline").submit();
 }); 
 </script>
 <%@ include file="../foot.jsp"%>

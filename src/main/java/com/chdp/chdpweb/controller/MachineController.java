@@ -64,6 +64,8 @@ public class MachineController {
 			if (machine.getType() == 1 && machine.getPour_machine_id() == 0) {
 				request.setAttribute("errorMsg", "您未选择关联的灌装机，请重新输入！");
 			} else {
+				if (machine.getType() == 2)
+					machine.setPour_machine_id(0);
 				machine.setUuid(Utils.generateUuid());
 				if (machineService.addMachine(machine)) {
 					request.setAttribute("successMsg", "添加机器成功！");

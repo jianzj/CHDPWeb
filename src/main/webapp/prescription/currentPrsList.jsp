@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ include file="../head.jsp"%>
 
-<form action="<%=request.getContextPath()%>/prescription/currentList" method="GET">
+<form class="form-inline" action="<%=request.getContextPath()%>/prescription/currentList" method="GET">
 <h3 class="sub-header">
 	当前处方列表
 	<span>
@@ -161,5 +161,10 @@
 	    $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printSingleLabel?printType=PRS&from=CURRENT&prsId="+id+"&process="+process+"&hospitalId="+selectedHospital+"&pageNum="+pageNum);
 	    $("#assureDlg").modal("show");
 	};
+</script>
+<script>
+$(".selectpicker").change(function(){
+    $(".form-inline").submit();
+}); 
 </script>
 <%@ include file="../foot.jsp"%>

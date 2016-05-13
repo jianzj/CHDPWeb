@@ -82,4 +82,9 @@
         $("#assureDlg").modal("show");
     };
 </script>
+<script>
+$(".selectpicker").change(function(){
+    $(".form-inline").submit();
+}); 
+</script>
 <%@ include file="../foot.jsp"%>

@@ -409,6 +409,8 @@ public class ProcessService {
 				} else {
 					return "正在煎煮";
 				}
+			case Constants.CLEAN:
+				return "正在清场";
 			default:
 				return Constants.getProcessName(prs.getProcess() - 1) + "完成";
 			}
