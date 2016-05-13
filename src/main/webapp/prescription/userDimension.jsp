@@ -5,7 +5,6 @@
 <%@ include file="../head.jsp"%>
 
 <form class="form-inline" action="<%=request.getContextPath()%>/prescription/userDimensionList" method="GET">
-
 <h3 class="sub-header">
 	员工维度统计
 	<span>
@@ -81,7 +80,7 @@
          <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-         <a type="button" class="btn btn-success" style="" href="<%=request.getContextPath()%>/prescription/printUserDimensionXls?userAuth=${userAuth}&startTime=${startTime}&endTime=${endTime}">导出用户统计清单</a>
+         <a type="button" class="btn btn-success" style="" href="<%=request.getContextPath()%>/prescription/printUserDimensionXls?userAuth=${userAuth}&startTime=${startTime}&endTime=${endTime}" target="_blank">导出用户统计清单</a>
 	</span>
 </h3>
 </form>
@@ -164,4 +163,9 @@
 		</div>
 	</div>
 </div>
+<script>
+$(".selectpicker").change(function(){
+    $(".form-inline").submit();
+}); 
+</script>
 <%@ include file="../foot.jsp"%>

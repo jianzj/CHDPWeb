@@ -615,7 +615,7 @@ public class PrescriptionController {
 		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../process/packageList?hospitalId=" + hospitalId;
 	}
 
-	// 生成出货清单
+	// 生成出库清单
 	@RequiresRoles(value = { "ADMIN", "SHIP" }, logical = Logical.OR)
 	@RequestMapping(value = "/printShipListXls")
 	public String printShipListXls(HttpServletRequest request, HttpServletResponse response,
@@ -730,7 +730,7 @@ public class PrescriptionController {
 				if (filename != null) {
 					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/" + URLEncoder.encode(filename,"UTF-8");
 				} else {
-					redirectAttributes.addFlashAttribute("errorMsg", "出货单统计清单导出出错，请重试！");
+					redirectAttributes.addFlashAttribute("errorMsg", "出库单统计清单导出出错，请重试！");
 				}
 			} else {
 				redirectAttributes.addFlashAttribute("errorMsg", "尚无可打印统计信息！");

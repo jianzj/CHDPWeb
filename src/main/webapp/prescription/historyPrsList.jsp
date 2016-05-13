@@ -91,4 +91,9 @@
 	<c:set var="pageUrl" value="prescription/historyList" />
 	<%@ include file="../common/nav.jsp"%>
 </div>
+<script>
+$(".selectpicker").change(function(){
+    $(".form-inline").submit();
+}); 
+</script>
 <%@ include file="../foot.jsp"%>
