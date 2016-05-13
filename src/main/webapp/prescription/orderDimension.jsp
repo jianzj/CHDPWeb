@@ -29,7 +29,7 @@
          <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-         <a type="button" class="btn btn-success" style="" onClick="exportList(${hospitalId}, '${startTime}', '${endTime}')">导出出货单统计清单</a>
+         <a type="button" class="btn btn-success" style="" href="<%=request.getContextPath()%>/prescription/printOrderDimensionXls?hospitalId=${hospitalID}&startTime=${startTime}&endTime=${endTime}">导出出货单统计清单</a>
 	</span>
 </h3>
 </form>
@@ -113,12 +113,6 @@
 	</div>
 </div>
 <script>
-    var exportList = function(hospitalId, startTime, endTime){
-    	$("#assureMsg").html("确认导出出货单维度统计单?");
-        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printOrderDimensionXls?hospitalId="+hospitalId+"&startTime="+startTime+"&endTime="+endTime);
-        $("#assureDlg").modal("show");
-    };
-    
     var generateOrderList = function(orderId, hospitalId, startTime, endTime){
     	$("#assureMsg").html("确认重新打印此出库单单?");
         $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/regenerateShipListXls?orderId="+orderId+"&shospitalId="+hospitalId+"&startTime="+startTime+"&endTime="+endTime);

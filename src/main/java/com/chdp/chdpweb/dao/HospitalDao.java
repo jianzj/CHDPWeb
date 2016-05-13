@@ -46,4 +46,8 @@ public interface HospitalDao {
 	@Select("select count(o.id) from CHDP.order as o where o.status = " + Constants.ORDER_FINISH + " and "
 				+ "o.hospital_id = #{hospitalId} and o.create_time >= #{startTime} and o.outbound_time <= #{endTime}")
 	int getOrderNumByHospitalId(@Param("hospitalId") int hospitalId, @Param("startTime") String startTime, @Param("endTime") String endTime);
+	
+	/** ------------------------------------------------**/
+	@Select("select min(id) from hospital")
+	Integer getFirstHospitalId();
 }

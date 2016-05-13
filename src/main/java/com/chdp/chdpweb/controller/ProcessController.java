@@ -81,12 +81,20 @@ public class ProcessController {
 	public String listPrsInShipping(HttpServletRequest request,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) {
 		request.setAttribute("nav", "出库流程列表");
-
-		List<Prescription> prsList = prsService.listShipPrescription(Constants.SHIP, hospitalId);
-		List<Hospital> hospitalList = hospitalService.getHospitalList();
-
-		request.setAttribute("hospitalList", hospitalList);
+		
+		if (hospitalId == 0){
+			hospitalId = hospitalService.getDefaultHospitalId();
+			
+		}
 		request.setAttribute("hospitalId", hospitalId);
+		List<Hospital> hospitalList = hospitalService.getHospitalList();
+		request.setAttribute("hospitalList", hospitalList);
+		
+		List<Prescription> prsList = null;
+		if (hospitalId != 0){
+			prsList = prsService.listShipPrescription(Constants.SHIP, hospitalId);
+		}
+		
 		request.setAttribute("shipList", prsList);
 
 		return "process/shipList";

@@ -28,7 +28,7 @@
          <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-         <a type="button" class="btn btn-success" style="" onClick="exportList(${hospitalId}, '${startTime}', '${endTime}')">导出医院统计清单</a>
+         <a type="button" class="btn btn-success" style="" href="<%=request.getContextPath()%>/prescription/printHospitalDimensionXls?hospitalId=${hospitalId}&startTime=${startTime}&endTime=${endTime}">导出医院统计清单</a>
 	</span>
 	
 </h3>
@@ -105,11 +105,4 @@
 		</div>
 	</div>
 </div>
-<script>
-    var exportList = function(hospitalId, startTime, endTime){
-    	$("#assureMsg").html("确认导出医院维度统计单?");
-        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printHospitalDimensionXls?hospitalId="+hospitalId+"&startTime="+startTime+"&endTime="+endTime);
-        $("#assureDlg").modal("show");
-    };
-</script>
 <%@ include file="../foot.jsp"%>

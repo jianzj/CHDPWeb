@@ -110,4 +110,17 @@ public class HospitalService {
 			return 0;
 		}
 	}
+	
+	//获取默认医院Id，默认医院Id为第一个创建的医院Id
+	public int getDefaultHospitalId(){
+		try{
+			Integer hospitalId = hospitalDao.getFirstHospitalId();
+			if (hospitalId != null){
+				return hospitalId;
+			}
+			return 0;
+		} catch (Exception e){
+			return 0;
+		}
+	}
 }
