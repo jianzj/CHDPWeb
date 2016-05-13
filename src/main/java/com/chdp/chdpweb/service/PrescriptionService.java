@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -1022,7 +1023,7 @@ public class PrescriptionService {
 
 			HSSFRow titleRow = templateSt.getRow(1);
 			HSSFRow itemRow = templateSt.getRow(2);
-
+			
 			String timeInterval = start + " 至 " + end;
 			titleRow.getCell(1).setCellValue(timeInterval);
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -1042,11 +1043,18 @@ public class PrescriptionService {
 				insertRow.setHeightInPoints(25);
 
 				insertRow.createCell(0).setCellValue(hospitalItem.getName());
-				insertRow.getCell(0).setCellStyle(itemRow.getCell(0).getCellStyle());
 				templateSt.addMergedRegion(new CellRangeAddress(index, index, 0, 2));
-								insertRow.createCell(3).setCellValue(hospitalItem.getOrderNum());
+				insertRow.getCell(0).getCellStyle().setBorderBottom(HSSFCellStyle.BORDER_THIN);
+				insertRow.getCell(0).getCellStyle().setBorderTop(HSSFCellStyle.BORDER_THIN);
+				insertRow.getCell(0).getCellStyle().setBorderLeft(HSSFCellStyle.BORDER_THIN);
+				insertRow.getCell(0).getCellStyle().setBorderRight(HSSFCellStyle.BORDER_THIN);
+				insertRow.getCell(0).setCellStyle(itemRow.getCell(0).getCellStyle());
+				
+				insertRow.createCell(3).setCellValue(hospitalItem.getOrderNum());
 				insertRow.getCell(3).setCellStyle(itemRow.getCell(1).getCellStyle());
-
+				insertRow.getCell(3).getCellStyle().setBorderLeft(HSSFCellStyle.BORDER_THIN);
+				insertRow.getCell(3).getCellStyle().setBorderRight(HSSFCellStyle.BORDER_THIN);
+				
 				insertRow.createCell(4).setCellValue(hospitalItem.getFinishedPrsNum());
 				insertRow.getCell(4).setCellStyle(itemRow.getCell(2).getCellStyle());
 
