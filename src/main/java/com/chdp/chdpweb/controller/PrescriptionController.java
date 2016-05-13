@@ -651,7 +651,7 @@ public class PrescriptionController {
 		if (!Utils.validStartEndTime(startTime, endTime)) {
 			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
-			List<Hospital> hospitalList = prsService.getHospitalListByHospitalId(hospitalId, start, end);
+			List<Hospital> hospitalList = prsService.getHospitalListByHospitalId(hospitalId, startTime, endTime);
 			if (hospitalList.size() != 0) {
 				Collections.sort(hospitalList);
 				String filename = prsService.generateHospitalDimensionXls(hospitalList, start, end);
@@ -687,7 +687,8 @@ public class PrescriptionController {
 		if (!Utils.validStartEndTime(startTime, endTime)) {
 			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
-			List<User> userList = prsService.getUserListForPrsSummary(userAuth, start, end);
+			List<User> userList = prsService.getUserListForPrsSummary(userAuth, startTime, endTime);
+
 			if (userList.size() != 0) {
 				Collections.sort(userList);
 				String filename = prsService.generateUserDimensionXls(userList, start, end);
@@ -723,7 +724,7 @@ public class PrescriptionController {
 		if (!Utils.validStartEndTime(startTime, endTime)) {
 			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
-			List<Order> orderList = prsService.getOrderListByHospitalId(hospitalId, start, end);
+			List<Order> orderList = prsService.getOrderListByHospitalId(hospitalId, startTime, endTime);
 			if (orderList.size() != 0) {
 				Collections.sort(orderList);
 				String filename = prsService.generateOrderDimensionXls(orderList, start, end);
@@ -762,7 +763,7 @@ public class PrescriptionController {
 		} else if (!Utils.validStartEndTime(startTime, endTime)) {
 			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
-			String filename = prsService.regenerateShipListXls(orderId, startTime, endTime);
+			String filename = prsService.regenerateShipListXls(orderId, start, end);
 			if (filename!=null) {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../shipFile/" + URLEncoder.encode(filename,"UTF-8");
 			} else {
