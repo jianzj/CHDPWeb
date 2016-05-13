@@ -1044,10 +1044,7 @@ public class PrescriptionService {
 
 				insertRow.createCell(0).setCellValue(hospitalItem.getName());
 				templateSt.addMergedRegion(new CellRangeAddress(index, index, 0, 2));
-				insertRow.getCell(0).getCellStyle().setBorderBottom(HSSFCellStyle.BORDER_THIN);
 				insertRow.getCell(0).getCellStyle().setBorderTop(HSSFCellStyle.BORDER_THIN);
-				insertRow.getCell(0).getCellStyle().setBorderLeft(HSSFCellStyle.BORDER_THIN);
-				insertRow.getCell(0).getCellStyle().setBorderRight(HSSFCellStyle.BORDER_THIN);
 				insertRow.getCell(0).setCellStyle(itemRow.getCell(0).getCellStyle());
 				
 				insertRow.createCell(3).setCellValue(hospitalItem.getOrderNum());
