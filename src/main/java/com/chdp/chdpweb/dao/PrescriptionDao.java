@@ -226,7 +226,7 @@ public interface PrescriptionDao {
 	List<Prescription> getPrsListFromOrderByUserId(@Param("userId") int userId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
 	// 用户维度统计:计算出错的Process
-	@Select("select count(distinct p1.prescription_id) from process as p1, process as p2 where p2.user_id = #{userId} and "
-			+ "p1.previous_process_id = p2.id and p1.error_type != 0 and p2.begin >= #{start} and p2.finish <= #{end} group by p2.user_id")
+	@Select("select count(1) from prescription where id in ( select distinct p1.prescription_id from process as p1, process as p2 where p2.user_id = #{userId} and "
+			+ "p1.previous_process_id = p2.id and p1.error_type != 0 and p2.begin >= #{start} and p2.finish <= #{end} group by p2.user_id) and process="+Constants.FINISH)
 	Integer getErrorProcessByUserId(@Param("userId") int userId, @Param("start") String start, @Param("end") String end);
 }

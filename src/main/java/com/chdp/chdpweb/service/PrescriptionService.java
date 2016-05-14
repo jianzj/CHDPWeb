@@ -20,6 +20,7 @@ import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.ClientAnchor.AnchorType;
 import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.Picture;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -686,10 +687,11 @@ public class PrescriptionService {
 			HSSFClientAnchor anchor = new HSSFClientAnchor();
 			anchor.setCol1(5);
 			anchor.setRow1(0);
+			anchor.setAnchorType(AnchorType.MOVE_DONT_RESIZE);
 			Drawing drawing = templateSt.createDrawingPatriarch();
 			Picture picture = drawing.createPicture(anchor,
 					templateWb.addPicture(baos.toByteArray(), HSSFWorkbook.PICTURE_TYPE_JPEG));
-			picture.resize();
+			picture.resize(95, 95);
 
 			String newPath = Constants.SHIPFILEPATH + hospital.getName() + "-" + orderUuid + ".xls";
 			File newShipList = new File(newPath);
@@ -714,7 +716,6 @@ public class PrescriptionService {
 		}
 	}
 
-	/** ------------------------------------------------------------------ **/
 	// 根据出库单ID获取所属的处方List
 	public List<Prescription> getPrsListByOrderId(int orderId, String start, String end) {
 		try {
@@ -744,7 +745,7 @@ public class PrescriptionService {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
+
 	// 根据出库单ID获取所属的处方List, 用于分页
 	public List<Prescription> getPrsListByOrderIdUnfinished(int orderId, int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
@@ -1023,7 +1024,7 @@ public class PrescriptionService {
 
 			HSSFRow titleRow = templateSt.getRow(1);
 			HSSFRow itemRow = templateSt.getRow(2);
-			
+
 			String timeInterval = start + " 至 " + end;
 			titleRow.getCell(1).setCellValue(timeInterval);
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -1046,12 +1047,12 @@ public class PrescriptionService {
 				templateSt.addMergedRegion(new CellRangeAddress(index, index, 0, 2));
 				insertRow.getCell(0).getCellStyle().setBorderTop(HSSFCellStyle.BORDER_THIN);
 				insertRow.getCell(0).setCellStyle(itemRow.getCell(0).getCellStyle());
-				
+
 				insertRow.createCell(3).setCellValue(hospitalItem.getOrderNum());
 				insertRow.getCell(3).setCellStyle(itemRow.getCell(1).getCellStyle());
 				insertRow.getCell(3).getCellStyle().setBorderLeft(HSSFCellStyle.BORDER_THIN);
 				insertRow.getCell(3).getCellStyle().setBorderRight(HSSFCellStyle.BORDER_THIN);
-				
+
 				insertRow.createCell(4).setCellValue(hospitalItem.getFinishedPrsNum());
 				insertRow.getCell(4).setCellStyle(itemRow.getCell(2).getCellStyle());
 

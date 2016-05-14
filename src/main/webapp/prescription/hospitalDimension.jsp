@@ -28,7 +28,7 @@
          <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-         <a type="button" class="btn btn-success" style="" href="<%=request.getContextPath()%>/prescription/printHospitalDimensionXls?hospitalId=${hospitalId}&startTime=${startTime}&endTime=${endTime}">导出医院统计清单</a>
+         <a type="button" class="btn btn-success" style="" href="<%=request.getContextPath()%>/prescription/printHospitalDimensionXls?hospitalId=${hospitalId}&startTime=${startTime}&endTime=${endTime}" target="_blank">导出医院统计清单</a>
 	</span>
 	
 </h3>
@@ -64,7 +64,7 @@
 					<c:if test="${hosp2.finishedPrsNum > 0}">
 					<td width="100">
 						<div class="btn-group" role="group" aria-label="...">
-						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&userId=&hospitalId=${hosp2.id}&from=HOSPITAL" target="_blank">处方详情</a>
+						    <a type="button" class="btn btn-info" href="<%=request.getContextPath()%>/prescription/dimensionPrsList?startTime=${startTime}&endTime=${endTime}&userId=&hospitalId=${hosp2.id}&from=HOSPITAL">处方详情</a>
 						</div>
 					</td>
 					</c:if>

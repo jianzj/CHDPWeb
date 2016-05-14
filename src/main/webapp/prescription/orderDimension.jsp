@@ -29,7 +29,7 @@
          <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
          <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-         <a type="button" class="btn btn-success" style="" href="<%=request.getContextPath()%>/prescription/printOrderDimensionXls?hospitalId=${hospitalID}&startTime=${startTime}&endTime=${endTime}">导出出库单统计清单</a>
+         <a type="button" class="btn btn-success" style="" href="<%=request.getContextPath()%>/prescription/printOrderDimensionXls?hospitalId=${hospitalID}&startTime=${startTime}&endTime=${endTime}" target="_blank">导出出库单统计清单</a>
 	</span>
 </h3>
 </form>
