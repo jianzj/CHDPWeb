@@ -475,7 +475,7 @@ public class PrescriptionController {
 			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
 		} else if (from.equals("CURRENT_ORDER") && orderId == 0) {
 			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "order/currentOrders";
-		} 
+		}
 
 		request.setAttribute("startTime", start);
 		request.setAttribute("endTime", end);
@@ -498,7 +498,7 @@ public class PrescriptionController {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/orderDimensionList";
 			} else if (from.equals("CURRENT_ORDER")) {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "order/currentOrders";
-			}else {
+			} else {
 				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "/" + "prescription/currentList";
 			}
 		}
@@ -513,7 +513,7 @@ public class PrescriptionController {
 			prsList = prsService.getPrsListByOrderId(orderId, start, end, pageNum);
 		} else if (from.equals("CURRENT_ORDER")) {
 			prsList = prsService.getPrsListByOrderIdUnfinished(orderId, pageNum);
-		}else {
+		} else {
 			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalId, pageNum, start, end);
 		}
 
@@ -635,8 +635,7 @@ public class PrescriptionController {
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/printHospitalDimensionXls")
 	public String printHospitalDimensionXls(HttpServletRequest request, HttpServletResponse resposne,
-			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
-			RedirectAttributes redirectAttributes) throws IOException {
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) throws IOException {
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
 		if (start == null || start.equals("")) {
@@ -649,19 +648,20 @@ public class PrescriptionController {
 		String endTime = Utils.formatEndTime(end);
 
 		if (!Utils.validStartEndTime(startTime, endTime)) {
-			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
+			request.setAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
 			List<Hospital> hospitalList = prsService.getHospitalListByHospitalId(hospitalId, startTime, endTime);
 			if (hospitalList.size() != 0) {
 				Collections.sort(hospitalList);
 				String filename = prsService.generateHospitalDimensionXls(hospitalList, start, end);
 				if (filename != null) {
-					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/" + URLEncoder.encode(filename,"UTF-8");
+					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/"
+							+ URLEncoder.encode(filename, "UTF-8");
 				} else {
-					redirectAttributes.addFlashAttribute("errorMsg", "医院统计清单导出出错，请重试！");
+					request.setAttribute("errorMsg", "医院统计清单导出出错，请重试！");
 				}
 			} else {
-				redirectAttributes.addFlashAttribute("errorMsg", "尚无可打印统计信息！");
+				request.setAttribute("errorMsg", "尚无可打印统计信息！");
 			}
 		}
 
@@ -671,8 +671,7 @@ public class PrescriptionController {
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/printUserDimensionXls")
 	public String printUserDimensionXls(HttpServletRequest request, HttpServletResponse resposne,
-			@RequestParam(value = "userAuth", defaultValue = "0") int userAuth, RedirectAttributes redirectAttributes)
-			throws IOException {
+			@RequestParam(value = "userAuth", defaultValue = "0") int userAuth) throws IOException {
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
 		if (start == null || start.equals("")) {
@@ -685,7 +684,7 @@ public class PrescriptionController {
 		String endTime = Utils.formatEndTime(end);
 
 		if (!Utils.validStartEndTime(startTime, endTime)) {
-			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
+			request.setAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
 			List<User> userList = prsService.getUserListForPrsSummary(userAuth, startTime, endTime);
 
@@ -693,12 +692,13 @@ public class PrescriptionController {
 				Collections.sort(userList);
 				String filename = prsService.generateUserDimensionXls(userList, start, end);
 				if (filename != null) {
-					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/" + URLEncoder.encode(filename,"UTF-8");
+					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/"
+							+ URLEncoder.encode(filename, "UTF-8");
 				} else {
-					redirectAttributes.addFlashAttribute("errorMsg", "用户统计清单导出出错，请重试！");
+					request.setAttribute("errorMsg", "用户统计清单导出出错，请重试！");
 				}
 			} else {
-				redirectAttributes.addFlashAttribute("errorMsg", "尚无可打印统计信息！");
+				request.setAttribute("errorMsg", "尚无可打印统计信息！");
 			}
 		}
 
@@ -708,8 +708,7 @@ public class PrescriptionController {
 	@RequiresRoles("ADMIN")
 	@RequestMapping(value = "/printOrderDimensionXls")
 	public String printOrderDimensionXls(HttpServletRequest request, HttpServletResponse resposne,
-			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
-			RedirectAttributes redirectAttributes) throws IOException {
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) throws IOException {
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
 		if (start == null || start.equals("")) {
@@ -722,19 +721,20 @@ public class PrescriptionController {
 		String endTime = Utils.formatEndTime(end);
 
 		if (!Utils.validStartEndTime(startTime, endTime)) {
-			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
+			request.setAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
 			List<Order> orderList = prsService.getOrderListByHospitalId(hospitalId, startTime, endTime);
 			if (orderList.size() != 0) {
 				Collections.sort(orderList);
 				String filename = prsService.generateOrderDimensionXls(orderList, start, end);
 				if (filename != null) {
-					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/" + URLEncoder.encode(filename,"UTF-8");
+					return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../tmpFile/"
+							+ URLEncoder.encode(filename, "UTF-8");
 				} else {
-					redirectAttributes.addFlashAttribute("errorMsg", "出库单统计清单导出出错，请重试！");
+					request.setAttribute("errorMsg", "出库单统计清单导出出错，请重试！");
 				}
 			} else {
-				redirectAttributes.addFlashAttribute("errorMsg", "尚无可打印统计信息！");
+				request.setAttribute("errorMsg", "尚无可打印统计信息！");
 			}
 		}
 
@@ -745,8 +745,7 @@ public class PrescriptionController {
 	@RequestMapping(value = "/regenerateShipListXls")
 	public String regenerateShipListXls(HttpServletRequest request, HttpServletResponse resposne,
 			@RequestParam(value = "orderId", defaultValue = "0") int orderId,
-			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
-			RedirectAttributes redirectAttributes) throws IOException {
+			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId) throws IOException {
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
 		if (start == null || start.equals("")) {
@@ -759,15 +758,16 @@ public class PrescriptionController {
 		String endTime = Utils.formatEndTime(end);
 
 		if (orderId == 0) {
-			redirectAttributes.addFlashAttribute("errorMsg", "未知出库单，无法打印!");
+			request.setAttribute("errorMsg", "未知出库单，无法打印!");
 		} else if (!Utils.validStartEndTime(startTime, endTime)) {
-			redirectAttributes.addFlashAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
+			request.setAttribute("errorMsg", "您输入的时间间隔有误，请重新输入!");
 		} else {
 			String filename = prsService.regenerateShipListXls(orderId, start, end);
-			if (filename!=null) {
-				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../shipFile/" + URLEncoder.encode(filename,"UTF-8");
+			if (filename != null) {
+				return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../shipFile/"
+						+ URLEncoder.encode(filename, "UTF-8");
 			} else {
-				redirectAttributes.addFlashAttribute("errorMsg", "导出出库单失败，请重试！");
+				request.setAttribute("errorMsg", "导出出库单失败，请重试！");
 			}
 		}
 

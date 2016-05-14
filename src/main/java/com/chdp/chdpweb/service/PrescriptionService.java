@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -1045,13 +1046,16 @@ public class PrescriptionService {
 
 				insertRow.createCell(0).setCellValue(hospitalItem.getName());
 				templateSt.addMergedRegion(new CellRangeAddress(index, index, 0, 2));
-				insertRow.getCell(0).getCellStyle().setBorderTop(HSSFCellStyle.BORDER_THIN);
 				insertRow.getCell(0).setCellStyle(itemRow.getCell(0).getCellStyle());
+				insertRow.getCell(0).getCellStyle().setBorderBottom(HSSFCellStyle.BORDER_THIN);
+				HSSFCell cell=insertRow.createCell(1);
+				cell.setCellStyle(itemRow.getCell(0).getCellStyle());
+				cell=insertRow.createCell(2);
+				cell.setCellStyle(itemRow.getCell(0).getCellStyle());
 
 				insertRow.createCell(3).setCellValue(hospitalItem.getOrderNum());
-				insertRow.getCell(3).setCellStyle(itemRow.getCell(1).getCellStyle());
+				insertRow.getCell(3).setCellStyle(itemRow.getCell(3).getCellStyle());
 				insertRow.getCell(3).getCellStyle().setBorderLeft(HSSFCellStyle.BORDER_THIN);
-				insertRow.getCell(3).getCellStyle().setBorderRight(HSSFCellStyle.BORDER_THIN);
 
 				insertRow.createCell(4).setCellValue(hospitalItem.getFinishedPrsNum());
 				insertRow.getCell(4).setCellStyle(itemRow.getCell(2).getCellStyle());
@@ -1081,7 +1085,7 @@ public class PrescriptionService {
 			lastRow.getCell(5).setCellValue(totalPacket);
 			lastRow.getCell(6).setCellValue(totalPrice);
 			lastRow.setHeightInPoints(25);
-
+			
 			df = new SimpleDateFormat("yyyyMMddHHmmss");
 			String timeStr = df.format(new Date());
 			String newPath = Constants.TEMPFILE + "医院维度统计单" + "-" + timeStr + ".xls";
@@ -1184,6 +1188,7 @@ public class PrescriptionService {
 			lastRow.setHeightInPoints(25);
 
 			lastRow = templateSt.getRow(templateSt.getLastRowNum());
+			lastRow.getCell(1).setCellValue(index - 3);
 			lastRow.getCell(2).setCellValue(prsNum);
 			lastRow.getCell(3).setCellValue(five_prsNum);
 			lastRow.getCell(4).setCellValue(seven_prsNum);
@@ -1281,6 +1286,7 @@ public class PrescriptionService {
 			lastRow.setHeightInPoints(25);
 
 			lastRow = templateSt.getRow(templateSt.getLastRowNum());
+			lastRow.getCell(1).setCellValue(index - 3);
 			lastRow.getCell(4).setCellValue(prsNum);
 			lastRow.getCell(5).setCellValue(packetNum);
 			lastRow.getCell(6).setCellValue(priceNum);
