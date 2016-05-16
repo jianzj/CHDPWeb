@@ -546,7 +546,7 @@ public class PrescriptionService {
 				prs.setProcess_id(newProcess.getId());
 				prsDao.updatePrescriptionProcess(prs);
 
-				PrintHelper.printPrescription(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(),
+				PrintHelper.printPrs(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(),
 						prs.getSex(), prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
 			}
 		} catch (Exception e) {
@@ -692,7 +692,7 @@ public class PrescriptionService {
 			Drawing drawing = templateSt.createDrawingPatriarch();
 			Picture picture = drawing.createPicture(anchor,
 					templateWb.addPicture(baos.toByteArray(), HSSFWorkbook.PICTURE_TYPE_JPEG));
-			picture.resize(95, 95);
+			picture.resize();
 
 			String newPath = Constants.SHIPFILEPATH + hospital.getName() + "-" + orderUuid + ".xls";
 			File newShipList = new File(newPath);

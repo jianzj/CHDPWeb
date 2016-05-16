@@ -549,8 +549,12 @@ public class PrescriptionController {
 		} else {
 			Prescription prs = prsService.getPrsNoUser(prsId);
 			PrintHelper.startAndSetup();
-			PrintHelper.printPrescription(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
-					prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
+			if (printType.equals("PACKAGE"))
+				PrintHelper.printPackage(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
+						prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
+			else
+				PrintHelper.printPrs(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
+						prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
 			PrintHelper.close();
 			request.setAttribute("successMsg", "打印成功！");
 		}
@@ -606,7 +610,7 @@ public class PrescriptionController {
 
 		PrintHelper.startAndSetup();
 		for (Prescription prs : prsList) {
-			PrintHelper.printPrescription(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
+			PrintHelper.printPackage(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
 					prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
 		}
 		PrintHelper.close();

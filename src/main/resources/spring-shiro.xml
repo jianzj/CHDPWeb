@@ -22,6 +22,7 @@
                 /fonts/** = anon
                 /images/** = anon
                 /shipFile/** = anon
+                /apk/** = anon
                 /tmpFile/** = anon
                 /js/** = anon
                 /templates/** = anon
