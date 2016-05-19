@@ -3,6 +3,7 @@ package com.chdp.chdpweb;
 import org.springframework.web.context.ContextLoader;
 
 public class Constants {
+	public static final String VERSION = "1.1";
 
 	public static final int PAGE_SIZE = 15;
 	public static final String DEFAULT_PASSWORD = "123456";

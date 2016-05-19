@@ -8,7 +8,7 @@ import com.sun.jna.Native;
 
 public class EZioLib {
 	public interface API extends Library {
-		String path = API.class.getResource("/").getPath().replaceAll("%20", " ").substring(1) + "EZio64.dll";
+		String path = API.class.getResource("/").getPath().replaceAll("%20", " ").substring(1) + "EZio32.dll";
 		API INSTANCE = (API) Native.loadLibrary(path, API.class);
 
 		public int openport(String strPort);

@@ -25,6 +25,7 @@
                 /apk/** = anon
                 /tmpFile/** = anon
                 /js/** = anon
+                /app/config/getVersion = anon
                 /templates/** = anon
                 /** = authc
             </value>

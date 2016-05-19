@@ -546,8 +546,8 @@ public class PrescriptionService {
 				prs.setProcess_id(newProcess.getId());
 				prsDao.updatePrescriptionProcess(prs);
 
-				PrintHelper.printPrs(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(),
-						prs.getSex(), prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
+				PrintHelper.printPrs(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
+						prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
 			}
 		} catch (Exception e) {
 			transactionManager.rollback(status);
@@ -593,7 +593,7 @@ public class PrescriptionService {
 				}
 			}
 
-			filename = generatePrsListXls(hospitalId, uuid, prsList);
+			filename = generatePrsListXls(hospitalId, uuid, newOrder.getCreate_time(), prsList);
 			if (filename == null) {
 				transactionManager.rollback(status);
 				return null;
@@ -608,7 +608,7 @@ public class PrescriptionService {
 	}
 
 	// 生成Excel出库单
-	private String generatePrsListXls(int hospitalId, String orderUuid, List<Prescription> prsList) {
+	private String generatePrsListXls(int hospitalId, String orderUuid, String orderTime, List<Prescription> prsList) {
 		try {
 			Resource tempResource = new ClassPathResource("shipTemplate.xls");
 
@@ -623,9 +623,7 @@ public class PrescriptionService {
 			Hospital hospital = hospitalDao.getHospitalwithID(hospitalId);
 			titleRow.getCell(1).setCellValue(hospital.getName());
 
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-			String currentTime = df.format(new Date());
-			titleRow.getCell(5).setCellValue(currentTime);
+			titleRow.getCell(5).setCellValue(orderTime.substring(0, 10));
 
 			noRow.getCell(0).setCellValue("No." + orderUuid);
 
@@ -1048,9 +1046,9 @@ public class PrescriptionService {
 				templateSt.addMergedRegion(new CellRangeAddress(index, index, 0, 2));
 				insertRow.getCell(0).setCellStyle(itemRow.getCell(0).getCellStyle());
 				insertRow.getCell(0).getCellStyle().setBorderBottom(HSSFCellStyle.BORDER_THIN);
-				HSSFCell cell=insertRow.createCell(1);
+				HSSFCell cell = insertRow.createCell(1);
 				cell.setCellStyle(itemRow.getCell(0).getCellStyle());
-				cell=insertRow.createCell(2);
+				cell = insertRow.createCell(2);
 				cell.setCellStyle(itemRow.getCell(0).getCellStyle());
 
 				insertRow.createCell(3).setCellValue(hospitalItem.getOrderNum());
@@ -1085,7 +1083,7 @@ public class PrescriptionService {
 			lastRow.getCell(5).setCellValue(totalPacket);
 			lastRow.getCell(6).setCellValue(totalPrice);
 			lastRow.setHeightInPoints(25);
-			
+
 			df = new SimpleDateFormat("yyyyMMddHHmmss");
 			String timeStr = df.format(new Date());
 			String newPath = Constants.TEMPFILE + "医院维度统计单" + "-" + timeStr + ".xls";
@@ -1318,11 +1316,19 @@ public class PrescriptionService {
 	}
 
 	public String regenerateShipListXls(int orderId, String start, String end) {
-
 		if (orderId == 0)
 			return null;
 		try {
 			Order orderItem = orderDao.getOrderById(orderId);
+			File file = new File(
+					Constants.SHIPFILEPATH + orderItem.getHospital_name() + "-" + orderItem.getUuid() + ".xls");
+			if (!file.exists()) {
+				List<Prescription> prsList = prsDao.getPrsListByOrderId(orderItem.getId(), orderItem.getHospital_id(),
+						Constants.DEFAULT_START, Constants.DEFAULT_END);
+				if (generatePrsListXls(orderItem.getHospital_id(), orderItem.getUuid(), orderItem.getCreate_time(),
+						prsList) == null)
+					return null;
+			}
 			return orderItem.getHospital_name() + "-" + orderItem.getUuid() + ".xls";
 		} catch (Exception e) {
 			return null;
