@@ -515,14 +515,33 @@ public class PrescriptionService {
 		}
 	}
 
+	//通过一个String[]列表的ID，获取Prs List
+	public List<Prescription> getPrsListByIds(String[] prsList){
+		List<Prescription> returnPrsList = new ArrayList<Prescription>();
+		try{
+			for (String item: prsList){
+				int prsId = Integer.parseInt(item);
+				Prescription prs = prsDao.getPrescriptionByID(prsId);
+				if (prs != null){
+					returnPrsList.add(prs);
+				}
+			}
+			return returnPrsList;
+		} catch (Exception e){
+			return returnPrsList;
+		}
+	}
+	
 	// 接方打印及流转，带事务控制
-	public boolean printReceiveList(int hospitalId) {
-		List<Prescription> prsList = null;
+	public boolean printReceiveList(String[] prsStrList) {
+		List<Prescription> prsList = getPrsListByIds(prsStrList);
+		
+		/**
 		if (hospitalId == 0) {
 			prsList = listPrsWithProcessNoUser(Constants.RECEIVE);
 		} else {
 			prsList = listPrsWithProHospitalNoUser(Constants.RECEIVE, hospitalId);
-		}
+		}**/
 
 		if (prsList == null)
 			return false;

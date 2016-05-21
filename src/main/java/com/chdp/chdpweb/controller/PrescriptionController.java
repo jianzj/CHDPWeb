@@ -586,10 +586,17 @@ public class PrescriptionController {
 	public String printReceiveList(HttpServletRequest request,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
 			RedirectAttributes redirectAttributes) {
-		if (prsService.printReceiveList(hospitalId)) {
-			redirectAttributes.addFlashAttribute("successMsg", "打印接方标签成功！");
-		} else {
+		
+		String prsListStr = request.getParameter("prsList");
+		if (prsListStr == null || prsListStr.equals("")){
 			redirectAttributes.addFlashAttribute("errorMsg", "打印接方标签出错，请重试！");
+		}else{
+			String[] prsList = prsListStr.split("/");
+			if (prsService.printReceiveList(prsList)) {
+				redirectAttributes.addFlashAttribute("successMsg", "打印接方标签成功！");
+			} else {
+				redirectAttributes.addFlashAttribute("errorMsg", "打印接方标签出错，请重试！");
+			}
 		}
 
 		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../process/receiveList?hospitalId=" + hospitalId;
@@ -601,21 +608,23 @@ public class PrescriptionController {
 	public String printPackageList(HttpServletRequest request,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
 			RedirectAttributes redirectAttributes) {
-		List<Prescription> prsList = null;
-		if (hospitalId == 0) {
-			prsList = prsService.listPrsWithProcessNoUser(Constants.PACKAGE);
-		} else {
-			prsList = prsService.listPrsWithProHospitalNoUser(Constants.PACKAGE, hospitalId);
-		}
+		
+		String prsListStr = request.getParameter("prsList");
+		if (prsListStr == null || prsListStr.equals("")){
+			redirectAttributes.addFlashAttribute("errorMsg", "打印接方标签出错，请重试！");
+		}else{
+			String[] prsStrList = prsListStr.split("/");
+			List<Prescription> prsList = prsService.getPrsListByIds(prsStrList);
 
-		PrintHelper.startAndSetup();
-		for (Prescription prs : prsList) {
-			PrintHelper.printPackage(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
-					prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
+			PrintHelper.startAndSetup();
+			for (Prescription prs : prsList) {
+				PrintHelper.printPackage(prs.getPatient_name(), prs.getOuter_id(), prs.getPacket_num(), prs.getSex(),
+						prs.getHospital_name(), prs.getUuid(), prs.getCreate_time());
+			}
+			PrintHelper.close();
+			redirectAttributes.addFlashAttribute("successMsg", "打印包装标签完成！");
 		}
-		PrintHelper.close();
-		redirectAttributes.addFlashAttribute("successMsg", "打印包装标签完成！");
-
+		
 		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../process/packageList?hospitalId=" + hospitalId;
 	}
 

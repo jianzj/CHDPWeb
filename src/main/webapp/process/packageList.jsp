@@ -17,7 +17,7 @@
 			</c:forEach>
 		</select>
 		<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-		<a type="button" class="btn btn-success" style="" onClick="printPrs('${hospital}')">打印包装标签</a>
+		<a type="button" class="btn btn-success" style="" onClick="printPrsSelected(${hospitalId})">打印包装标签</a>
 	</span>
 	</h3>
 </form>
@@ -33,6 +33,7 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
+				<th><input type="checkbox" value=0 class="check" id="checkAll"></th>
 				<th>编号</th>
 				<th>医院</th>
 				<th>医院编号</th>
@@ -46,6 +47,7 @@
 		<tbody>
 			<c:forEach var="prs" items="${packageList}">
 				<tr>
+				    <td><input type="checkbox" value="${prs.id}" class="check"/></td>
 					<td><c:out value="${prs.uuid}" /></td>
 					<td><c:out value="${prs.hospital_name}" /></td>
 					<td><c:out value="${prs.outer_id}" /></td>
@@ -86,5 +88,28 @@
 $(".selectpicker").change(function(){
     $(".form-inline").submit();
 }); 
+</script>
+<script>
+$("#checkAll").click(function () {
+    $(".check").prop('checked', $(this).prop('checked'));
+});
+</script>
+<script>
+var printPrsSelected = function(hospitalId){
+	var prsList = [];
+	$.each($("input[class='check']:checked"), function(){
+		if ($(this).val() > 0){
+			prsList.push($(this).val());
+		}
+    });
+	if (prsList.length == 0){
+		alert("您未选择任何需要打印的处方！");
+	}else{
+		prsListStr = prsList.join("/");
+		$("#assureMsg").html("确认打印包装标签?");
+        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/printPackageList?hospitalId="+hospitalId+"&prsList="+prsListStr);
+        $("#assureDlg").modal("show");
+	}
+}
 </script>
 <%@ include file="../foot.jsp"%>
