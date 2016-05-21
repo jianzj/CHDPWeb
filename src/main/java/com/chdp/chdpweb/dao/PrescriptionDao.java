@@ -229,4 +229,9 @@ public interface PrescriptionDao {
 	@Select("select count(1) from prescription where id in ( select distinct p1.prescription_id from process as p1, process as p2 where p2.user_id = #{userId} and "
 			+ "p1.previous_process_id = p2.id and p1.error_type != 0 and p2.begin >= #{start} and p2.finish <= #{end} group by p2.user_id) and process="+Constants.FINISH)
 	Integer getErrorProcessByUserId(@Param("userId") int userId, @Param("start") String start, @Param("end") String end);
+	
+	//允许处方创建过程中，同一天不允许出现重复编号的处方，不同一天，可以出现同一编号的处方
+	@Select("select count(*) from prescription as p, hospital as h where h.id = #{prs.hospital_id} and p.outer_id = #{prs.outer_id} and p.hospital_id = h.id and "+
+				"p.create_time >= #{start} and p.create_time <= #{end}")
+	int countPrescriptionWithHospitalInfo_New(@Param("prs") Prescription prs, @Param("start") String start, @Param("end") String end);
 }

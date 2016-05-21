@@ -334,7 +334,12 @@ public class PrescriptionService {
 
 	public boolean validPrescriptionHospitalInfo(Prescription prs) {
 		try {
-			int count = prsDao.countPrescriptionWithHospitalInfo(prs);
+			String current = Utils.getCurrentTime();
+			String startTime = current + " 00:00:00";
+			String endTime = current + " 23:59:59";
+			System.out.println(startTime);
+			System.out.println(endTime);
+			int count = prsDao.countPrescriptionWithHospitalInfo_New(prs, startTime, endTime);
 			if (count > 0) {
 				return true;
 			}
