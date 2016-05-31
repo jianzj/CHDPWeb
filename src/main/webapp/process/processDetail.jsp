@@ -38,6 +38,50 @@
 	</table>
 </div>
 
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>处方类型</th>
+                <th>先煎</th>
+                <th>后下</th>
+                <th>包煎</th>
+                <th>冲服</th>
+                <th>烊化</th>
+                <th>另煎</th>
+            </tr>
+        </thead>
+        <tbody>
+            <c:if test="${not empty currentPrs}">
+                <tr>
+                    <td>
+                    <c:choose>
+					    <c:when test="${currentPrs.class_of_medicines == 1}">
+                                                                解表或芳香类药
+					    </c:when>
+					    <c:when test="${currentPrs.class_of_medicines == 2}">
+                                                                一般治疗药
+					    </c:when>
+					    <c:when test="${currentPrs.class_of_medicines == 3}">
+                                                                调理滋补药
+                        </c:when>
+					    <c:otherwise>
+                        &nbsp;
+					    </c:otherwise>
+					</c:choose>
+                    </td>
+                    <td><c:out value="${currentPrs.decoct_first_list}" /></td>
+                    <td><c:out value="${currentPrs.decoct_later_list}" /></td>
+                    <td><c:out value="${currentPrs.wrapped_decoct_list}" /></td>
+                    <td><c:out value="${currentPrs.take_drenched_list}" /></td>
+                    <td><c:out value="${currentPrs.melt_list}" /></td>
+                    <td><c:out value="${currentPrs.decoct_alone_list}" /></td>
+                </tr>           
+            </c:if>
+        </tbody>
+    </table>
+</div>
+
 <div class="row bs-wizard" style="border-bottom:0;">
 <% if (request.getAttribute("nodeList") != null){ %>
     <% int step = 0; %>
