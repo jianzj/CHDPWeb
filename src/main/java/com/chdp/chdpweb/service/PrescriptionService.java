@@ -68,7 +68,9 @@ public class PrescriptionService {
 	private ProcessDao processDao;
 	@Autowired
 	private HospitalDao hospitalDao;
-
+    @Autowired
+    private ProcessService proService;
+		
 	@Autowired
 	private DataSourceTransactionManager transactionManager;
 
@@ -632,7 +634,9 @@ public class PrescriptionService {
 			return null;
 
 		List<Prescription> prsList = getPrsForPrintOrderListUnprinted(hospitalId);
-
+        if (prsList.size() == 0){
+        	return null;
+        }
 		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
 		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
 		TransactionStatus status = transactionManager.getTransaction(def);
@@ -877,7 +881,12 @@ public class PrescriptionService {
 	// 根据出库单ID获取所属的处方List, 用于分页 New 
 	public List<Prescription> getPrsListByOrderIdInProcess(int orderId) {
 		try {
-			return prsDao.getPrsListByOrderIdInProcess(orderId);
+			List<Prescription> prsList = prsDao.getPrsListByOrderIdInProcess(orderId);
+			for (Prescription prs : prsList) {
+				String phase = proService.getPhaseNamewithProcess(prs);
+				prs.setPhase_name(phase);
+			}
+			return prsList;
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
@@ -887,7 +896,12 @@ public class PrescriptionService {
 	public List<Prescription> getPrsListByOrderIdInProcess(int orderId, int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
-			return prsDao.getPrsListByOrderIdInProcess(orderId);
+			List<Prescription> prsList = prsDao.getPrsListByOrderIdInProcess(orderId);
+			for (Prescription prs : prsList) {
+				String phase = proService.getPhaseNamewithProcess(prs);
+				prs.setPhase_name(phase);
+			}
+			return prsList;
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}
