@@ -240,16 +240,16 @@ public interface PrescriptionDao {
 	
 	//获取接方完成且尚在进行中的处方列表
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where "
-			+ "p.process > 2 and p.process < 11 and h.id = #{hospitalId} and p.hospital_id = h.id order by p.create_time desc")
+			+ "p.process >= 2 and p.process < 11 and h.id = #{hospitalId} and p.hospital_id = h.id order by p.create_time desc")
 	List<Prescription> getPrsForPrintOrderList(@Param("hospitalId") int hospitalId);
 	
 	//获取接方完成且尚在进行中的处方列表, 且尚未打印出库单的列表
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where "
-			+ "p.process > 2 and p.process < 11 and h.id = #{hospitalId} and p.hospital_id = h.id and p.order_id = 0 order by p.create_time desc")
+			+ "p.process >= 2 and p.process < 11 and h.id = #{hospitalId} and p.hospital_id = h.id and p.order_id = 0 order by p.create_time desc")
 	List<Prescription> getPrsForPrintOrderListUnprinted(@Param("hospitalId") int hospitalId);
 	
 	// 获取已经包含在此出库单中的处方
-	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h  where p.process > 2 and p.process < 11 " +
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h  where p.process >= 2 and p.process < 11 " +
 				"and p.order_id = #{orderId} and p.hospital_id = h.id order by p.create_time desc")
 	List<Prescription> getPrsListByOrderIdInProcess(@Param("orderId") int orderId);
 }
