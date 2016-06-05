@@ -43,6 +43,7 @@
         <thead>
             <tr>
                 <th>处方类型</th>
+                <th>煎煮要求</th>
                 <th>先煎</th>
                 <th>后下</th>
                 <th>包煎</th>
@@ -69,6 +70,22 @@
                         &nbsp;
 					    </c:otherwise>
 					</c:choose>
+                    </td>
+                    <td>
+                    <c:choose>
+                        <c:when test="${currentPrs.class_of_medicines == 1}">
+                                                                温度110℃，保温时间20分钟
+                        </c:when>
+                        <c:when test="${currentPrs.class_of_medicines == 2}">
+                                                                温度115℃，保温时间30分钟
+                        </c:when>
+                        <c:when test="${currentPrs.class_of_medicines == 3}">
+                                                                温度120℃，保温时间40分钟
+                        </c:when>
+                        <c:otherwise>
+                        &nbsp;
+                        </c:otherwise>
+                    </c:choose>
                     </td>
                     <td><c:out value="${currentPrs.decoct_first_list}" /></td>
                     <td><c:out value="${currentPrs.decoct_later_list}" /></td>
@@ -147,7 +164,7 @@
 		 		<% }else if (node.getSpecialDisplay()){ %>
 		 		    <h4><span class="glyphicon glyphicon-flag"></span> 处理完成</h4>
 			 		<% if (node.getNodeType() == Constants.DECOCT){ %>
-				 		<p><span class="glyphicon glyphicon-time"></span> 煎煮: <%=node.getDecoctTime() %></p>
+				 		<p><span class="glyphicon glyphicon-time"></span> 升温: <%=node.getDecoctTime() %></p>
                         <p><span class="glyphicon glyphicon-time"></span> 保温: <%=node.getHeatTime() %></p>
                         <p><span class="glyphicon glyphicon-scale"></span> 煎煮机: <%=node.getMachineName() %></p>
 			 		<% }else if (node.getNodeType() == Constants.POUR){ %>

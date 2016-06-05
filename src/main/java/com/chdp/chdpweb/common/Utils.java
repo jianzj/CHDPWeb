@@ -143,6 +143,26 @@ public class Utils {
 		return prs1;
 	}
 
+	public static String getIntervalTime(String start, String end) {
+		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sdf3 = new SimpleDateFormat("HH:mm");
+
+		if (end != null && start != null) {
+			try {
+				Date startDate = sdf1.parse(start);
+				Date endDate = sdf1.parse(end);
+				String dayStr = sdf2.format(endDate);
+				String timeStr = dayStr + " " + sdf3.format(startDate) + " - " + sdf3.format(endDate);
+				return timeStr;
+			} catch (Exception e) {
+				return "";
+			}
+		}
+
+		return "";
+	}
+	
 	public static String getDecoctTime(String start, String end, int decoct_type) {
 		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");

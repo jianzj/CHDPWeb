@@ -224,10 +224,13 @@ public class ProcessService {
 					}
 				} else {
 					try {
-						Prescription prs = new Prescription();
+						Prescription prs = prsDao.getPrescriptionByID(prsId);
 						prs.setId(prsId);
 						prs.setProcess(forwardTo);
-						prs.setProcess_id(-1);
+						if (prs.getOrder_id() != 0)
+							prs.setProcess_id(prs.getOrder_id());
+						else
+							prs.setProcess_id(-1);
 						prsDao.updatePrescriptionProcess(prs);
 					} catch (Exception e) {
 						transactionManager.rollback(status);
@@ -335,7 +338,7 @@ public class ProcessService {
 			return result;
 		}
 	}
-	
+
 	public AppResult startProcessWithMachine(int procId, int proc, int machineId) {
 		AppResult result = new AppResult();
 		try {
@@ -467,11 +470,17 @@ public class ProcessService {
 					node.setStatus(1);
 				} else {
 					node.setStatus(2);
+					node.setMiddleTime(process.getMiddle());
 					node.setEndTime(process.getFinish());
 					if (process.getProcess_type() == Constants.DECOCT) {
-						node.setDecoctTime(Utils.getDecoctTime(node.getStartTime(), node.getEndTime(),
-								prs.getClass_of_medicines()));
-						node.setHeatTime(Utils.getHeatTime(node.getEndTime(), prs.getClass_of_medicines()));
+						if (node.getMiddleTime() == null) {
+							node.setDecoctTime(Utils.getDecoctTime(node.getStartTime(), node.getEndTime(),
+									prs.getClass_of_medicines()));
+							node.setHeatTime(Utils.getHeatTime(node.getEndTime(), prs.getClass_of_medicines()));
+						} else {
+							node.setDecoctTime(Utils.getIntervalTime(node.getStartTime(), node.getMiddleTime()));
+							node.setHeatTime(Utils.getIntervalTime(node.getMiddleTime(), node.getEndTime()));
+						}
 						node.setMachineName(process.getMachine_name());
 					} else if (process.getProcess_type() == Constants.POUR) {
 						node.setMachineName(process.getMachine_name());
