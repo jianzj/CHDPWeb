@@ -75,9 +75,12 @@ public interface PrescriptionDao {
 	List<Prescription> getPrescriptionByHospitalwithProcess(@Param("hospital_id") int hospital_id,
 			@Param("process") int process);
 
+	@Update("update prescription set order_id = #{prs.order_id} where id = #{prs.id}")
+	int updatePrescriptionOrderId(@Param("prs") Prescription prs);
+
 	@Update("update prescription set process = #{prs.process}, process_id = #{prs.process_id} where id = #{prs.id}")
 	int updatePrescriptionProcess(@Param("prs") Prescription prs);
-
+	
 	@Update("update prescription set outer_id = #{prs.outer_id}, hospital_id = #{prs.hospital_id}, patient_name = #{prs.patient_name}, "
 			+ "sex = #{prs.sex}, packet_num = #{prs.packet_num}, price = #{prs.price} where id = #{prs.id}")
 	int updatePrescriptionByPhase1(@Param("prs") Prescription prs);
@@ -234,4 +237,19 @@ public interface PrescriptionDao {
 	@Select("select count(*) from prescription as p, hospital as h where h.id = #{prs.hospital_id} and p.outer_id = #{prs.outer_id} and p.hospital_id = h.id and "+
 				"p.create_time >= #{start} and p.create_time <= #{end}")
 	int countPrescriptionWithHospitalInfo_New(@Param("prs") Prescription prs, @Param("start") String start, @Param("end") String end);
+	
+	//获取接方完成且尚在进行中的处方列表
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where "
+			+ "p.process > 2 and p.process < 11 and h.id = #{hospitalId} and p.hospital_id = h.id order by p.create_time desc")
+	List<Prescription> getPrsForPrintOrderList(@Param("hospitalId") int hospitalId);
+	
+	//获取接方完成且尚在进行中的处方列表, 且尚未打印出库单的列表
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where "
+			+ "p.process > 2 and p.process < 11 and h.id = #{hospitalId} and p.hospital_id = h.id and p.order_id = 0 order by p.create_time desc")
+	List<Prescription> getPrsForPrintOrderListUnprinted(@Param("hospitalId") int hospitalId);
+	
+	// 获取已经包含在此出库单中的处方
+	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h  where p.process > 2 and p.process < 11 " +
+				"and p.order_id = #{orderId} and p.hospital_id = h.id order by p.create_time desc")
+	List<Prescription> getPrsListByOrderIdInProcess(@Param("orderId") int orderId);
 }

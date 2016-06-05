@@ -322,6 +322,15 @@ public class PrescriptionService {
 			return false;
 		}
 	}
+	
+	public boolean updatePrescriptionOrderId(Prescription prs) {
+		try {
+			prsDao.updatePrescriptionOrderId(prs);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
 	public boolean deletePrescription(int prsId) {
 		try {
@@ -581,7 +590,95 @@ public class PrescriptionService {
 		transactionManager.commit(status);
 		return true;
 	}
+    
+	// 获取当前此医院所属的出库单列表
+	public int getOrderIdByPrsList(List<Prescription> prsList){
+		try{
+			int orderId = 0;
+			for (Prescription prs : prsList) {
+				orderId = prs.getOrder_id();
+				if (orderId > 0) {
+					break;
+				}
+			}
+			return orderId;
+		} catch (Exception e){
+			return -1;
+		}
+	}
+	
+	// 获取接方完成且尚未完成的处方列表
+	public List<Prescription> getPrsForPrintOrderList(int hospitalId) {
+		try {
+			return prsDao.getPrsForPrintOrderList(hospitalId);
+		} catch (Exception e) {
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	// 获取接方完成且尚未完成的处方列表, 且尚未打印出库单的列表
+	public List<Prescription> getPrsForPrintOrderListUnprinted(int hospitalId) {
+		try {
+			return prsDao.getPrsForPrintOrderListUnprinted(hospitalId);
+		} catch (Exception e) {
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	// 出库单生成逻辑，带事务控制
+	public String printShipListXls_New(int hospitalId) {
+		String filename = null;
+		if (hospitalId == 0)
+			return null;
 
+		List<Prescription> prsList = getPrsForPrintOrderListUnprinted(hospitalId);
+
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		TransactionStatus status = transactionManager.getTransaction(def);
+
+		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
+
+		try {	
+			String uuid = Utils.generateUuid();
+			Order newOrder = new Order();
+			newOrder.setUuid(uuid);
+			newOrder.setHospital_id(hospitalId);
+			newOrder.setCreate_time(Utils.getCurrentDateAndTime());
+			newOrder.setCreate_user_id(currentUser.getId());
+			newOrder.setStatus(Constants.ORDER_BEGIN);
+			orderDao.createFullOrder(newOrder);
+	
+			for (Prescription prs : prsList) {
+				if (prs.getProcess_id() == -1) {
+					prs.setProcess_id(newOrder.getId());
+					if (!updatePrescriptionProcess(prs)) {
+						transactionManager.rollback(status);
+						return null;
+					}
+				}
+				
+				prs.setOrder_id(newOrder.getId());
+				if (!updatePrescriptionOrderId(prs)) {
+					transactionManager.rollback(status);
+					return null;
+				}
+			}
+
+			filename = generatePrsListXls(hospitalId, newOrder.getUuid(), newOrder.getCreate_time(), prsList);
+			if (filename == null) {
+				transactionManager.rollback(status);
+				return null;
+			}
+		} catch (Exception e) {
+			transactionManager.rollback(status);
+			return null;
+		}
+
+		transactionManager.commit(status);
+		return filename;
+	}
+	
 	// 出库单生成逻辑，带事务控制
 	public String printShipListXls(int hospitalId) {
 		String filename = null;
@@ -772,6 +869,25 @@ public class PrescriptionService {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
 			return prsDao.getPrsListByOrderIdUnfinished(orderId);
+		} catch (Exception e) {
+			return new ArrayList<Prescription>();
+		}
+	}
+	
+	// 根据出库单ID获取所属的处方List, 用于分页 New 
+	public List<Prescription> getPrsListByOrderIdInProcess(int orderId) {
+		try {
+			return prsDao.getPrsListByOrderIdInProcess(orderId);
+		} catch (Exception e) {
+			return new ArrayList<Prescription>();
+		}
+	}
+
+	// 根据出库单ID获取所属的处方List, 用于分页 New
+	public List<Prescription> getPrsListByOrderIdInProcess(int orderId, int pageNum) {
+		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
+		try {
+			return prsDao.getPrsListByOrderIdInProcess(orderId);
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
 		}

@@ -92,7 +92,8 @@ public class ProcessController {
 		
 		List<Prescription> prsList = null;
 		if (hospitalId != 0){
-			prsList = prsService.listShipPrescription(Constants.SHIP, hospitalId);
+			// prsList = prsService.listShipPrescription(Constants.SHIP, hospitalId);
+			prsList = prsService.getPrsForPrintOrderListUnprinted(hospitalId);
 		}
 		
 		request.setAttribute("shipList", prsList);

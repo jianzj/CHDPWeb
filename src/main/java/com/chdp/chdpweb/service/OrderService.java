@@ -150,7 +150,7 @@ public class OrderService {
     		}
     		List<Prescription> prsList = null;
 			for (Order order : orderList) {
-				prsList = prsDao.getPrsListByOrderIdUnfinished(order.getId());
+				prsList = prsDao.getPrsListByOrderIdInProcess(order.getId());
 				order.setPrs_num(prsList.size());
 				int packet_num = 0;
 				double price_total = 0;
@@ -180,7 +180,7 @@ public class OrderService {
     		}
     		List<Prescription> prsList = null;
 			for (Order order : orderList) {
-				prsList = prsDao.getPrsListByOrderIdUnfinished(order.getId());
+				prsList = prsDao.getPrsListByOrderIdInProcess(order.getId());
 				order.setPrs_num(prsList.size());
 				int packet_num = 0;
 				double price_total = 0;
