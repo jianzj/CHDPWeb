@@ -323,14 +323,14 @@ public class ProcessService {
 		}
 	}
 
-	public AppResult middleProcess(int procId, int proc) {
+	public AppResult middleProcess(int procId) {
 		AppResult result = new AppResult();
 		try {
 			proDao.middleProcess(procId, Utils.getCurrentDateAndTime());
 			result.setSuccess(true);
 			return result;
 		} catch (Exception e) {
-			result.setErrorMsg("更新" + Constants.getProcessName(proc) + "流程失败");
+			result.setErrorMsg("更新保温开始时间失败");
 			result.setSuccess(false);
 			return result;
 		}

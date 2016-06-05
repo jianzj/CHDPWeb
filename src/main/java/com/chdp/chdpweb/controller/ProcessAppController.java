@@ -157,10 +157,9 @@ public class ProcessAppController {
 	@RequestMapping(value = "/middle", method = RequestMethod.POST)
 	@ResponseBody
 	public AppResult middle(HttpServletRequest request) {
-		int prsId = Integer.parseInt(request.getParameter("prsId"));
 		int procId = Integer.parseInt(request.getParameter("procId"));
 		
-		return procService.middleProcess(prsId, procId);
+		return procService.middleProcess(procId);
 	}
 
 	@RequestMapping(value = "/decoctCancel", method = RequestMethod.POST)
