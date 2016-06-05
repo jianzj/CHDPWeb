@@ -38,7 +38,7 @@
 					<td><c:out value="${prs.patient_name}" /></td>
 					<td><c:out value="${prs.packet_num}" /></td>
 					<% if (request.getAttribute("from") != null && ((String)request.getAttribute("from")).equals("CURRENT_ORDER")){ %>
-					<td>等待出库</td>
+					<td><c:out value="${prs.phase_name}" /></td>
 				    <% }else { %>
 				    <td>完成</td>
 					<td><c:out value="${prs.finish_time}"/></td>
