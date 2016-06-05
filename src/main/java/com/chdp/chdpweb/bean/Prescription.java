@@ -31,6 +31,8 @@ public class Prescription {
 	private String user_name;
 	private String finish_time;
 
+	private int order_id;
+	
 	private String phase_name;
 	
 	public int getId() {
@@ -251,6 +253,14 @@ public class Prescription {
 
 	public void setFinish_time(String finish_time) {
 		this.finish_time = finish_time;
+	}
+	
+	public int getOrder_id(){
+		return order_id;
+	}
+	
+	public void setOrder_id(int order_id){
+		this.order_id = order_id;
 	}
 
 	public String getUser_name() {

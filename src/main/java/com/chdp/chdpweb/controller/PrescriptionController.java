@@ -512,7 +512,7 @@ public class PrescriptionController {
 		} else if (from.equals("ORDER")) {
 			prsList = prsService.getPrsListByOrderId(orderId, start, end, pageNum);
 		} else if (from.equals("CURRENT_ORDER")) {
-			prsList = prsService.getPrsListByOrderIdUnfinished(orderId, pageNum);
+			prsList = prsService.getPrsListByOrderIdInProcess(orderId, pageNum);
 		} else {
 			prsList = prsService.listPrsWithParamsAndTime(Constants.FINISH, hospitalId, pageNum, start, end);
 		}
@@ -634,7 +634,8 @@ public class PrescriptionController {
 	public String printShipListXls(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
 			RedirectAttributes redirectAttributes) throws IOException {
-		String filename = prsService.printShipListXls(hospitalId);
+		// String filename = prsService.printShipListXls(hospitalId);
+		String filename = prsService.printShipListXls_New(hospitalId);
 		if (filename != null) {
 			redirectAttributes.addFlashAttribute("successMsg", "出库单生成成功！ <a class='btn btn-primary' href='"
 					+ request.getContextPath() + "/shipFile/" + filename + "' target='_blank'>请点击此处下载</a>");
