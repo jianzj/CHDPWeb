@@ -9,7 +9,7 @@ public class PrintHelper {
 		Printer.Config.LabelMode(PaperMode.GetEnum(0), 40, 2);
 		Printer.Config.LabelWidth(60);
 
-		Printer.Config.Dark(15);
+		Printer.Config.Dark(6);
 		Printer.Config.Speed(3);
 		Printer.Config.PageNo(1);
 		Printer.Config.CopyNo(1);

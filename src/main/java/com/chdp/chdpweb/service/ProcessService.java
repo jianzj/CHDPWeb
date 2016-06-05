@@ -323,6 +323,19 @@ public class ProcessService {
 		}
 	}
 
+	public AppResult middleProcess(int procId, int proc) {
+		AppResult result = new AppResult();
+		try {
+			proDao.middleProcess(procId, Utils.getCurrentDateAndTime());
+			result.setSuccess(true);
+			return result;
+		} catch (Exception e) {
+			result.setErrorMsg("更新" + Constants.getProcessName(proc) + "流程失败");
+			result.setSuccess(false);
+			return result;
+		}
+	}
+	
 	public AppResult startProcessWithMachine(int procId, int proc, int machineId) {
 		AppResult result = new AppResult();
 		try {

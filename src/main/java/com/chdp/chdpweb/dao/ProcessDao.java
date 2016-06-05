@@ -58,6 +58,9 @@ public interface ProcessDao {
 	@Update("update process set begin = #{begin}, user_id = #{user_id} where id = #{id}")
 	int startProcess(@Param("id") int id, @Param("begin") String begin, @Param("user_id") int user_id);
 
+	@Update("update process set middle = #{middle} where id = #{id}")
+	int middleProcess(@Param("id") int id, @Param("middle") String middle);
+
 	@Update("update process set begin = #{begin}, user_id = #{user_id}, machine_id = #{machine_id} where id = #{id}")
 	int startProcessWithMachine(@Param("id") int id, @Param("begin") String begin, @Param("user_id") int user_id, @Param("machine_id") int machine_id);
 
