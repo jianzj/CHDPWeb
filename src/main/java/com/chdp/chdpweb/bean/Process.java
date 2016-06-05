@@ -7,6 +7,7 @@ public class Process {
 	private int id;
 	private int process_type;
 	private String begin;
+	private String middle;
 	private String finish;
 	private int user_id;
 	private String user_name;
@@ -49,6 +50,22 @@ public class Process {
 		this.begin = begin;
 	}
 
+	public String getMiddle(){
+		try{
+			if (middle != null){
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				middle = sdf.format(sdf.parse(middle));
+			}
+			return middle;
+		}catch (Exception e){
+			return middle;
+		}
+	}
+	
+	public void setMiddle(String middle){
+		this.middle = middle;
+	}
+	
 	public String getFinish() {
 		try{
 			if (finish != null){
