@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -68,9 +69,9 @@ public class PrescriptionService {
 	private ProcessDao processDao;
 	@Autowired
 	private HospitalDao hospitalDao;
-    @Autowired
-    private ProcessService proService;
-		
+	@Autowired
+	private ProcessService proService;
+
 	@Autowired
 	private DataSourceTransactionManager transactionManager;
 
@@ -324,7 +325,7 @@ public class PrescriptionService {
 			return false;
 		}
 	}
-	
+
 	public boolean updatePrescriptionOrderId(Prescription prs) {
 		try {
 			prsDao.updatePrescriptionOrderId(prs);
@@ -355,15 +356,6 @@ public class PrescriptionService {
 			return false;
 		} catch (Exception e) {
 			return false;
-		}
-	}
-
-	public double formatPricewithPrs(Prescription prs, String price) {
-		try {
-			double newPrice = Double.parseDouble(price);
-			return newPrice;
-		} catch (Exception e) {
-			return prs.getPrice();
 		}
 	}
 
@@ -524,33 +516,32 @@ public class PrescriptionService {
 		}
 	}
 
-	//通过一个String[]列表的ID，获取Prs List
-	public List<Prescription> getPrsListByIds(String[] prsList){
+	// 通过一个String[]列表的ID，获取Prs List
+	public List<Prescription> getPrsListByIds(String[] prsList) {
 		List<Prescription> returnPrsList = new ArrayList<Prescription>();
-		try{
-			for (String item: prsList){
+		try {
+			for (String item : prsList) {
 				int prsId = Integer.parseInt(item);
 				Prescription prs = prsDao.getPrescriptionByID(prsId);
-				if (prs != null){
+				if (prs != null) {
 					returnPrsList.add(prs);
 				}
 			}
 			return returnPrsList;
-		} catch (Exception e){
+		} catch (Exception e) {
 			return returnPrsList;
 		}
 	}
-	
+
 	// 接方打印及流转，带事务控制
 	public boolean printReceiveList(String[] prsStrList) {
 		List<Prescription> prsList = getPrsListByIds(prsStrList);
-		
+
 		/**
-		if (hospitalId == 0) {
-			prsList = listPrsWithProcessNoUser(Constants.RECEIVE);
-		} else {
-			prsList = listPrsWithProHospitalNoUser(Constants.RECEIVE, hospitalId);
-		}**/
+		 * if (hospitalId == 0) { prsList =
+		 * listPrsWithProcessNoUser(Constants.RECEIVE); } else { prsList =
+		 * listPrsWithProHospitalNoUser(Constants.RECEIVE, hospitalId); }
+		 **/
 
 		if (prsList == null)
 			return false;
@@ -592,10 +583,10 @@ public class PrescriptionService {
 		transactionManager.commit(status);
 		return true;
 	}
-    
+
 	// 获取当前此医院所属的出库单列表
-	public int getOrderIdByPrsList(List<Prescription> prsList){
-		try{
+	public int getOrderIdByPrsList(List<Prescription> prsList) {
+		try {
 			int orderId = 0;
 			for (Prescription prs : prsList) {
 				orderId = prs.getOrder_id();
@@ -604,11 +595,11 @@ public class PrescriptionService {
 				}
 			}
 			return orderId;
-		} catch (Exception e){
+		} catch (Exception e) {
 			return -1;
 		}
 	}
-	
+
 	// 获取接方完成且尚未完成的处方列表
 	public List<Prescription> getPrsForPrintOrderList(int hospitalId) {
 		try {
@@ -617,7 +608,7 @@ public class PrescriptionService {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
+
 	// 获取接方完成且尚未完成的处方列表, 且尚未打印出库单的列表
 	public List<Prescription> getPrsForPrintOrderListUnprinted(int hospitalId) {
 		try {
@@ -626,7 +617,7 @@ public class PrescriptionService {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
+
 	// 出库单生成逻辑，带事务控制
 	public String printShipListXls_New(int hospitalId) {
 		String filename = null;
@@ -634,16 +625,16 @@ public class PrescriptionService {
 			return null;
 
 		List<Prescription> prsList = getPrsForPrintOrderListUnprinted(hospitalId);
-        if (prsList.size() == 0){
-        	return null;
-        }
+		if (prsList.size() == 0) {
+			return null;
+		}
 		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
 		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
 		TransactionStatus status = transactionManager.getTransaction(def);
 
 		User currentUser = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
 
-		try {	
+		try {
 			String uuid = Utils.generateUuid();
 			Order newOrder = new Order();
 			newOrder.setUuid(uuid);
@@ -652,7 +643,7 @@ public class PrescriptionService {
 			newOrder.setCreate_user_id(currentUser.getId());
 			newOrder.setStatus(Constants.ORDER_BEGIN);
 			orderDao.createFullOrder(newOrder);
-	
+
 			for (Prescription prs : prsList) {
 				if (prs.getProcess_id() == -1) {
 					prs.setProcess_id(newOrder.getId());
@@ -661,7 +652,7 @@ public class PrescriptionService {
 						return null;
 					}
 				}
-				
+
 				prs.setOrder_id(newOrder.getId());
 				if (!updatePrescriptionOrderId(prs)) {
 					transactionManager.rollback(status);
@@ -682,7 +673,7 @@ public class PrescriptionService {
 		transactionManager.commit(status);
 		return filename;
 	}
-	
+
 	// 出库单生成逻辑，带事务控制
 	public String printShipListXls(int hospitalId) {
 		String filename = null;
@@ -752,7 +743,7 @@ public class PrescriptionService {
 
 			templateSt.shiftRows(4, templateSt.getLastRowNum(), prsList.size());
 			int index = 4;
-			double totalPrice = 0;
+			BigDecimal totalPrice = new BigDecimal("0.00");
 			int totalNum = 0;
 
 			for (Prescription printItem : prsList) {
@@ -771,13 +762,13 @@ public class PrescriptionService {
 				insertRow.createCell(3).setCellValue(printItem.getPacket_num());
 				insertRow.getCell(3).setCellStyle(itemRow.getCell(3).getCellStyle());
 
-				insertRow.createCell(4).setCellValue(printItem.getPrice());
+				insertRow.createCell(4).setCellValue(printItem.getPrice().toString());
 				insertRow.getCell(4).setCellStyle(itemRow.getCell(4).getCellStyle());
 
 				insertRow.createCell(5).setCellValue("");
 				insertRow.getCell(5).setCellStyle(itemRow.getCell(5).getCellStyle());
 
-				totalPrice += printItem.getPrice();
+				totalPrice = totalPrice.add(printItem.getPrice());
 				totalNum += printItem.getPacket_num();
 				index += 1;
 			}
@@ -785,7 +776,7 @@ public class PrescriptionService {
 			HSSFRow lastRow = templateSt.getRow(templateSt.getLastRowNum() - 1);
 			lastRow.getCell(1).setCellValue(prsList.size());
 			lastRow.getCell(3).setCellValue(totalNum + "帖");
-			lastRow.getCell(4).setCellValue(totalPrice);
+			lastRow.getCell(4).setCellValue(totalPrice.toString());
 
 			lastRow = templateSt.getRow(templateSt.getLastRowNum());
 			lastRow.setHeightInPoints(25);
@@ -877,8 +868,8 @@ public class PrescriptionService {
 			return new ArrayList<Prescription>();
 		}
 	}
-	
-	// 根据出库单ID获取所属的处方List, 用于分页 New 
+
+	// 根据出库单ID获取所属的处方List, 用于分页 New
 	public List<Prescription> getPrsListByOrderIdInProcess(int orderId) {
 		try {
 			List<Prescription> prsList = prsDao.getPrsListByOrderIdInProcess(orderId);
@@ -1056,11 +1047,11 @@ public class PrescriptionService {
 			for (Hospital hospitalItem : hospitalList) {
 				prsList = prsDao.getPrescriptionsByParamswithTime(Constants.FINISH, hospitalItem.getId(), start, end);
 				int packetNum = 0;
-				double totalPrice = 0;
+				BigDecimal totalPrice = new BigDecimal("0.00");
 				hospitalItem.setFinishedPrsNum(prsList.size());
 				for (Prescription item : prsList) {
 					packetNum += item.getPacket_num();
-					totalPrice += item.getPrice();
+					totalPrice = totalPrice.add(item.getPrice());
 				}
 				hospitalItem.setTotalPacketNum(packetNum);
 				hospitalItem.setTotalPrice(totalPrice);
@@ -1085,11 +1076,11 @@ public class PrescriptionService {
 			for (Hospital hospitalItem : hospitalList) {
 				prsList = prsDao.getPrescriptionsByParamswithTime(Constants.FINISH, hospitalItem.getId(), start, end);
 				int packetNum = 0;
-				double totalPrice = 0;
+				BigDecimal totalPrice = new BigDecimal("0.00");
 				hospitalItem.setFinishedPrsNum(prsList.size());
 				for (Prescription item : prsList) {
 					packetNum += item.getPacket_num();
-					totalPrice += item.getPrice();
+					totalPrice = totalPrice.add(item.getPrice());
 				}
 				hospitalItem.setTotalPacketNum(packetNum);
 				hospitalItem.setTotalPrice(totalPrice);
@@ -1117,10 +1108,10 @@ public class PrescriptionService {
 				prsList = this.getPrsListByOrderId(order.getId(), start, end);
 				order.setPrs_num(prsList.size());
 				int packet_num = 0;
-				double price_total = 0;
+				BigDecimal price_total = new BigDecimal("0.00");
 				for (Prescription item : prsList) {
 					packet_num += item.getPacket_num();
-					price_total += item.getPrice();
+					price_total = price_total.add(item.getPrice());
 				}
 				order.setPacket_num(packet_num);
 				order.setPrice_total(price_total);
@@ -1148,10 +1139,10 @@ public class PrescriptionService {
 				prsList = this.getPrsListByOrderId(order.getId(), start, end);
 				order.setPrs_num(prsList.size());
 				int packet_num = 0;
-				double price_total = 0;
+				BigDecimal price_total = new BigDecimal("0.00");
 				for (Prescription item : prsList) {
 					packet_num += item.getPacket_num();
-					price_total += item.getPrice();
+					price_total = price_total.add(item.getPrice());
 				}
 				order.setPacket_num(packet_num);
 				order.setPrice_total(price_total);
@@ -1185,7 +1176,7 @@ public class PrescriptionService {
 			templateSt.shiftRows(3, templateSt.getLastRowNum(), hospitalList.size());
 			int index = 3;
 
-			double totalPrice = 0;
+			BigDecimal totalPrice = new BigDecimal("0.00");
 			int totalOrder = 0;
 			int totalPacket = 0;
 			int totalPrs = 0;
@@ -1213,13 +1204,13 @@ public class PrescriptionService {
 				insertRow.createCell(5).setCellValue(hospitalItem.getTotalPacketNum());
 				insertRow.getCell(5).setCellStyle(itemRow.getCell(3).getCellStyle());
 
-				insertRow.createCell(6).setCellValue(hospitalItem.getTotalPrice());
+				insertRow.createCell(6).setCellValue(hospitalItem.getTotalPrice().toString());
 				insertRow.getCell(6).setCellStyle(itemRow.getCell(4).getCellStyle());
 
 				insertRow.createCell(7).setCellValue("");
 				insertRow.getCell(7).setCellStyle(itemRow.getCell(5).getCellStyle());
 
-				totalPrice += hospitalItem.getTotalPrice();
+				totalPrice = totalPrice.add(hospitalItem.getTotalPrice());
 				totalOrder += hospitalItem.getOrderNum();
 				totalPacket += hospitalItem.getTotalPacketNum();
 				totalPrs += hospitalItem.getFinishedPrsNum();
@@ -1233,7 +1224,7 @@ public class PrescriptionService {
 			lastRow.getCell(3).setCellValue(totalOrder);
 			lastRow.getCell(4).setCellValue(totalPrs);
 			lastRow.getCell(5).setCellValue(totalPacket);
-			lastRow.getCell(6).setCellValue(totalPrice);
+			lastRow.getCell(6).setCellValue(totalPrice.toString());
 			lastRow.setHeightInPoints(25);
 
 			df = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -1396,7 +1387,7 @@ public class PrescriptionService {
 
 			int prsNum = 0;
 			int packetNum = 0;
-			double priceNum = 0;
+			BigDecimal priceNum = new BigDecimal("0.00");
 
 			for (Order order : orderList) {
 				HSSFRow insertRow = templateSt.createRow(index);
@@ -1422,9 +1413,9 @@ public class PrescriptionService {
 				insertRow.getCell(5).setCellStyle(itemRow.getCell(5).getCellStyle());
 				packetNum += order.getPacket_num();
 
-				insertRow.createCell(6).setCellValue(order.getPrice_total());
+				insertRow.createCell(6).setCellValue(order.getPrice_total().toString());
 				insertRow.getCell(6).setCellStyle(itemRow.getCell(6).getCellStyle());
-				priceNum += order.getPrice_total();
+				priceNum = priceNum.add(order.getPrice_total());
 
 				insertRow.createCell(7).setCellValue("");
 				insertRow.getCell(7).setCellStyle(itemRow.getCell(7).getCellStyle());
@@ -1439,7 +1430,7 @@ public class PrescriptionService {
 			lastRow.getCell(1).setCellValue(index - 3);
 			lastRow.getCell(4).setCellValue(prsNum);
 			lastRow.getCell(5).setCellValue(packetNum);
-			lastRow.getCell(6).setCellValue(priceNum);
+			lastRow.getCell(6).setCellValue(priceNum.toString());
 			lastRow.setHeightInPoints(25);
 
 			df = new SimpleDateFormat("yyyyMMddHHmmss");

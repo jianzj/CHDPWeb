@@ -1,5 +1,6 @@
 package com.chdp.chdpweb.bean;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 
 public class Order implements Comparable<Order> {
@@ -18,7 +19,7 @@ public class Order implements Comparable<Order> {
     private int prs_num;
     private String create_user_name;
     private String outbound_user_name;
-    private double price_total;
+    private BigDecimal price_total;
     private int packet_num;
     
     public int getId() {
@@ -133,11 +134,11 @@ public class Order implements Comparable<Order> {
     	this.outbound_user_name = user_name;
     }
   
-    public double getPrice_total(){
+    public BigDecimal getPrice_total(){
     	return price_total;
     }
     
-    public void setPrice_total(double priceTotal){
+    public void setPrice_total(BigDecimal priceTotal){
     	this.price_total = priceTotal;
     }
     

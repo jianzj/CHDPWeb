@@ -1,6 +1,7 @@
 package com.chdp.chdpweb.controller;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,9 +75,9 @@ public class PrescriptionController {
 		}
 
 		String price = request.getParameter("prs_price");
-		double priceNum = 0;
+		BigDecimal priceNum = new BigDecimal("0.00");
 		try {
-			priceNum = Double.parseDouble(price);
+			priceNum = new BigDecimal(price);
 		} catch (Exception e) {
 			request.setAttribute("errorMsg", "您输入的价格格式不正确，请重新输入！");
 
@@ -182,9 +183,9 @@ public class PrescriptionController {
 		}
 
 		String price = request.getParameter("price_num");
-		double priceNum = 0;
+		BigDecimal priceNum = new BigDecimal("0.00");
 		try {
-			priceNum = Double.parseDouble(price);
+			priceNum = new BigDecimal(price);
 		} catch (Exception e) {
 			request.setAttribute("errorMsg", "您输入的价格格式不正确，请重新输入！");
 			request.setAttribute("prsModify", prs);
@@ -586,11 +587,11 @@ public class PrescriptionController {
 	public String printReceiveList(HttpServletRequest request,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
 			RedirectAttributes redirectAttributes) {
-		
+
 		String prsListStr = request.getParameter("prsList");
-		if (prsListStr == null || prsListStr.equals("")){
+		if (prsListStr == null || prsListStr.equals("")) {
 			redirectAttributes.addFlashAttribute("errorMsg", "打印接方标签出错，请重试！");
-		}else{
+		} else {
 			String[] prsList = prsListStr.split("/");
 			if (prsService.printReceiveList(prsList)) {
 				redirectAttributes.addFlashAttribute("successMsg", "打印接方标签成功！");
@@ -608,11 +609,11 @@ public class PrescriptionController {
 	public String printPackageList(HttpServletRequest request,
 			@RequestParam(value = "hospitalId", defaultValue = "0") int hospitalId,
 			RedirectAttributes redirectAttributes) {
-		
+
 		String prsListStr = request.getParameter("prsList");
-		if (prsListStr == null || prsListStr.equals("")){
+		if (prsListStr == null || prsListStr.equals("")) {
 			redirectAttributes.addFlashAttribute("errorMsg", "打印接方标签出错，请重试！");
-		}else{
+		} else {
 			String[] prsStrList = prsListStr.split("/");
 			List<Prescription> prsList = prsService.getPrsListByIds(prsStrList);
 
@@ -624,7 +625,7 @@ public class PrescriptionController {
 			PrintHelper.close();
 			redirectAttributes.addFlashAttribute("successMsg", "打印包装标签完成！");
 		}
-		
+
 		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../process/packageList?hospitalId=" + hospitalId;
 	}
 

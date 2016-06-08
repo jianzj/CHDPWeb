@@ -1,5 +1,7 @@
 package com.chdp.chdpweb.bean;
 
+import java.math.BigDecimal;
+
 public class Hospital implements Comparable<Hospital> {
 	
 	private int id;
@@ -9,7 +11,7 @@ public class Hospital implements Comparable<Hospital> {
 	//以下变量用于医院维度统计处方情况时使用
 	private int finishedPrsNum;
 	private int totalPacketNum;
-	private double totalPrice;
+	private BigDecimal totalPrice;
 	private int orderNum;
 	
 	public int getId(){
@@ -52,11 +54,11 @@ public class Hospital implements Comparable<Hospital> {
 		this.totalPacketNum = totalPacketNum;
 	}
 	
-	public double getTotalPrice(){
+	public BigDecimal getTotalPrice(){
 		return totalPrice;
 	}
 	
-	public void setTotalPrice(double price){
+	public void setTotalPrice(BigDecimal price){
 		this.totalPrice = price;
 	}
 

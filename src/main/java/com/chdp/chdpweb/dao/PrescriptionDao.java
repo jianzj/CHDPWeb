@@ -36,7 +36,7 @@ public interface PrescriptionDao {
 	Prescription getPrescriptionByPourMachineUuid(@Param("uuid") String uuid);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where "
-			+ "p.process = #{process} and p.hospital_id = h.id order by p.create_time desc")
+			+ "p.process = #{process} and p.hospital_id = h.id order by p.hospital_id,p.outer_id asc")
 	List<Prescription> getPrescriptionsByProcess(@Param("process") int process);
 
 	// Used to find out finished prescriptions by hospital and time.
@@ -52,15 +52,15 @@ public interface PrescriptionDao {
 			@Param("hospitalId") int hospitalId, @Param("start") String start, @Param("end") String end);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where "
-			+ "p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id order by p.create_time desc")
+			+ "p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id order by p.hospital_id,p.outer_id asc")
 	List<Prescription> getPrescriptionsByParams(@Param("process") int process, @Param("hospitalId") int hospitalId);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where h.id = #{hospitalId} and h.id = p.hospital_id and p.process < 11 order by p.create_time desc")
+			+ "where h.id = #{hospitalId} and h.id = p.hospital_id and p.process < 11 order by p.hospital_id,p.outer_id asc")
 	List<Prescription> getPrescriptionByHospitalId(@Param("hospitalId") int hospitalId);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where p.process < 11 and p.hospital_id = h.id order by p.create_time desc")
+			+ "where p.process < 11 and p.hospital_id = h.id order by p.hospital_id,p.outer_id asc")
 	List<Prescription> getPrescriptionsUnfinished();
 
 	// 获取在一段时间内指定一家医院完成的处方
@@ -114,7 +114,7 @@ public interface PrescriptionDao {
 	// Used for receiveList/ to get PrsList with Process type. No user_name
 	// included.
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where p.process = #{process} and p.hospital_id = h.id order by p.create_time desc")
+			+ "where p.process = #{process} and p.hospital_id = h.id order by p.hospital_id,p.outer_id asc")
 	List<Prescription> getPrsListWithProcess(@Param("process") int process);
 
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
@@ -131,7 +131,7 @@ public interface PrescriptionDao {
 	// Used for receiveList/ to get PrsList with Process type. No user_name
 	// included.
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h "
-			+ "where p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id order by p.create_time desc")
+			+ "where p.process = #{process} and h.id = #{hospitalId} and p.hospital_id = h.id order by p.hospital_id,p.outer_id asc")
 	List<Prescription> getPrsListWithProAndHospital(@Param("process") int process, @Param("hospitalId") int hospitalId);
 
 	@Select("select h.id from prescription as p, hospital as h "
@@ -245,7 +245,7 @@ public interface PrescriptionDao {
 	
 	//获取接方完成且尚在进行中的处方列表, 且尚未打印出库单的列表
 	@Select("select p.*, h.name as hospital_name from prescription as p, hospital as h where "
-			+ "p.process >= 2 and p.process < 11 and h.id = #{hospitalId} and p.hospital_id = h.id and p.order_id = 0 order by p.create_time desc")
+			+ "p.process >= 2 and p.process < 11 and h.id = #{hospitalId} and p.hospital_id = h.id and p.order_id = 0 order by p.hospital_id,p.outer_id asc")
 	List<Prescription> getPrsForPrintOrderListUnprinted(@Param("hospitalId") int hospitalId);
 	
 	// 获取已经包含在此出库单中的处方

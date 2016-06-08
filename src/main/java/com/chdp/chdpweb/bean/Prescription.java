@@ -1,5 +1,6 @@
 package com.chdp.chdpweb.bean;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 
 public class Prescription {
@@ -11,7 +12,7 @@ public class Prescription {
 	private String patient_name;
 	private int sex;
 	private int packet_num;
-	private double price;
+	private BigDecimal price;
 	private String create_time;
 	private int class_of_medicines;
 	private int need_decoct_first;
@@ -99,11 +100,11 @@ public class Prescription {
 		this.packet_num = packet_num;
 	}
 
-	public double getPrice() {
+	public BigDecimal getPrice() {
 		return price;
 	}
 
-	public void setPrice(double price) {
+	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
 
