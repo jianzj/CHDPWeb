@@ -61,7 +61,7 @@ public class ProcessAppController {
 		int procId = Integer.parseInt(request.getParameter("procId"));
 		String reason = request.getParameter("reason");
 
-		return procService.backwardProcess(prsId, procId, Constants.RECEIVE, 1, reason);
+		return procService.backwardProcess(prsId, procId, Constants.RECEIVE, 1, reason, 0);
 	}
 
 	@RequestMapping(value = "/mix", method = RequestMethod.POST)
@@ -79,7 +79,7 @@ public class ProcessAppController {
 		int procId = Integer.parseInt(request.getParameter("procId"));
 		String reason = request.getParameter("reason");
 
-		return procService.backwardProcess(prsId, procId, Constants.CHECK, 1, reason);
+		return procService.backwardProcess(prsId, procId, Constants.CHECK, 1, reason, 0);
 	}
 
 	@RequestMapping(value = "/mixcheck", method = RequestMethod.POST)
@@ -97,7 +97,7 @@ public class ProcessAppController {
 		int procId = Integer.parseInt(request.getParameter("procId"));
 		String reason = request.getParameter("reason");
 
-		return procService.backwardProcess(prsId, procId, Constants.MIX, 2, reason);
+		return procService.backwardProcess(prsId, procId, Constants.MIX, 2, reason, 0);
 	}
 
 	@RequestMapping(value = "/soak", method = RequestMethod.POST)
@@ -115,7 +115,7 @@ public class ProcessAppController {
 		int procId = Integer.parseInt(request.getParameter("procId"));
 		String reason = request.getParameter("reason");
 
-		return procService.backwardProcess(prsId, procId, Constants.MIXCHECK, 1, reason);
+		return procService.backwardProcess(prsId, procId, Constants.MIXCHECK, 1, reason, 0);
 	}
 
 	@RequestMapping(value = "/start", method = RequestMethod.POST)
@@ -150,15 +150,15 @@ public class ProcessAppController {
 	public AppResult decoct(HttpServletRequest request) {
 		int prsId = Integer.parseInt(request.getParameter("prsId"));
 		int procId = Integer.parseInt(request.getParameter("procId"));
-		
+
 		return procService.forwardProcess(prsId, procId, Constants.POUR, 0);
 	}
-	
+
 	@RequestMapping(value = "/middle", method = RequestMethod.POST)
 	@ResponseBody
 	public AppResult middle(HttpServletRequest request) {
 		int procId = Integer.parseInt(request.getParameter("procId"));
-		
+
 		return procService.middleProcess(procId);
 	}
 
@@ -169,7 +169,7 @@ public class ProcessAppController {
 		int procId = Integer.parseInt(request.getParameter("procId"));
 		String reason = request.getParameter("reason");
 
-		return procService.backwardProcess(prsId, procId, Constants.SOAK, 1, reason);
+		return procService.backwardProcess(prsId, procId, Constants.SOAK, 1, reason, 0);
 	}
 
 	@RequestMapping(value = "/pour", method = RequestMethod.POST)
@@ -188,7 +188,7 @@ public class ProcessAppController {
 		int procId = Integer.parseInt(request.getParameter("procId"));
 		String reason = request.getParameter("reason");
 
-		return procService.backwardProcess(prsId, procId, Constants.DECOCT, 1, reason);
+		return procService.backwardProcess(prsId, procId, Constants.DECOCT, 1, reason, 0);
 	}
 
 	@RequestMapping(value = "/clean", method = RequestMethod.POST)
@@ -206,7 +206,7 @@ public class ProcessAppController {
 		int procId = Integer.parseInt(request.getParameter("procId"));
 		String reason = request.getParameter("reason");
 
-		return procService.backwardProcess(prsId, procId, Constants.POUR, 1, reason);
+		return procService.backwardProcess(prsId, procId, Constants.POUR, 1, reason, 0);
 	}
 
 	@RequestMapping(value = "/pack", method = RequestMethod.POST)
@@ -223,7 +223,11 @@ public class ProcessAppController {
 		int prsId = Integer.parseInt(request.getParameter("prsId"));
 		int procId = Integer.parseInt(request.getParameter("procId"));
 		String reason = request.getParameter("reason");
+		int machineId = procService.getLastestDecoctMachine(prsId);
 
-		return procService.backwardProcess(prsId, procId, Constants.CLEAN, 2, reason);
+		if (reason.contains("数量不符") || reason.contains("未知原因"))
+			return procService.backwardProcess(prsId, procId, Constants.POUR, 2, reason, machineId);
+		else
+			return procService.backwardProcess(prsId, procId, Constants.MIX, 2, reason, 0);
 	}
 }

@@ -260,7 +260,7 @@ public class ProcessService {
 		return result;
 	}
 
-	public AppResult backwardProcess(int prsId, int procId, int backTo, int type, String reason) {
+	public AppResult backwardProcess(int prsId, int procId, int backTo, int type, String reason, int machineId) {
 		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
 		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
 		TransactionStatus status = transactionManager.getTransaction(def);
@@ -277,7 +277,11 @@ public class ProcessService {
 				proc.setPrescription_id(prsId);
 				proc.setPrevious_process_id(procId);
 				proc.setUser_id(user.getId());
-				proDao.createProcess(proc);
+				proc.setMachine_id(machineId);
+				if (machineId == 0)
+					proDao.createProcess(proc);
+				else
+					proDao.createProcessWithMachine(proc);
 
 				try {
 					Prescription prs = new Prescription();
@@ -527,5 +531,9 @@ public class ProcessService {
 		} catch (Exception e) {
 			return new ArrayList<Node>();
 		}
+	}
+
+	public int getLastestDecoctMachine(int prsId) {
+		return proDao.getProcesswithPrsIdandProcess(prsId, Constants.DECOCT).getMachine_id();
 	}
 }
