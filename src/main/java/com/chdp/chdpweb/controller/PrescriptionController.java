@@ -224,6 +224,48 @@ public class PrescriptionController {
 		return "prescription/modifyPrs";
 	}
 
+	// 新Delete方法，删除已选择的处方
+	@RequiresRoles("ADMIN")
+	@RequestMapping(value = "/deletePrsSelected")
+	public String deletePrsSelected(HttpServletRequest request,
+			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
+			@RequestParam(name = "hospitalId", defaultValue = "0") int hospitalId,
+			@RequestParam(name = "process", defaultValue = "0") int process,
+			RedirectAttributes redirectAttributes) {
+
+		String start = request.getParameter("startTime");
+		String end = request.getParameter("endTime");
+
+		if (start == null || start.equals("")) {
+			start = Utils.getOneMonthAgoTime();
+		}
+		if (end == null || end.equals("")) {
+			end = Utils.getCurrentTime();
+		}
+		
+		String from = request.getParameter("pageFrom");
+		if (from == null || from.equals("")) {
+			from = "currentList";
+		}
+		
+		String prsListStr = request.getParameter("prsList");
+		if (prsListStr == null || prsListStr.equals("")){
+			redirectAttributes.addFlashAttribute("errorMsg", "删除处方出错，请重试！");
+		}else{
+			String[] prsList = prsListStr.split("/");
+			if (prsService.deletePrsSelected(prsList)) {
+				redirectAttributes.addFlashAttribute("successMsg", "已删除选择的处方！");
+			} else {
+				request.setAttribute("errorMsg", "删除选择标签出错，请重试！");
+			}
+		}
+        System.out.println(InternalResourceViewResolver.REDIRECT_URL_PREFIX);
+		if (from.equals("historyList")) {
+			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/historyList?hospitalId=" + hospitalId + "&startTime=" + start + "&endTime=" + end + "&pageNum=" + pageNum;
+		}
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/currentList?hospitalId=" + hospitalId + "&process=" + process + "&pageNum=" + pageNum;
+	}
+
 	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)
 	@RequestMapping(value = "/delete")
 	public String delete(HttpServletRequest request, RedirectAttributes redirectAttributes) {

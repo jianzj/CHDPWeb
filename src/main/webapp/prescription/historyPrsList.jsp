@@ -28,6 +28,7 @@
          <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
          </span>
 		<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+		<a type="button" class="btn btn-danger" style="" onClick="deletePrsSelected(${hospitalId}, '${startTime}', '${endTime}')">删除处方</a>
 	</span>
 </h3>
 </form>
@@ -43,6 +44,7 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
+			    <th><input type="checkbox" value=0 class="check" id="checkAll"></th>
 				<th>编号</th>
 				<th>医院</th>
 				<th>医院编号</th>
@@ -56,6 +58,7 @@
 		<tbody>
 			<c:forEach var="prs" items="${historyPrsList}">
 				<tr>
+				    <td><input type="checkbox" value="${prs.id}" class="check"/></td>
 					<td><c:out value="${prs.uuid}" /></td>
 					<td><c:out value="${prs.hospital_name}" /></td>
 					<td><c:out value="${prs.outer_id}" /></td>
@@ -91,9 +94,43 @@
 	<c:set var="pageUrl" value="prescription/historyList" />
 	<%@ include file="../common/nav.jsp"%>
 </div>
+<div class="modal fade" id="assureDlg" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<div class="modal-body" id="assureMsg"></div>
+			<div class="modal-footer">
+				<a type="button" class="btn btn-success" id="assureBtn">确认</a> <a type="button" class="btn btn-default"
+					data-dismiss="modal">取消</a>
+			</div>
+		</div>
+	</div>
+</div>
 <script>
 $(".selectpicker").change(function(){
     $(".form-inline").submit();
 }); 
+</script>
+<script>
+$("#checkAll").click(function () {
+    $(".check").prop('checked', $(this).prop('checked'));
+});
+</script>
+<script>
+var deletePrsSelected = function(hospitalId, startTime, endTime){
+	var prsList = [];
+	$.each($("input[class='check']:checked"), function(){
+		if ($(this).val() > 0){
+			prsList.push($(this).val());
+		}
+    });
+	if (prsList.length == 0){
+		alert("您未选择任何需要删除的处方！");
+	}else{
+		prsListStr = prsList.join("/");
+		$("#assureMsg").html("确认删除标签?");
+        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/deletePrsSelected?hospitalId="+hospitalId+"&prsList="+prsListStr+"&startTime="+startTime+"&endTime="+endTime+"&pageFrom=historyList");
+        $("#assureDlg").modal("show");
+	}
+}
 </script>
 <%@ include file="../foot.jsp"%>
