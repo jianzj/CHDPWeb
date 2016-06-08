@@ -81,6 +81,7 @@
 			</c:if>			
 		</select>
 		<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+		<a type="button" class="btn btn-danger" style="" onClick="deletePrsSelected(${hospitalId}, ${process})">删除处方</a>
 	</span>
 </h3>
 </form>
@@ -96,6 +97,7 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
+			    <th><input type="checkbox" value=0 class="check" id="checkAll"></th>
 				<th>编号</th>
 				<th>医院</th>
 				<th>医院编号</th>
@@ -108,6 +110,7 @@
 		<tbody>
 			<c:forEach var="prs" items="${currentPrsList}">
 				<tr>
+				    <td><input type="checkbox" value="${prs.id}" class="check"/></td>
 					<td><c:out value="${prs.uuid}" /></td>
 					<td><c:out value="${prs.hospital_name}" /></td>
 					<td><c:out value="${prs.outer_id}" /></td>
@@ -166,5 +169,28 @@
 $(".selectpicker").change(function(){
     $(".form-inline").submit();
 }); 
+</script>
+<script>
+$("#checkAll").click(function () {
+    $(".check").prop('checked', $(this).prop('checked'));
+});
+</script>
+<script>
+var deletePrsSelected = function(hospitalId, process){
+	var prsList = [];
+	$.each($("input[class='check']:checked"), function(){
+		if ($(this).val() > 0){
+			prsList.push($(this).val());
+		}
+    });
+	if (prsList.length == 0){
+		alert("您未选择任何需要删除的处方！");
+	}else{
+		prsListStr = prsList.join("/");
+		$("#assureMsg").html("确认删除标签?");
+        $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/deletePrsSelected?hospitalId="+hospitalId+"&prsList="+prsListStr+"&process="+process+"&pageFrom=currentList");
+        $("#assureDlg").modal("show");
+	}
+}
 </script>
 <%@ include file="../foot.jsp"%>

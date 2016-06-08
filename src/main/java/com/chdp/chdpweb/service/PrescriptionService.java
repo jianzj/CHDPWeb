@@ -1477,4 +1477,30 @@ public class PrescriptionService {
 			return null;
 		}
 	}
+	
+	// 删除已选定的处方
+	public boolean deletePrsSelected(String[] prsStrList) {
+		List<Prescription> prsList = getPrsListByIds(prsStrList);
+
+		if (prsList == null)
+			return false;
+
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		TransactionStatus status = transactionManager.getTransaction(def);
+		try {
+			for (Prescription prs : prsList) {
+				List<Process> processList = processDao.getProcessesByPrsID(prs.getId());
+				for (Process process : processList) {
+					processDao.deleteProcess(process.getId());
+				}
+				prsDao.deletePrescription(prs.getId());
+			}
+		} catch (Exception e) {
+			transactionManager.rollback(status);
+			return false;
+		} 
+		transactionManager.commit(status);
+		return true;
+	}
 }
