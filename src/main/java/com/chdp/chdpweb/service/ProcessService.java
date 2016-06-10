@@ -267,8 +267,11 @@ public class ProcessService {
 		AppResult result = new AppResult();
 		try {
 			User user = (User) SecurityUtils.getSubject().getSession().getAttribute("user");
-			proDao.cancelProcess(procId, Utils.getCurrentDateAndTime(), user.getId(), type, reason);
-
+			if (machineId == 0)
+				proDao.cancelProcess(procId, Utils.getCurrentDateAndTime(), user.getId(), type, reason);
+			else
+				proDao.cancelProcessWithMachine(procId, Utils.getCurrentDateAndTime(), user.getId(), type, reason, machineId);
+			
 			try {
 				Process proc = new Process();
 				if (backTo != Constants.SOAK && backTo != Constants.DECOCT)
@@ -278,10 +281,7 @@ public class ProcessService {
 				proc.setPrevious_process_id(procId);
 				proc.setUser_id(user.getId());
 				proc.setMachine_id(machineId);
-				if (machineId == 0)
-					proDao.createProcess(proc);
-				else
-					proDao.createProcessWithMachine(proc);
+				proDao.createProcess(proc);
 
 				try {
 					Prescription prs = new Prescription();
@@ -424,8 +424,12 @@ public class ProcessService {
 				return "处方完成";
 			case Constants.DECOCT:
 				proc = proDao.getProcessesById(prs.getProcess_id());
+				Process previous = proDao.getProcessesById(proc.getPrevious_process_id());
 				if (proc.getBegin() == null) {
-					return "正在浸泡";
+					if (previous.getFinish() == null)
+						return "正在浸泡";
+					else
+						return "浸泡完成";
 				} else {
 					return "正在煎煮";
 				}

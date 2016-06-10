@@ -202,19 +202,11 @@ public class PrescriptionController {
 			request.setAttribute("prsId", prsId);
 			return "prescription/modifyPrs";
 		} else {
-			if (prsService.validPrescriptionHospitalInfo(prs)) {
-				request.setAttribute("errorMsg", "与此处方相同医院名称，相同订单编号的处方已经存在，请检查输入！");
-				request.setAttribute("prsModify", prs);
-				request.setAttribute("from", from);
-				request.setAttribute("prsId", prsId);
-				return "prescription/modifyPrs";
+			prs.setId(prsId);
+			if (prsService.updatePrsInReceive(prs)) {
+				request.setAttribute("successMsg", "修改处方成功！");
 			} else {
-				prs.setId(prsId);
-				if (prsService.updatePrsInReceive(prs)) {
-					request.setAttribute("successMsg", "修改处方成功！");
-				} else {
-					request.setAttribute("errorMsg", "处方修改失败，请稍后重试！");
-				}
+				request.setAttribute("errorMsg", "处方修改失败，请稍后重试！");
 			}
 		}
 
@@ -231,8 +223,7 @@ public class PrescriptionController {
 	public String deletePrsSelected(HttpServletRequest request,
 			@RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
 			@RequestParam(name = "hospitalId", defaultValue = "0") int hospitalId,
-			@RequestParam(name = "process", defaultValue = "0") int process,
-			RedirectAttributes redirectAttributes) {
+			@RequestParam(name = "process", defaultValue = "0") int process, RedirectAttributes redirectAttributes) {
 
 		String start = request.getParameter("startTime");
 		String end = request.getParameter("endTime");
@@ -243,16 +234,16 @@ public class PrescriptionController {
 		if (end == null || end.equals("")) {
 			end = Utils.getCurrentTime();
 		}
-		
+
 		String from = request.getParameter("pageFrom");
 		if (from == null || from.equals("")) {
 			from = "currentList";
 		}
-		
+
 		String prsListStr = request.getParameter("prsList");
-		if (prsListStr == null || prsListStr.equals("")){
+		if (prsListStr == null || prsListStr.equals("")) {
 			redirectAttributes.addFlashAttribute("errorMsg", "删除处方出错，请重试！");
-		}else{
+		} else {
 			String[] prsList = prsListStr.split("/");
 			if (prsService.deletePrsSelected(prsList)) {
 				redirectAttributes.addFlashAttribute("successMsg", "已删除选择的处方！");
@@ -260,11 +251,13 @@ public class PrescriptionController {
 				request.setAttribute("errorMsg", "删除选择标签出错，请重试！");
 			}
 		}
-        System.out.println(InternalResourceViewResolver.REDIRECT_URL_PREFIX);
+		System.out.println(InternalResourceViewResolver.REDIRECT_URL_PREFIX);
 		if (from.equals("historyList")) {
-			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/historyList?hospitalId=" + hospitalId + "&startTime=" + start + "&endTime=" + end + "&pageNum=" + pageNum;
+			return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/historyList?hospitalId="
+					+ hospitalId + "&startTime=" + start + "&endTime=" + end + "&pageNum=" + pageNum;
 		}
-		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/currentList?hospitalId=" + hospitalId + "&process=" + process + "&pageNum=" + pageNum;
+		return InternalResourceViewResolver.REDIRECT_URL_PREFIX + "../prescription/currentList?hospitalId=" + hospitalId
+				+ "&process=" + process + "&pageNum=" + pageNum;
 	}
 
 	@RequiresRoles(value = { "ADMIN", "RECEIVE" }, logical = Logical.OR)

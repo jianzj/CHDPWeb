@@ -250,7 +250,13 @@ public class PrescriptionService {
 	public List<Prescription> listPrsWithProcess(int process, int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
-			List<Prescription> prsList = prsDao.getPrescriptionsByProcess(process);
+			List<Prescription> prsList = null;
+			if (process == Constants.SOAK)
+				prsList = prsDao.getPrescriptionsOfSoak();
+			else if (process ==Constants.DECOCT)
+				prsList = prsDao.getPrescriptionsOfDecoct();
+			else
+				prsList = prsDao.getPrescriptionsByProcess(process);
 			return prsList;
 			// return this.updatePrsListwithUsername(prsList);
 		} catch (Exception e) {
@@ -310,7 +316,13 @@ public class PrescriptionService {
 	public List<Prescription> listPrsWithParams(int process, int hospitalId, int pageNum) {
 		PageHelper.startPage(pageNum, Constants.PAGE_SIZE);
 		try {
-			List<Prescription> prsList = prsDao.getPrescriptionsByParams(process, hospitalId);
+			List<Prescription> prsList = null;
+			if (process == Constants.SOAK)
+				prsList = prsDao.getPrescriptionsByParamsOfSoak(hospitalId);
+			else if (process == Constants.DECOCT)
+				prsList = prsDao.getPrescriptionsByParamsOfDecoct(hospitalId);
+			else
+				prsList = prsDao.getPrescriptionsByParams(process, hospitalId);
 			return prsList;
 		} catch (Exception e) {
 			return new ArrayList<Prescription>();
@@ -1477,7 +1489,7 @@ public class PrescriptionService {
 			return null;
 		}
 	}
-	
+
 	// 删除已选定的处方
 	public boolean deletePrsSelected(String[] prsStrList) {
 		List<Prescription> prsList = getPrsListByIds(prsStrList);
@@ -1499,8 +1511,24 @@ public class PrescriptionService {
 		} catch (Exception e) {
 			transactionManager.rollback(status);
 			return false;
-		} 
+		}
 		transactionManager.commit(status);
 		return true;
+	}
+
+	public List<Prescription> listPackagePrs() {
+		try {
+			return prsDao.listPackagePrs();
+		} catch (Exception e) {
+			return new ArrayList<Prescription>();
+		}
+	}
+
+	public List<Prescription> listPackagePrsWithHospital(int hospitalId) {
+		try {
+			return prsDao.listPackagePrsWithHospital(hospitalId);
+		} catch (Exception e) {
+			return new ArrayList<Prescription>();
+		}
 	}
 }

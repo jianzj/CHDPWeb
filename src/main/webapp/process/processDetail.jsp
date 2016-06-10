@@ -74,13 +74,13 @@
                     <td>
                     <c:choose>
                         <c:when test="${currentPrs.class_of_medicines == 1}">
-                                                                温度110℃，保温时间20分钟
+                                                                温度110℃，保温时间15-20分钟
                         </c:when>
                         <c:when test="${currentPrs.class_of_medicines == 2}">
-                                                                温度115℃，保温时间30分钟
+                                                                温度115℃，保温时间20-30分钟
                         </c:when>
                         <c:when test="${currentPrs.class_of_medicines == 3}">
-                                                                温度120℃，保温时间40分钟
+                                                                温度120℃，保温时间30-40分钟
                         </c:when>
                         <c:otherwise>
                         &nbsp;

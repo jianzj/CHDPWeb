@@ -63,9 +63,9 @@ public class ProcessController {
 
 		List<Prescription> prsList = null;
 		if (hospitalId == 0) {
-			prsList = prsService.listPrsWithProcessNoUser(Constants.PACKAGE);
+			prsList = prsService.listPackagePrs();
 		} else {
-			prsList = prsService.listPrsWithProHospitalNoUser(Constants.PACKAGE, hospitalId);
+			prsList = prsService.listPackagePrsWithHospital(hospitalId);
 		}
 
 		List<Hospital> hospitalList = hospitalService.getHospitalList();

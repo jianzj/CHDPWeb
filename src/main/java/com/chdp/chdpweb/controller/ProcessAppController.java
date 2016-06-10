@@ -226,8 +226,8 @@ public class ProcessAppController {
 		int machineId = procService.getLastestDecoctMachine(prsId);
 
 		if (reason.contains("数量不符") || reason.contains("未知原因"))
-			return procService.backwardProcess(prsId, procId, Constants.POUR, 2, reason, machineId);
-		else
 			return procService.backwardProcess(prsId, procId, Constants.MIX, 2, reason, 0);
+		else
+			return procService.backwardProcess(prsId, procId, Constants.POUR, 2, reason, machineId);
 	}
 }

@@ -187,7 +187,7 @@ var deletePrsSelected = function(hospitalId, process){
 		alert("您未选择任何需要删除的处方！");
 	}else{
 		prsListStr = prsList.join("/");
-		$("#assureMsg").html("确认删除标签?");
+		$("#assureMsg").html("确认删除处方?");
         $("#assureBtn").attr('href',"<%=request.getContextPath()%>/prescription/deletePrsSelected?hospitalId="+hospitalId+"&prsList="+prsListStr+"&process="+process+"&pageFrom=currentList");
         $("#assureDlg").modal("show");
 	}
